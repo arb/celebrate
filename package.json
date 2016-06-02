@@ -1,0 +1,38 @@
+{
+  "name": "celebrate",
+  "version": "0.1.0",
+  "description": "A joi validation middleware for express.",
+  "main": "lib/index.js",
+  "scripts": {
+    "lint": "belly-button -f",
+    "test": "npm run lint && lab -v -a code -c -p"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/continuationlabs/celebrate.git"
+  },
+  "keywords": [
+    "joi",
+    "validation",
+    "express",
+    "middleware"
+  ],
+  "author": "Continuation Labs <contact@continuation.io> (http://continuation.io/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/continuationlabs/celebrate/issues"
+  },
+  "homepage": "https://github.com/continuationlabs/celebrate#readme",
+  "dependencies": {
+    "insync": "2.x.x",
+    "joi": "8.4.x"
+  },
+  "devDependencies": {
+    "belly-button": "2.x.x",
+    "code": "3.x.x",
+    "lab": "10.x.x"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  }
+}
