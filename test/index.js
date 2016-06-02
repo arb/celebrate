@@ -33,6 +33,26 @@ describe('Celebrate Middleware', () => {
     done();
   });
 
+  it('validates req.headers', (done) => {
+    const middleware = Celebrate({
+      headers: {
+        accept: Joi.string().regex(/xml/)
+      }
+    });
+
+    middleware({
+      headers: {
+        accept: 'application/json'
+      }
+    }, null, (err) => {
+      expect(err).to.exist();
+      expect(err.isJoi).to.be.true();
+      console.log(err.details[0].message);
+      expect(err.details[0].message).to.equal('"accept" with value "application&#x2f;json" fails to match the required pattern: /xml/');
+      done();
+    });
+  });
+
   it('validates req.params', (done) => {
     const middleware = Celebrate({
       params: {
