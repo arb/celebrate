@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "lint": "belly-button -f",
-    "test": "npm run lint && lab -v -a code -c -p"
+    "test": "npm run lint && lab -v -a code -p -t 100"
   },
   "repository": {
     "type": "git",
