@@ -4,6 +4,7 @@
 
 [![Current Version](https://img.shields.io/npm/v/celebrate.svg)](https://www.npmjs.org/package/celebrate)
 [![Build Status](https://travis-ci.org/continuationlabs/celebrate.svg?branch=master)](https://travis-ci.org/continuationlabs/celebrate)
+[![Dependencies](https://img.shields.io/david/continuationlabs/celebrate.svg)](https://github.com/continuationlabs/celebrate)
 
 [![belly-button-style](https://cdn.rawgit.com/continuationlabs/belly-button/master/badge.svg)](https://github.com/continuationlabs/belly-button)
 
