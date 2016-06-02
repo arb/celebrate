@@ -1,8 +1,8 @@
 'use strict';
 
 const Code = require('code');
-const Lab = require('lab');
 const Joi = require('joi');
+const Lab = require('lab');
 const Celebrate = require('../lib');
 
 const lab = exports.lab = Lab.script();
@@ -31,6 +31,26 @@ describe('Celebrate Middleware', () => {
     }).to.throw('"value" must have at least 1 children');
 
     done();
+  });
+
+  it('validates req.headers', (done) => {
+    const middleware = Celebrate({
+      headers: {
+        accept: Joi.string().regex(/xml/)
+      }
+    });
+
+    middleware({
+      headers: {
+        accept: 'application/json'
+      }
+    }, null, (err) => {
+      expect(err).to.exist();
+      expect(err.isJoi).to.be.true();
+      console.log(err.details[0].message);
+      expect(err.details[0].message).to.equal('"accept" with value "application&#x2f;json" fails to match the required pattern: /xml/');
+      done();
+    });
   });
 
   it('validates req.params', (done) => {
@@ -84,7 +104,8 @@ describe('Celebrate Middleware', () => {
       body: {
         first: 'john',
         last: 123
-      }
+      },
+      method: 'POST'
     }, null, (err) => {
       expect(err).to.exist();
       expect(err.isJoi).to.be.true();
@@ -133,7 +154,8 @@ describe('Celebrate Middleware', () => {
         first: 'john',
         last: 'doe'
       },
-      query: undefined
+      query: undefined,
+      method: 'POST'
     };
     const middleware = Celebrate({
       body: {
@@ -152,6 +174,27 @@ describe('Celebrate Middleware', () => {
         role: 'admin'
       });
       expect(req.query).to.be.undefined();
+      done();
+    });
+  });
+
+  it('does not validate req.body if the method is "GET" or "HEAD"', (done) => {
+    const middleware = Celebrate({
+      body: {
+        first: Joi.string().required(),
+        last: Joi.string(),
+        role: Joi.number().integer()
+      }
+    });
+
+    middleware({
+      body: {
+        first: 'john',
+        last: 123
+      },
+      method: 'GET'
+    }, null, (err) => {
+      expect(err).to.be.undefined();
       done();
     });
   });

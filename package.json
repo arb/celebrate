@@ -1,11 +1,11 @@
 {
   "name": "celebrate",
   "version": "0.1.0",
-  "description": "A joi validation middleware for express.",
+  "description": "A joi validation middleware for Express.",
   "main": "lib/index.js",
   "scripts": {
     "lint": "belly-button -f",
-    "test": "npm run lint && lab -v -a code -p -t 100"
+    "test": "npm run lint && lab -v -a code -p -c"
   },
   "repository": {
     "type": "git",
