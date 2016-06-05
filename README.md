@@ -27,7 +27,10 @@ app.post('/signup', Celebrate({
     name: Joi.string().required(),
     age: Joi.number().integer(),
     role: Joi.string().default('admin')
-  })
+  }),
+  query: {
+    token: Joi.string().token.required()
+  }
 }), (req, res) => {
   // At this point, req.body has been validated and is equal to req.body.name if provided in the POST or set to 'admin' by joi
 });
@@ -58,8 +61,8 @@ Returns a `function` with the middleware signature (`(req, res, next)`).
 3. `req.query`
 4. `req.body`
 
-If at any point, any of the validation fails, the entire request will be considered invalid and the rest of the validation will be short-circuited. 
+If any of the configured validation rules fail, the entire request will be considered invalid and the rest of the validation will be short-circuited and the validation error will be passed into `next`. 
 
 ## Issues
 
-*Before* opening issues on this repo, make sure your joi schema is correct and working like it's supposed to. The bulk of this code is just exposing the joi API as Express middleware. All of the heavy lifting still happens inside joi. 
+*Before* opening issues on this repo, make sure your joi schema is correct and working like as you inted. The bulk of this code is just exposing the joi API as Express middleware. All of the heavy lifting still happens inside joi. 
