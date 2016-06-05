@@ -65,4 +65,4 @@ If any of the configured validation rules fail, the entire request will be consi
 
 ## Issues
 
-*Before* opening issues on this repo, make sure your joi schema is correct and working like as you inted. The bulk of this code is just exposing the joi API as Express middleware. All of the heavy lifting still happens inside joi. 
+*Before* opening issues on this repo, make sure your joi schema is correct and workingas you intend. The bulk of this code is just exposing the joi API as Express middleware. All of the heavy lifting still happens inside joi. 
