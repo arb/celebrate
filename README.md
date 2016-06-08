@@ -29,7 +29,7 @@ app.post('/signup', Celebrate({
     role: Joi.string().default('admin')
   }),
   query: {
-    token: Joi.string().token.required()
+    token: Joi.string().token().required()
   }
 }), (req, res) => {
   // At this point, req.body has been validated and is equal to req.body.name if provided in the POST or set to 'admin' by joi
