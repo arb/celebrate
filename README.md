@@ -12,6 +12,7 @@
 
 ## Usage
 
+Example of using `celebrate` on a single POST route to validate `req.body`.
 ```js
 const express = require('express');
 const BodyParser = require('body-parser');
@@ -44,6 +45,7 @@ app.use((err, req, res) => {
 });
 ``` 
 
+Example of using `celebrate` to validate all incoming requests to ensure the `token` header is present and mathes the supplied regular expression.
 ```js
 const express = require(‘express’);
 const Joi = require(‘joi’);
