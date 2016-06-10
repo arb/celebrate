@@ -20,7 +20,6 @@ const Celebrate = require('celebrate');
 
 const app = express();
 app.use(BodyParser.json());
-app.use(Logger());
 
 app.post('/signup', Celebrate({
   body: Joi.object().keys({
@@ -32,7 +31,8 @@ app.post('/signup', Celebrate({
     token: Joi.string().token().required()
   }
 }), (req, res) => {
-  // At this point, req.body has been validated and is equal to req.body.name if provided in the POST or set to 'admin' by joi
+  // At this point, req.body has been validated and 
+  // req.body.name is equal to req.body.name if provided in the POST or set to 'admin' by joi
 });
 
 // By default, Express will try to send our errors back as HTML, if you want the JSON, add an error handler here
@@ -43,6 +43,29 @@ app.use((err, req, res) => {
   res.status(500).send('Some other error');
 });
 ``` 
+
+```js
+const express = require(‘express’);
+const Joi = require(‘joi’);
+const Celebrate = require(‘celebrate’);
+const app = express();
+
+// valide all incoming request headers for the token header
+// if missing or not the correct format, respond with an error
+app.use(Celebrate({
+ headers: Joi.object({
+   token: Joi.string().required().regex(/abc\d{3}/)
+ }).unknown()
+}));
+app.get('/', (req, res) => { res.send('hello world'); });
+app.get('/foo', (req, res) => { res.send('a foo request'); });
+app.use((err, req, res) => {
+  if (err.isJoi) {
+    return res.status(400).send(err);
+  }
+  res.status(500).send('Some other error');
+});
+```
 
 ## API
 
