@@ -24,12 +24,15 @@
   },
   "homepage": "https://github.com/continuationlabs/celebrate#readme",
   "dependencies": {
-    "insync": "2.x.x",
-    "joi": "8.4.x"
+    "insync": "2.x.x"
+  },
+  "peerDependencies": {
+    "joi": "9.x.x"
   },
   "devDependencies": {
     "belly-button": "2.x.x",
     "code": "3.x.x",
+    "joi": "9.x.x",
     "lab": "10.x.x"
   },
   "engines": {

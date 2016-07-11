@@ -198,4 +198,40 @@ describe('Celebrate Middleware', () => {
       done();
     });
   });
+
+  it('works with Joi.extend()', (done) => {
+    const _Joi = Joi.extend({
+      base: Joi.string(),
+      name: 'string',
+      language: { isJohn: 'must equal "john"' },
+      rules: [{
+        name: 'isJohn',
+        validate (params, v, state, options) {
+          if (v !== 'john') {
+            return this.createError('string.isJohn', { v }, state, options);
+          }
+        }
+      }]
+    });
+
+    const middleware = Celebrate({
+      body: {
+        first: _Joi.string().required().isJohn(),
+        role: _Joi.number().integer()
+      }
+    });
+
+    middleware({
+      body: {
+        first: 'george',
+        role: 123
+      },
+      method: 'POST'
+    }, null, (err) => {
+      expect(err).to.exist();
+      expect(err.isJoi).to.be.true();
+      expect(err.details[0].message).to.equal('"first" must equal "john"');
+      done();
+    });
+  });
 });
