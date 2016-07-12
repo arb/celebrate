@@ -4,11 +4,12 @@
 
 [![Current Version](https://img.shields.io/npm/v/celebrate.svg)](https://www.npmjs.org/package/celebrate)
 [![Build Status](https://travis-ci.org/continuationlabs/celebrate.svg?branch=master)](https://travis-ci.org/continuationlabs/celebrate)
-[![Dependencies](https://img.shields.io/david/continuationlabs/celebrate.svg)](https://github.com/continuationlabs/celebrate)
 
 [![belly-button-style](https://cdn.rawgit.com/continuationlabs/belly-button/master/badge.svg)](https://github.com/continuationlabs/belly-button)
 
 `celebrate` is an Express middleware function that wraps the [joi](https://github.com/hapijs/joi) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, `req.query` and `req.body` (provided you are using `body-parser`).
+
+`celebrate` uses ["peerDependencies"](https://docs.npmjs.com/files/package.json#peerdependencies) to manage the required version of `joi` it will use. This means that if you're using npm@3, *you must* install a compatible version of `joi` (currently *9.x.x*) as a top level dependency for `celebrate` to work correctly. `celebrate` does *not* install its own copy of `joi` when using npm@3. This is to maximize compatibility and to keep the number of `joi` version mismatch bugs to a minimum.
 
 ## Usage
 
@@ -47,9 +48,9 @@ app.use((err, req, res) => {
 
 Example of using `celebrate` to validate all incoming requests to ensure the `token` header is present and mathes the supplied regular expression.
 ```js
-const express = require(‘express’);
-const Joi = require(‘joi’);
-const Celebrate = require(‘celebrate’);
+const express = require('express');
+const Joi = require('joi');
+const Celebrate = require('celebrate');
 const app = express();
 
 // valide all incoming request headers for the token header
@@ -90,4 +91,4 @@ If any of the configured validation rules fail, the entire request will be consi
 
 ## Issues
 
-*Before* opening issues on this repo, make sure your joi schema is correct and workingas you intend. The bulk of this code is just exposing the joi API as Express middleware. All of the heavy lifting still happens inside joi. 
+*Before* opening issues on this repo, make sure your joi schema is correct and working as you intended. The bulk of this code is just exposing the joi API as Express middleware. All of the heavy lifting still happens inside joi. 
