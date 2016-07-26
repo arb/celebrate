@@ -234,4 +234,25 @@ describe('Celebrate Middleware', () => {
       done();
     });
   });
+
+  it('uses the supplied the Joi options', (done) => {
+    const middleware = Celebrate({
+      query: Joi.object().keys({
+        page: Joi.number()
+      })
+    }, { stripUnknown: true });
+    const req = {
+      query: {
+        start: Date.now(),
+        page: 1
+      },
+      method: 'GET'
+    };
+
+    middleware(req, null, (err) => {
+      expect(err).to.not.exist();
+      expect(req.query).to.equal({ page: 1 });
+      done();
+    });
+  });
 });
