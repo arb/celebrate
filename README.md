@@ -11,6 +11,8 @@
 
 `celebrate` uses ["peerDependencies"](https://docs.npmjs.com/files/package.json#peerdependencies) to manage the required version of `joi` it will use. This means that if you're using npm@3, *you must* install a compatible version of `joi` (currently *9.x.x*) as a top level dependency for `celebrate` to work correctly. `celebrate` does *not* install its own copy of `joi` when using npm@3. This is to maximize compatibility and to keep the number of `joi` version mismatch bugs to a minimum.
 
+Wondering why *another* joi middleware library for Express? Full blog post [here](https://medium.com/@adambretz/time-to-celebrate-27ccfc656d7f#.3vgn76uy1)
+
 ## Usage
 
 Example of using `celebrate` on a single POST route to validate `req.body`.
