@@ -72,11 +72,12 @@ app.use((err, req, res) => {
 
 ## API
 
-### `celebrate(schema)`
+### `celebrate(schema, [options])`
 
 Returns a `function` with the middleware signature (`(req, res, next)`).
 
 - `schema` - a object where `key` can be one of `'params', 'headers', 'query', and 'body'` and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the `key`s specified will be validated against the incomming `req` object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one of the valid keys. 
+- `[options]` - `joi` [options](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function.
 
 ## Order
 
