@@ -194,7 +194,7 @@ describe('Celebrate Middleware', () => {
       },
       method: 'GET'
     }, null, (err) => {
-      expect(err).to.be.undefined();
+      expect(err).to.be.null();
       done();
     });
   });

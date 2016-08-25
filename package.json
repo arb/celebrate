@@ -30,10 +30,10 @@
     "joi": "9.x.x"
   },
   "devDependencies": {
-    "belly-button": "2.x.x",
+    "belly-button": "3.x.x",
     "code": "3.x.x",
     "joi": "9.x.x",
-    "lab": "10.x.x"
+    "lab": "11.x.x"
   },
   "engines": {
     "node": ">=4.0.0"
