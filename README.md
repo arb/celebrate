@@ -40,7 +40,7 @@ app.post('/signup', Celebrate({
 });
 
 // By default, Express will try to send our errors back as HTML, if you want the JSON, add an error handler here
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   if (err.isJoi) {
     return res.status(400).send(err);
   }
@@ -64,7 +64,7 @@ app.use(Celebrate({
 }));
 app.get('/', (req, res) => { res.send('hello world'); });
 app.get('/foo', (req, res) => { res.send('a foo request'); });
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   if (err.isJoi) {
     return res.status(400).send(err);
   }
