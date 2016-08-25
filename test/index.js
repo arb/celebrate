@@ -167,7 +167,7 @@ describe('Celebrate Middleware', () => {
     });
 
     middleware(req, null, (err) => {
-      expect(err).to.be.undefined();
+      expect(err).to.be.null();
       expect(req.body).to.equal({
         first: 'john',
         last: 'doe',

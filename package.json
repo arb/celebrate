@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/continuationlabs/celebrate#readme",
   "dependencies": {
-    "insync": "2.x.x"
+    "fastseries": "1.7.2"
   },
   "peerDependencies": {
     "joi": "9.x.x"
