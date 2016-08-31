@@ -47,7 +47,6 @@ describe('Celebrate Middleware', () => {
     }, null, (err) => {
       expect(err).to.exist();
       expect(err.isJoi).to.be.true();
-      console.log(err.details[0].message);
       expect(err.details[0].message).to.equal('"accept" with value "application&#x2f;json" fails to match the required pattern: /xml/');
       done();
     });
@@ -253,6 +252,57 @@ describe('Celebrate Middleware', () => {
       expect(err).to.not.exist();
       expect(req.query).to.equal({ page: 1 });
       done();
+    });
+  });
+
+  describe('errors()', () => {
+    it('responds with a joi error', (done) => {
+      const handler = Celebrate.errors();
+      const res = {
+        status (statusCode) {
+          expect(statusCode).to.equal(400);
+          return {
+            send (err) {
+              expect(err).to.equal({
+                isJoi: true,
+                message: 'You spelled "name" wrong.'
+              });
+              done();
+            }
+          };
+        }
+      };
+      const next = () => {
+        Code.fail('next called');
+      };
+
+      handler({
+        isJoi: true,
+        message: 'You spelled "name" wrong.'
+      }, undefined, res, next);
+    });
+
+    it('passes the error through next if not a joi error', (done) => {
+      const handler = Celebrate.errors();
+      const res = {
+        status (statusCode) {
+          Code.fail('status called');
+        }
+      };
+      const next = (err) => {
+        expect(err).to.equal({
+          isBoom: true,
+          message: 'Not Found',
+          statusCode: 404
+        });
+        done();
+      };
+
+      handler({
+        isBoom: true,
+        message: 'Not Found',
+        statusCode: 404
+      }, undefined, res, next);
     });
   });
 });

@@ -38,14 +38,7 @@ app.post('/signup', Celebrate({
   // At this point, req.body has been validated and 
   // req.body.name is equal to req.body.name if provided in the POST or set to 'admin' by joi
 });
-
-// By default, Express will try to send our errors back as HTML, if you want the JSON, add an error handler here
-app.use((err, req, res, next) => {
-  if (err.isJoi) {
-    return res.status(400).send(err);
-  }
-  res.status(500).send('Some other error');
-});
+app.use(Celebrate.errors()));
 ``` 
 
 Example of using `celebrate` to validate all incoming requests to ensure the `token` header is present and mathes the supplied regular expression.
@@ -64,22 +57,21 @@ app.use(Celebrate({
 }));
 app.get('/', (req, res) => { res.send('hello world'); });
 app.get('/foo', (req, res) => { res.send('a foo request'); });
-app.use((err, req, res, next) => {
-  if (err.isJoi) {
-    return res.status(400).send(err);
-  }
-  res.status(500).send('Some other error');
-});
+app.use(Celebrate.errors()));
 ```
 
 ## API
 
-### `celebrate(schema, [options])`
+### `Celebrate(schema, [options])`
 
 Returns a `function` with the middleware signature (`(req, res, next)`).
 
 - `schema` - a object where `key` can be one of `'params', 'headers', 'query', and 'body'` and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the `key`s specified will be validated against the incomming `req` object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one of the valid keys. 
 - `[options]` - `joi` [options](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function.
+
+### `Celebrate.errors()`
+
+Returns a `function` with the error handler signature (`(err, req, res, next)`). This should be placed with any other error handling middleware to catch Joi validation errors. If the incomming `err` object is a Joi error, `errors()` will respond with a 400 status code and the Joi validation message. Otherwise, it will call `next(err)` and will pass the error along and need to be processed by another error handler.
 
 ## Order
 
