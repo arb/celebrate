@@ -73,6 +73,8 @@ Returns a `function` with the middleware signature (`(req, res, next)`).
 
 Returns a `function` with the error handler signature (`(err, req, res, next)`). This should be placed with any other error handling middleware to catch Joi validation errors. If the incomming `err` object is a Joi error, `errors()` will respond with a 400 status code and the Joi validation message. Otherwise, it will call `next(err)` and will pass the error along and need to be processed by another error handler.
 
+If the error format does not suite your needs, you an encouraged to write your own error handler and check `err.isJoi` to format joi errors to your liking. The full joi error object will be available in your own error handler.
+
 ## Order
 
 `celebrate` validates `req` values in the following order:

@@ -264,8 +264,17 @@ describe('Celebrate Middleware', () => {
           return {
             send (err) {
               expect(err).to.equal({
-                isJoi: true,
-                message: 'You spelled "name" wrong.'
+                error: 'Bad Request',
+                message: 'child "first" fails because ["first" is required]. child "last" fails because ["last" is required]. child "role" fails because ["role" must be a number]',
+                statusCode: 400,
+                validation: {
+                  keys: [
+                    'first',
+                    'last',
+                    'role'
+                  ],
+                  source: 'query'
+                }
               });
               done();
             }
@@ -276,10 +285,16 @@ describe('Celebrate Middleware', () => {
         Code.fail('next called');
       };
 
-      handler({
-        isJoi: true,
-        message: 'You spelled "name" wrong.'
-      }, undefined, res, next);
+      const schema = Joi.object({
+        first: Joi.string().required(),
+        last: Joi.string().required(),
+        role: Joi.number().integer().min(4)
+      });
+
+      Joi.validate({ role: '0' }, schema, { abortEarly: false, convert: false }, (err) => {
+        err._meta = { source: 'query' };
+        handler(err, undefined, res, next);
+      });
     });
 
     it('passes the error through next if not a joi error', (done) => {
@@ -303,6 +318,42 @@ describe('Celebrate Middleware', () => {
         message: 'Not Found',
         statusCode: 404
       }, undefined, res, next);
+    });
+
+    it('only includes key values if joi returns details', (done) => {
+      const handler = Celebrate.errors();
+      const res = {
+        status (statusCode) {
+          expect(statusCode).to.equal(400);
+          return {
+            send (err) {
+              expect(err).to.equal({
+                error: 'Bad Request',
+                message: 'child "first" fails because ["first" is required]',
+                statusCode: 400,
+                validation: {
+                  keys: [],
+                  source: 'body'
+                }
+              });
+              done();
+            }
+          };
+        }
+      };
+      const next = () => {
+        Code.fail('next called');
+      };
+
+      const schema = Joi.object({
+        first: Joi.string().required()
+      });
+
+      Joi.validate({ role: '0' }, schema, (err) => {
+        err._meta = { source: 'body' };
+        err.details = null;
+        handler(err, undefined, res, next);
+      });
     });
   });
 });
