@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/continuationlabs/celebrate#readme",
   "dependencies": {
+    "escape-html": "1.0.3",
     "fastseries": "1.7.2"
   },
   "peerDependencies": {
