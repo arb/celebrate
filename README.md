@@ -38,7 +38,7 @@ app.post('/signup', Celebrate({
   // At this point, req.body has been validated and 
   // req.body.name is equal to req.body.name if provided in the POST or set to 'admin' by joi
 });
-app.use(Celebrate.errors()));
+app.use(Celebrate.errors());
 ``` 
 
 Example of using `celebrate` to validate all incoming requests to ensure the `token` header is present and mathes the supplied regular expression.
