@@ -36,7 +36,7 @@ app.post('/signup', Celebrate({
   }
 }), (req, res) => {
   // At this point, req.body has been validated and 
-  // req.body.name is equal to req.body.name if provided in the POST or set to 'admin' by joi
+  // req.body.role is equal to req.body.role if provided in the POST or set to 'admin' by joi
 });
 app.use(Celebrate.errors());
 ``` 
