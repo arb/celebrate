@@ -28,12 +28,12 @@
     "fastseries": "1.7.2"
   },
   "peerDependencies": {
-    "joi": "9.x.x"
+    "joi": "10.x.x"
   },
   "devDependencies": {
     "belly-button": "3.x.x",
     "code": "3.x.x",
-    "joi": "9.x.x",
+    "joi": "10.x.x",
     "lab": "11.x.x"
   },
   "engines": {
