@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "belly-button": "3.x.x",
-    "code": "3.x.x",
+    "code": "4.x.x",
     "joi": "10.x.x",
     "lab": "11.x.x"
   },
