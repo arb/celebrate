@@ -88,4 +88,4 @@ If any of the configured validation rules fail, the entire request will be consi
 
 ## Issues
 
-*Before* opening issues on this repo, make sure your joi schema is correct and working as you intended. The bulk of this code is just exposing the joi API as Express middleware. All of the heavy lifting still happens inside joi. 
+*Before* opening issues on this repo, make sure your joi schema is correct and working as you intended. The bulk of this code is just exposing the joi API as Express middleware. All of the heavy lifting still happens inside joi. You can go [here](https://npm.runkit.com/joi) to verify your joi schema easily.
