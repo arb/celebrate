@@ -7,10 +7,10 @@ import * as express from 'express';
  * @param {object} config optional configuration options that will be passed directly into Joi.
  */
 declare function Celebrate (schema: {
-    params: object,
-    headers: object,
-    query: object,
-    body: object,
+    params?: object,
+    headers?: object,
+    query?: object,
+    body?: object,
 }, config?: object): express.RequestHandler;
 
 declare namespace Celebrate {
