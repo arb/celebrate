@@ -1,4 +1,4 @@
-import * as express from 'express';
+import { ErrorRequestHandler, RequestHandler } from 'express';
 
 /**
  * Creates a Celebrate middleware function.
@@ -7,17 +7,17 @@ import * as express from 'express';
  * @param {object} config optional configuration options that will be passed directly into Joi.
  */
 declare function Celebrate (schema: {
-    params: object,
-    headers: object,
-    query: object,
-    body: object,
-}, config?: object): express.RequestHandler;
+    params?: object,
+    headers?: object,
+    query?: object,
+    body?: object,
+}, config?: object): RequestHandler;
 
 declare namespace Celebrate {
     /**
      * Creates a Celebrate error handler middleware function
      */
-    function errors(): express.ErrorRequestHandler;
+    function errors(): ErrorRequestHandler;
 }
 
 export = Celebrate;
