@@ -19,8 +19,8 @@ Example of using `celebrate` on a single POST route to validate `req.body`.
 ```js
 const express = require('express');
 const BodyParser = require('body-parser');
-const Joi = require('joi');
 const Celebrate = require('celebrate');
+const { Joi } = Celebrate;
 
 const app = express();
 app.use(BodyParser.json());
@@ -44,8 +44,8 @@ app.use(Celebrate.errors());
 Example of using `celebrate` to validate all incoming requests to ensure the `token` header is present and matches the supplied regular expression.
 ```js
 const express = require('express');
-const Joi = require('joi');
 const Celebrate = require('celebrate');
+const { Joi } = Celebrate;
 const app = express();
 
 // validate all incoming request headers for the token header
@@ -64,7 +64,7 @@ app.use(Celebrate.errors());
 
 ### `Celebrate(schema, [options])`
 
-Returns a `function` with the middleware signature (`(req, res, next)`).
+The single exported function from `celebrate`. Returns a `function` with the middleware signature (`(req, res, next)`).
 
 - `schema` - a object where `key` can be one of `'params', 'headers', 'query', and 'body'` and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the `key`s specified will be validated against the incoming `req` object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one of the valid keys. 
 - `[options]` - `joi` [options](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function.
@@ -74,6 +74,10 @@ Returns a `function` with the middleware signature (`(req, res, next)`).
 Returns a `function` with the error handler signature (`(err, req, res, next)`). This should be placed with any other error handling middleware to catch Joi validation errors. If the incoming `err` object is a Joi error, `errors()` will respond with a 400 status code and the Joi validation message. Otherwise, it will call `next(err)` and will pass the error along and need to be processed by another error handler.
 
 If the error format does not suite your needs, you an encouraged to write your own error handler and check `err.isJoi` to format joi errors to your liking. The full joi error object will be available in your own error handler.
+
+### `Celebrate.Joi`
+
+`celebrate` exports the version of joi it is using internally. For maximum compatibility, you should use this version when passing in any validation schemas.
 
 ## Order
 

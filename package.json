@@ -25,16 +25,13 @@
   "homepage": "https://github.com/continuationlabs/celebrate#readme",
   "dependencies": {
     "escape-html": "1.0.3",
-    "fastseries": "1.7.2"
-  },
-  "peerDependencies": {
-    "joi": "10.x.x"
+    "fastseries": "1.7.2",
+    "joi": "11.x.x"
   },
   "devDependencies": {
     "@types/express": "4.x.x",
     "belly-button": "4.x.x",
     "code": "4.x.x",
-    "joi": "10.x.x",
     "lab": "14.x.x"
   },
   "engines": {
