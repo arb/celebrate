@@ -1,9 +1,9 @@
 'use strict';
 
 const Code = require('code');
-const Joi = require('joi');
 const Lab = require('lab');
 const Celebrate = require('../lib');
+const Joi = Celebrate.Joi;
 
 const lab = exports.lab = Lab.script();
 const expect = Code.expect;
