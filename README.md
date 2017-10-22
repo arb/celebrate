@@ -70,7 +70,7 @@ app.use(Celebrate.errors());
 The single exported function from `celebrate`. Returns a `function` with the middleware signature (`(req, res, next)`).
 
 - `schema` - a object where `key` can be one of `'params', 'headers', 'query', and 'body'` and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the `key`s specified will be validated against the incoming `req` object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one of the valid keys. 
-- `[options]` - `joi` [options](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function.
+- `[options]` - `joi` [options](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function. Note : `options.escapeHtml` is `true` by default in `Celebrate`, which is not the case for `Joi` since version 12. 
 
 ### `Celebrate.errors()`
 
