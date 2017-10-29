@@ -3,6 +3,7 @@
   "version": "5.0.1",
   "description": "A joi validation middleware for Express.",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "lint": "belly-button -f",
     "test": "npm run lint && lab -v -a code -p -t 100"
