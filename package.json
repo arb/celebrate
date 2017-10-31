@@ -27,7 +27,7 @@
   "dependencies": {
     "escape-html": "1.0.3",
     "fastseries": "1.7.2",
-    "joi": "11.x.x"
+    "joi": "12.x.x"
   },
   "devDependencies": {
     "@types/express": "4.x.x",

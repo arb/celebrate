@@ -255,6 +255,25 @@ describe('Celebrate Middleware', () => {
     });
   });
 
+  it('honors the escapeHtml Joi option', (done) => {
+    const middleware = Celebrate({
+      headers: {
+        accept: Joi.string().regex(/xml/)
+      }
+    }, { escapeHtml: false });
+
+    middleware({
+      headers: {
+        accept: 'application/json'
+      }
+    }, null, (err) => {
+      expect(err).to.exist();
+      expect(err.isJoi).to.be.true();
+      expect(err.details[0].message).to.equal('"accept" with value "application/json" fails to match the required pattern: /xml/');
+      done();
+    });
+  });
+
   describe('errors()', () => {
     it('responds with a joi error', (done) => {
       const handler = Celebrate.errors();
