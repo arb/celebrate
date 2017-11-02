@@ -1,17 +1,12 @@
 'use strict';
 
-const Code = require('code');
-const Lab = require('lab');
+const expect = require('expect');
 const Celebrate = require('../lib');
 const Joi = Celebrate.Joi;
 
-const lab = exports.lab = Lab.script();
-const expect = Code.expect;
-const describe = lab.describe;
-const it = lab.it;
-
 describe('Celebrate Middleware', () => {
-  it('throws an error if using an invalid schema', (done) => {
+  it('throws an error if using an invalid schema', () => {
+    expect.assertions(3);
     expect(() => {
       Celebrate({
         query: {
@@ -20,20 +15,19 @@ describe('Celebrate Middleware', () => {
         },
         foo: Joi.string()
       });
-    }).to.throw('"foo" is not allowed');
+    }).toThrow('"foo" is not allowed');
 
     expect(() => {
       Celebrate();
-    }).to.throw('"value" must have at least 1 children');
+    }).toThrow('"value" must have at least 1 children');
 
     expect(() => {
       Celebrate(false);
-    }).to.throw('"value" must have at least 1 children');
-
-    done();
+    }).toThrow('"value" must have at least 1 children');
   });
 
-  it('validates req.headers', (done) => {
+  it('validates req.headers', () => {
+    expect.assertions(2);
     const middleware = Celebrate({
       headers: {
         accept: Joi.string().regex(/xml/)
@@ -45,14 +39,13 @@ describe('Celebrate Middleware', () => {
         accept: 'application/json'
       }
     }, null, (err) => {
-      expect(err).to.exist();
-      expect(err.isJoi).to.be.true();
-      expect(err.details[0].message).to.equal('"accept" with value "application&#x2f;json" fails to match the required pattern: /xml/');
-      done();
+      expect(err.isJoi).toBe(true);
+      expect(err.details[0].message).toBe('"accept" with value "application&#x2f;json" fails to match the required pattern: /xml/');
     });
   });
 
-  it('validates req.params', (done) => {
+  it('validates req.params', () => {
+    expect.assertions(2);
     const middleware = Celebrate({
       params: {
         id: Joi.string().token()
@@ -64,14 +57,13 @@ describe('Celebrate Middleware', () => {
         id: '@@@'
       }
     }, null, (err) => {
-      expect(err).to.exist();
-      expect(err.isJoi).to.be.true();
-      expect(err.details[0].message).to.equal('"id" must only contain alpha-numeric and underscore characters');
-      done();
+      expect(err.isJoi).toBe(true);
+      expect(err.details[0].message).toBe('"id" must only contain alpha-numeric and underscore characters');
     });
   });
 
-  it('validates req.query', (done) => {
+  it('validates req.query', () => {
+    expect.assertions(2);
     const middleware = Celebrate({
       query: Joi.object().keys({
         start: Joi.date()
@@ -83,14 +75,13 @@ describe('Celebrate Middleware', () => {
         end: 1
       }
     }, null, (err) => {
-      expect(err).to.exist();
-      expect(err.isJoi).to.be.true();
-      expect(err.details[0].message).to.equal('"end" is not allowed');
-      done();
+      expect(err.isJoi).toBe(true);
+      expect(err.details[0].message).toBe('"end" is not allowed');
     });
   });
 
-  it('validates req.body', (done) => {
+  it('validates req.body', () => {
+    expect.assertions(2);
     const middleware = Celebrate({
       body: {
         first: Joi.string().required(),
@@ -106,14 +97,13 @@ describe('Celebrate Middleware', () => {
       },
       method: 'POST'
     }, null, (err) => {
-      expect(err).to.exist();
-      expect(err.isJoi).to.be.true();
-      expect(err.details[0].message).to.equal('"last" must be a string');
-      done();
+      expect(err.isJoi).toBe(true);
+      expect(err.details[0].message).toBe('"last" must be a string');
     });
   });
 
-  it('errors on the first validation problem (params, query, body)', (done) => {
+  it('errors on the first validation problem (params, query, body)', () => {
+    expect.assertions(2);
     const middleware = Celebrate({
       params: {
         id: Joi.string().required()
@@ -140,14 +130,13 @@ describe('Celebrate Middleware', () => {
         last: 123
       }
     }, null, (err) => {
-      expect(err).to.exist();
-      expect(err.isJoi).to.be.true();
-      expect(err.details[0].message).to.equal('"end" is not allowed');
-      done();
+      expect(err.isJoi).toBe(true);
+      expect(err.details[0].message).toBe('"end" is not allowed');
     });
   });
 
-  it('applys any joi transorms back to the object', (done) => {
+  it('applys any joi transorms back to the object', () => {
+    expect.assertions(3);
     const req = {
       body: {
         first: 'john',
@@ -166,18 +155,18 @@ describe('Celebrate Middleware', () => {
     });
 
     middleware(req, null, (err) => {
-      expect(err).to.be.null();
-      expect(req.body).to.equal({
+      expect(err).toBe(null);
+      expect(req.body).toEqual({
         first: 'john',
         last: 'doe',
         role: 'admin'
       });
-      expect(req.query).to.be.undefined();
-      done();
+      expect(req.query).toBeUndefined();
     });
   });
 
-  it('does not validate req.body if the method is "GET" or "HEAD"', (done) => {
+  it('does not validate req.body if the method is "GET" or "HEAD"', () => {
+    expect.assertions(1);
     const middleware = Celebrate({
       body: {
         first: Joi.string().required(),
@@ -193,12 +182,12 @@ describe('Celebrate Middleware', () => {
       },
       method: 'GET'
     }, null, (err) => {
-      expect(err).to.be.null();
-      done();
+      expect(err).toBe(null);
     });
   });
 
-  it('works with Joi.extend()', (done) => {
+  it('works with Joi.extend()', () => {
+    expect.assertions(2);
     const _Joi = Joi.extend({
       base: Joi.string(),
       name: 'string',
@@ -227,14 +216,13 @@ describe('Celebrate Middleware', () => {
       },
       method: 'POST'
     }, null, (err) => {
-      expect(err).to.exist();
-      expect(err.isJoi).to.be.true();
-      expect(err.details[0].message).to.equal('"first" must equal "john"');
-      done();
+      expect(err.isJoi).toBe(true);
+      expect(err.details[0].message).toBe('"first" must equal "john"');
     });
   });
 
-  it('uses the supplied the Joi options', (done) => {
+  it('uses the supplied the Joi options', () => {
+    expect.assertions(2);
     const middleware = Celebrate({
       query: Joi.object().keys({
         page: Joi.number()
@@ -249,13 +237,13 @@ describe('Celebrate Middleware', () => {
     };
 
     middleware(req, null, (err) => {
-      expect(err).to.not.exist();
-      expect(req.query).to.equal({ page: 1 });
-      done();
+      expect(err).toBe(null);
+      expect(req.query).toEqual({ page: 1 });
     });
   });
 
-  it('honors the escapeHtml Joi option', (done) => {
+  it('honors the escapeHtml Joi option', () => {
+    expect.assertions(2);
     const middleware = Celebrate({
       headers: {
         accept: Joi.string().regex(/xml/)
@@ -267,41 +255,26 @@ describe('Celebrate Middleware', () => {
         accept: 'application/json'
       }
     }, null, (err) => {
-      expect(err).to.exist();
-      expect(err.isJoi).to.be.true();
-      expect(err.details[0].message).to.equal('"accept" with value "application/json" fails to match the required pattern: /xml/');
-      done();
+      expect(err.isJoi).toBe(true);
+      expect(err.details[0].message).toBe('"accept" with value "application/json" fails to match the required pattern: /xml/');
     });
   });
 
   describe('errors()', () => {
-    it('responds with a joi error', (done) => {
+    it('responds with a joi error', () => {
+      expect.assertions(3);
       const handler = Celebrate.errors();
+      const next = jest.fn();
       const res = {
         status (statusCode) {
-          expect(statusCode).to.equal(400);
+          expect(statusCode).toBe(400);
           return {
             send (err) {
-              expect(err).to.equal({
-                error: 'Bad Request',
-                message: 'child "first" fails because ["first" is required]. child "last" fails because ["last" is required]. child "role" fails because ["role" must be a number]',
-                statusCode: 400,
-                validation: {
-                  keys: [
-                    'first',
-                    'last',
-                    'role'
-                  ],
-                  source: 'query'
-                }
-              });
-              done();
+              expect(err).toMatchSnapshot();
+              expect(next).not.toHaveBeenCalled();
             }
           };
         }
-      };
-      const next = () => {
-        Code.fail('next called');
       };
 
       const schema = Joi.object({
@@ -316,7 +289,7 @@ describe('Celebrate Middleware', () => {
       });
     });
 
-    it('passes the error through next if not a joi error', (done) => {
+    it('passes the error through next if not a joi error', () => {
       const handler = Celebrate.errors();
       const res = {
         status (statusCode) {
@@ -324,12 +297,11 @@ describe('Celebrate Middleware', () => {
         }
       };
       const next = (err) => {
-        expect(err).to.equal({
+        expect(err).toEqual({
           isBoom: true,
           message: 'Not Found',
           statusCode: 404
         });
-        done();
       };
 
       handler({
@@ -339,29 +311,20 @@ describe('Celebrate Middleware', () => {
       }, undefined, res, next);
     });
 
-    it('only includes key values if joi returns details', (done) => {
+    it('only includes key values if joi returns details', () => {
+      expect.assertions(3);
       const handler = Celebrate.errors();
+      const next = jest.fn();
       const res = {
         status (statusCode) {
-          expect(statusCode).to.equal(400);
+          expect(statusCode).toBe(400);
           return {
             send (err) {
-              expect(err).to.equal({
-                error: 'Bad Request',
-                message: 'child "first" fails because ["first" is required]',
-                statusCode: 400,
-                validation: {
-                  keys: [],
-                  source: 'body'
-                }
-              });
-              done();
+              expect(err).toMatchSnapshot();
+              expect(next).not.toHaveBeenCalled();
             }
           };
         }
-      };
-      const next = () => {
-        Code.fail('next called');
       };
 
       const schema = Joi.object({

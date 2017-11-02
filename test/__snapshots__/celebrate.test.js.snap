@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Celebrate Middleware errors() only includes key values if joi returns details 1`] = `
+Object {
+  "error": "Bad Request",
+  "message": "child \\"first\\" fails because [\\"first\\" is required]",
+  "statusCode": 400,
+  "validation": Object {
+    "keys": Array [],
+    "source": "body",
+  },
+}
+`;
+
+exports[`Celebrate Middleware errors() responds with a joi error 1`] = `
+Object {
+  "error": "Bad Request",
+  "message": "child \\"first\\" fails because [\\"first\\" is required]. child \\"last\\" fails because [\\"last\\" is required]. child \\"role\\" fails because [\\"role\\" must be a number]",
+  "statusCode": 400,
+  "validation": Object {
+    "keys": Array [
+      "first",
+      "last",
+      "role",
+    ],
+    "source": "query",
+  },
+}
+`;
