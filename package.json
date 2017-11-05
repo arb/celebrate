@@ -31,8 +31,11 @@
   },
   "devDependencies": {
     "@types/express": "4.x.x",
+    "artificial": "0.1.x",
     "belly-button": "4.x.x",
+    "body-parser": "1.18.2",
     "expect": "21.2.x",
+    "express": "5.0.0-alpha.6",
     "jest": "21.2.x"
   },
   "engines": {

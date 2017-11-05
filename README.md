@@ -16,6 +16,9 @@
 
 Wondering why *another* joi middleware library for Express? Full blog post [here](https://blog.continuation.io/time-to-celebrate/).
 
+## Express Compatibility
+Celebrate is tested and has full compatibility with express 4 and 5. It should work correctly with express 3, but including it in the testing was proving to be more trouble than it's worth. This is primarily because express 3 stores exposes route parameters as an array, rather than an object.
+
 ## Usage
 
 Example of using `celebrate` on a single POST route to validate `req.body`.
