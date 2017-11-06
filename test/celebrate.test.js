@@ -2,13 +2,19 @@
 
 const expect = require('expect');
 const Celebrate = require('../lib');
+
+const celebrate = Celebrate.celebrate;
 const Joi = Celebrate.Joi;
+const errors = Celebrate.errors;
+const values = Celebrate.values;
+
+const Res = () => ({ locals: {}});
 
 describe('Celebrate Middleware', () => {
   it('throws an error if using an invalid schema', () => {
     expect.assertions(3);
     expect(() => {
-      Celebrate({
+      celebrate({
         query: {
           name: Joi.string(),
           age: Joi.number()
@@ -18,17 +24,17 @@ describe('Celebrate Middleware', () => {
     }).toThrow('"foo" is not allowed');
 
     expect(() => {
-      Celebrate();
+      celebrate();
     }).toThrow('"value" must have at least 1 children');
 
     expect(() => {
-      Celebrate(false);
+      celebrate(false);
     }).toThrow('"value" must have at least 1 children');
   });
 
   it('validates req.headers', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       headers: {
         accept: Joi.string().regex(/xml/)
       }
@@ -38,7 +44,7 @@ describe('Celebrate Middleware', () => {
       headers: {
         accept: 'application/json'
       }
-    }, null, (err) => {
+    }, Res(), (err) => {
       expect(err.isJoi).toBe(true);
       expect(err.details[0].message).toBe('"accept" with value "application&#x2f;json" fails to match the required pattern: /xml/');
     });
@@ -46,7 +52,7 @@ describe('Celebrate Middleware', () => {
 
   it('validates req.params', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       params: {
         id: Joi.string().token()
       }
@@ -56,7 +62,7 @@ describe('Celebrate Middleware', () => {
       params: {
         id: '@@@'
       }
-    }, null, (err) => {
+    }, Res(), (err) => {
       expect(err.isJoi).toBe(true);
       expect(err.details[0].message).toBe('"id" must only contain alpha-numeric and underscore characters');
     });
@@ -64,7 +70,7 @@ describe('Celebrate Middleware', () => {
 
   it('validates req.query', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       query: Joi.object().keys({
         start: Joi.date()
       })
@@ -74,7 +80,7 @@ describe('Celebrate Middleware', () => {
       query: {
         end: 1
       }
-    }, null, (err) => {
+    }, Res(), (err) => {
       expect(err.isJoi).toBe(true);
       expect(err.details[0].message).toBe('"end" is not allowed');
     });
@@ -82,7 +88,7 @@ describe('Celebrate Middleware', () => {
 
   it('validates req.body', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       body: {
         first: Joi.string().required(),
         last: Joi.string(),
@@ -96,7 +102,7 @@ describe('Celebrate Middleware', () => {
         last: 123
       },
       method: 'POST'
-    }, null, (err) => {
+    }, Res(), (err) => {
       expect(err.isJoi).toBe(true);
       expect(err.details[0].message).toBe('"last" must be a string');
     });
@@ -104,7 +110,7 @@ describe('Celebrate Middleware', () => {
 
   it('errors on the first validation problem (params, query, body)', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       params: {
         id: Joi.string().required()
       },
@@ -129,13 +135,13 @@ describe('Celebrate Middleware', () => {
         first: 'john',
         last: 123
       }
-    }, null, (err) => {
+    }, Res(), (err) => {
       expect(err.isJoi).toBe(true);
       expect(err.details[0].message).toBe('"end" is not allowed');
     });
   });
 
-  it('applys any joi transorms back to the object', () => {
+  it('applys any joi transorms back to res.locals.celebrate the object', () => {
     expect.assertions(3);
     const req = {
       body: {
@@ -145,7 +151,8 @@ describe('Celebrate Middleware', () => {
       query: undefined,
       method: 'POST'
     };
-    const middleware = Celebrate({
+    const res = Res();
+    const middleware = celebrate({
       body: {
         first: Joi.string().required(),
         last: Joi.string(),
@@ -154,20 +161,21 @@ describe('Celebrate Middleware', () => {
       query: Joi.number()
     });
 
-    middleware(req, null, (err) => {
+    middleware(req, res, (err) => {
       expect(err).toBe(null);
-      expect(req.body).toEqual({
+      const v = values(res, req);
+      expect(v.body).toEqual({
         first: 'john',
         last: 'doe',
         role: 'admin'
       });
-      expect(req.query).toBeUndefined();
+      expect(v.query).toBeUndefined();
     });
   });
 
   it('does not validate req.body if the method is "GET" or "HEAD"', () => {
     expect.assertions(1);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       body: {
         first: Joi.string().required(),
         last: Joi.string(),
@@ -181,7 +189,7 @@ describe('Celebrate Middleware', () => {
         last: 123
       },
       method: 'GET'
-    }, null, (err) => {
+    }, Res(), (err) => {
       expect(err).toBe(null);
     });
   });
@@ -202,7 +210,7 @@ describe('Celebrate Middleware', () => {
       }]
     });
 
-    const middleware = Celebrate({
+    const middleware = celebrate({
       body: {
         first: _Joi.string().required().isJohn(),
         role: _Joi.number().integer()
@@ -215,15 +223,15 @@ describe('Celebrate Middleware', () => {
         role: 123
       },
       method: 'POST'
-    }, null, (err) => {
+    }, Res(), (err) => {
       expect(err.isJoi).toBe(true);
       expect(err.details[0].message).toBe('"first" must equal "john"');
     });
   });
 
-  it('uses the supplied the Joi options', () => {
+  it('uses the supplied Joi options', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       query: Joi.object().keys({
         page: Joi.number()
       })
@@ -235,16 +243,18 @@ describe('Celebrate Middleware', () => {
       },
       method: 'GET'
     };
+    const res = Res();
 
-    middleware(req, null, (err) => {
+    middleware(req, res, (err) => {
       expect(err).toBe(null);
-      expect(req.query).toEqual({ page: 1 });
+      const v = values(res);
+      expect(v.query).toEqual({ page: 1 });
     });
   });
 
   it('honors the escapeHtml Joi option', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       headers: {
         accept: Joi.string().regex(/xml/)
       }
@@ -254,9 +264,55 @@ describe('Celebrate Middleware', () => {
       headers: {
         accept: 'application/json'
       }
-    }, null, (err) => {
+    }, Res(), (err) => {
       expect(err.isJoi).toBe(true);
       expect(err.details[0].message).toBe('"accept" with value "application/json" fails to match the required pattern: /xml/');
+    });
+  });
+
+  it('copies all req.x values to res.locales.celebrate', () => {
+    expect.assertions(6);
+    const req = {
+      body: {
+        first: 'john',
+        last: 'doe'
+      },
+      query: { page: '1' },
+      params: { userId: 100 },
+      headers: {
+        accept: 'application/json',
+        userAgent: 'not-a-browser',
+      },
+      method: 'POST'
+    };
+    const res = Res();
+    const middleware = celebrate({
+      query: {
+        page: Joi.number()
+      }
+    });
+
+    middleware(req, res, (err) => {
+      expect(err).toBe(null);
+      const v = values(res);
+      expect(v.body).toEqual({
+        first: 'john',
+        last: 'doe',
+      });
+      expect(v.headers).toEqual({
+        accept: 'application/json',
+        userAgent: 'not-a-browser',
+      });
+      expect(v.query).toEqual({
+        page: 1,
+      });
+      expect(v.params).toEqual({
+        userId: 100,
+      });
+      expect(v.headers).toEqual({
+        accept: 'application/json',
+        userAgent: 'not-a-browser',
+      });
     });
   });
 
@@ -335,6 +391,25 @@ describe('Celebrate Middleware', () => {
         err._meta = { source: 'body' };
         err.details = null;
         handler(err, undefined, res, next);
+      });
+    });
+  });
+
+  describe('values()', () => {
+    it('returns res.locals.celebrate if present', () => {
+      const v = {};
+      expect(values({locals: {celebrate: v}}, null)).toBe(v);
+    });
+
+    it('returns the fallback value if res.locals.celebrate is not present', () => {
+      const req = {
+        query: { foo: 'bar' },
+        params: { id: 100 },
+        onComplete: () => {},
+      };
+      expect(values(null, req)).toEqual({
+        query: { foo: 'bar' },
+        params: { id: 100 },
       });
     });
   });
