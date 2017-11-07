@@ -2,7 +2,9 @@ const Express = require('express');
 const Artificial = require('artificial');
 const BodyParser = require('body-parser');
 const Celebrate = require('../lib');
-const Joi = Celebrate.Joi
+
+const celebrate = Celebrate.celebrate;
+const Joi = Celebrate.Joi;
 const errors = Celebrate.errors;
 
 const Server = () => {
@@ -18,7 +20,7 @@ describe('express integration', () => {
       expect.assertions(2);
       const server = Server();
   
-      server.get('/', Celebrate({
+      server.get('/', celebrate({
         headers: {
           accept: Joi.string().regex(/xml/)
         }
@@ -44,7 +46,7 @@ describe('express integration', () => {
     it('req.params', (done) => {
       expect.assertions(2);
       const server = Server();
-      server.get('/user/:id', Celebrate({
+      server.get('/user/:id', celebrate({
         params: {
           id: Joi.string().token()
         }
@@ -66,7 +68,7 @@ describe('express integration', () => {
       expect.assertions(2);
       const server = Server();
   
-      server.get('/', Celebrate({
+      server.get('/', celebrate({
         query: Joi.object().keys({
           start: Joi.date()
         })
@@ -86,7 +88,7 @@ describe('express integration', () => {
     it('req.body', (done) => {
       expect.assertions(2);
       const server = Server();
-      server.post('/', Celebrate({
+      server.post('/', celebrate({
         body: {
           first: Joi.string().required(),
           last: Joi.string(),
@@ -115,7 +117,7 @@ describe('express integration', () => {
       expect.assertions(1);
       const server = Server();
   
-      server.get('/', Celebrate({
+      server.get('/', celebrate({
         headers: {
           accept: Joi.string().regex(/json/),
           ['secret-header']: Joi.string().default('@@@@@@')
@@ -144,7 +146,7 @@ describe('express integration', () => {
     it('req.params', (done) => {
       expect.assertions(1);
       const server = Server();
-      server.get('/user/:id', Celebrate({
+      server.get('/user/:id', celebrate({
         params: {
           id: Joi.string().uppercase()
         }
@@ -163,7 +165,7 @@ describe('express integration', () => {
       expect.assertions(1);
       const server = Server();
   
-      server.get('/', Celebrate({
+      server.get('/', celebrate({
         query: Joi.object().keys({
           name: Joi.string().uppercase(),
           page: Joi.number().default(1),
@@ -185,7 +187,7 @@ describe('express integration', () => {
     it('req.body', (done) => {
       expect.assertions(1);
       const server = Server();
-      server.post('/', Celebrate({
+      server.post('/', celebrate({
         body: {
           first: Joi.string().required(),
           last: Joi.string().default('Smith'),
