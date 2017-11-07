@@ -261,58 +261,66 @@ describe('Celebrate Middleware', () => {
   });
 
   describe('errors()', () => {
-    it('responds with a joi error', () => {
-      expect.assertions(3);
-      const handler = Celebrate.errors();
-      const next = jest.fn();
-      const res = {
-        status (statusCode) {
-          expect(statusCode).toBe(400);
-          return {
-            send (err) {
-              expect(err).toMatchSnapshot();
-              expect(next).not.toHaveBeenCalled();
-            }
-          };
-        }
-      };
+    it('responds with a joi error from celebrate middleware', () => {
+        expect.assertions(3);
+        const middleware = Celebrate({
+          query: {
+            role: Joi.number().integer().min(4)
+          }
+        });
+        const handler = Celebrate.errors();
+        const next = jest.fn();
+        const res = {
+          status (statusCode) {
+            expect(statusCode).toBe(400);
+            return {
+              send (err) {
+                expect(err).toMatchSnapshot();
+                expect(next).not.toHaveBeenCalled();
+              }
+            };
+          }
+        };
 
-      const schema = Joi.object({
-        first: Joi.string().required(),
-        last: Joi.string().required(),
-        role: Joi.number().integer().min(4)
-      });
-
-      Joi.validate({ role: '0' }, schema, { abortEarly: false, convert: false }, (err) => {
-        err._meta = { source: 'query' };
-        handler(err, undefined, res, next);
-      });
+        middleware({
+          query: {
+            role: '0'
+          },
+          method: 'GET'
+        }, null, (err) => {
+            handler(err, undefined, res, next);
+        });
     });
 
-    it('passes the error through next if not a joi error', () => {
-      const handler = Celebrate.errors();
-      const res = {
-        status (statusCode) {
-          Code.fail('status called');
-        }
-      };
-      const next = (err) => {
-        expect(err).toEqual({
-          isBoom: true,
-          message: 'Not Found',
-          statusCode: 404
-        });
-      };
+    it('passes the error through next if not a joi error from celebrate middleware', () => {
+        let errorDirectlyFromJoi = null;
+        const handler = Celebrate.errors();
+        const res = {
+          status (statusCode) {
+            Code.fail('status called');
+          }
+        };
+        const next = (err) => {
+          expect(err).toEqual(errorDirectlyFromJoi);
+        };
 
-      handler({
-        isBoom: true,
-        message: 'Not Found',
-        statusCode: 404
-      }, undefined, res, next);
+        const schema = Joi.object({
+          role: Joi.number().integer().min(4)
+        });
+
+        Joi.validate({ role: '0' }, schema, { abortEarly: false, convert: false }, (err) => {
+          errorDirectlyFromJoi = err;
+          handler(err, undefined, res, next);
+        });
     });
 
     it('only includes key values if joi returns details', () => {
       expect.assertions(3);
+      const middleware = Celebrate({
+        body: {
+          first: Joi.string().required()
+        }
+      });
       const handler = Celebrate.errors();
       const next = jest.fn();
       const res = {
@@ -327,14 +335,14 @@ describe('Celebrate Middleware', () => {
         }
       };
 
-      const schema = Joi.object({
-        first: Joi.string().required()
-      });
-
-      Joi.validate({ role: '0' }, schema, (err) => {
-        err._meta = { source: 'body' };
-        err.details = null;
-        handler(err, undefined, res, next);
+      middleware({
+        body: {
+          role: '0'
+      },
+      method: 'POST'
+      }, null, (err) => {
+          err.details = null;
+          handler(err, undefined, res, next);
       });
     });
   });

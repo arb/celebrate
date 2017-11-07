@@ -12,15 +12,13 @@ Object {
 }
 `;
 
-exports[`Celebrate Middleware errors() responds with a joi error 1`] = `
+exports[`Celebrate Middleware errors() responds with a joi error from celebrate middleware 1`] = `
 Object {
   "error": "Bad Request",
-  "message": "child \\"first\\" fails because [\\"first\\" is required]. child \\"last\\" fails because [\\"last\\" is required]. child \\"role\\" fails because [\\"role\\" must be a number]",
+  "message": "child \\"role\\" fails because [\\"role\\" must be larger than or equal to 4]",
   "statusCode": 400,
   "validation": Object {
     "keys": Array [
-      "first",
-      "last",
       "role",
     ],
     "source": "query",
