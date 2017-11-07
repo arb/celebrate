@@ -2,13 +2,16 @@
 
 const expect = require('expect');
 const Celebrate = require('../lib');
+
+const celebrate = Celebrate.celebrate;
 const Joi = Celebrate.Joi;
+const errors = Celebrate.errors;
 
 describe('Celebrate Middleware', () => {
   it('throws an error if using an invalid schema', () => {
     expect.assertions(3);
     expect(() => {
-      Celebrate({
+      celebrate({
         query: {
           name: Joi.string(),
           age: Joi.number()
@@ -18,17 +21,17 @@ describe('Celebrate Middleware', () => {
     }).toThrow('"foo" is not allowed');
 
     expect(() => {
-      Celebrate();
+      celebrate();
     }).toThrow('"value" must have at least 1 children');
 
     expect(() => {
-      Celebrate(false);
+      celebrate(false);
     }).toThrow('"value" must have at least 1 children');
   });
 
   it('validates req.headers', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       headers: {
         accept: Joi.string().regex(/xml/)
       }
@@ -46,7 +49,7 @@ describe('Celebrate Middleware', () => {
 
   it('validates req.params', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       params: {
         id: Joi.string().token()
       }
@@ -64,7 +67,7 @@ describe('Celebrate Middleware', () => {
 
   it('validates req.query', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       query: Joi.object().keys({
         start: Joi.date()
       })
@@ -82,7 +85,7 @@ describe('Celebrate Middleware', () => {
 
   it('validates req.body', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       body: {
         first: Joi.string().required(),
         last: Joi.string(),
@@ -104,7 +107,7 @@ describe('Celebrate Middleware', () => {
 
   it('errors on the first validation problem (params, query, body)', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       params: {
         id: Joi.string().required()
       },
@@ -145,7 +148,7 @@ describe('Celebrate Middleware', () => {
       query: undefined,
       method: 'POST'
     };
-    const middleware = Celebrate({
+    const middleware = celebrate({
       body: {
         first: Joi.string().required(),
         last: Joi.string(),
@@ -167,7 +170,7 @@ describe('Celebrate Middleware', () => {
 
   it('does not validate req.body if the method is "GET" or "HEAD"', () => {
     expect.assertions(1);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       body: {
         first: Joi.string().required(),
         last: Joi.string(),
@@ -202,7 +205,7 @@ describe('Celebrate Middleware', () => {
       }]
     });
 
-    const middleware = Celebrate({
+    const middleware = celebrate({
       body: {
         first: _Joi.string().required().isJohn(),
         role: _Joi.number().integer()
@@ -223,7 +226,7 @@ describe('Celebrate Middleware', () => {
 
   it('uses the supplied the Joi options', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       query: Joi.object().keys({
         page: Joi.number()
       })
@@ -244,7 +247,7 @@ describe('Celebrate Middleware', () => {
 
   it('honors the escapeHtml Joi option', () => {
     expect.assertions(2);
-    const middleware = Celebrate({
+    const middleware = celebrate({
       headers: {
         accept: Joi.string().regex(/xml/)
       }
@@ -263,12 +266,12 @@ describe('Celebrate Middleware', () => {
   describe('errors()', () => {
     it('responds with a joi error from celebrate middleware', () => {
         expect.assertions(3);
-        const middleware = Celebrate({
+        const middleware = celebrate({
           query: {
             role: Joi.number().integer().min(4)
           }
         });
-        const handler = Celebrate.errors();
+        const handler = errors();
         const next = jest.fn();
         const res = {
           status (statusCode) {
@@ -294,7 +297,7 @@ describe('Celebrate Middleware', () => {
 
     it('passes the error through next if not a joi error from celebrate middleware', () => {
         let errorDirectlyFromJoi = null;
-        const handler = Celebrate.errors();
+        const handler = errors();
         const res = {
           status (statusCode) {
             Code.fail('status called');
@@ -316,12 +319,12 @@ describe('Celebrate Middleware', () => {
 
     it('only includes key values if joi returns details', () => {
       expect.assertions(3);
-      const middleware = Celebrate({
+      const middleware = celebrate({
         body: {
           first: Joi.string().required()
         }
       });
-      const handler = Celebrate.errors();
+      const handler = errors();
       const next = jest.fn();
       const res = {
         status (statusCode) {
