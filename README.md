@@ -83,6 +83,12 @@ If the error format does not suite your needs, you an encouraged to write your o
 
 `celebrate` exports the version of joi it is using internally. For maximum compatibility, you should use this version when passing in any validation schemas.
 
+### `isCelebrate(err)`
+
+Returns `true` if the provided `err` object originated from the `celebrate` middleware. Usseful if you want to write your own error handler for `celebrate` errors.
+
+- `err` - an error object
+
 ## Order
 
 `celebrate` validates `req` values in the following order:
