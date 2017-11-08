@@ -6,8 +6,9 @@ const Celebrate = require('../lib');
 const celebrate = Celebrate.celebrate;
 const Joi = Celebrate.Joi;
 const errors = Celebrate.errors;
+const isCelebrate = Celebrate.isCelebrate;
 
-describe('Celebrate Middleware', () => {
+describe('Celebrate', () => {
   it('throws an error if using an invalid schema', () => {
     expect.assertions(3);
     expect(() => {
@@ -42,7 +43,7 @@ describe('Celebrate Middleware', () => {
         accept: 'application/json'
       }
     }, null, (err) => {
-      expect(err.isJoi).toBe(true);
+      expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"accept" with value "application&#x2f;json" fails to match the required pattern: /xml/');
     });
   });
@@ -60,7 +61,7 @@ describe('Celebrate Middleware', () => {
         id: '@@@'
       }
     }, null, (err) => {
-      expect(err.isJoi).toBe(true);
+      expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"id" must only contain alpha-numeric and underscore characters');
     });
   });
@@ -78,7 +79,7 @@ describe('Celebrate Middleware', () => {
         end: 1
       }
     }, null, (err) => {
-      expect(err.isJoi).toBe(true);
+      expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"end" is not allowed');
     });
   });
@@ -100,7 +101,7 @@ describe('Celebrate Middleware', () => {
       },
       method: 'POST'
     }, null, (err) => {
-      expect(err.isJoi).toBe(true);
+      expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"last" must be a string');
     });
   });
@@ -133,7 +134,7 @@ describe('Celebrate Middleware', () => {
         last: 123
       }
     }, null, (err) => {
-      expect(err.isJoi).toBe(true);
+      expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"end" is not allowed');
     });
   });
@@ -219,7 +220,7 @@ describe('Celebrate Middleware', () => {
       },
       method: 'POST'
     }, null, (err) => {
-      expect(err.isJoi).toBe(true);
+      expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"first" must equal "john"');
     });
   });
@@ -258,7 +259,7 @@ describe('Celebrate Middleware', () => {
         accept: 'application/json'
       }
     }, null, (err) => {
-      expect(err.isJoi).toBe(true);
+      expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"accept" with value "application/json" fails to match the required pattern: /xml/');
     });
   });
@@ -347,6 +348,43 @@ describe('Celebrate Middleware', () => {
           err.details = null;
           handler(err, undefined, res, next);
       });
+    });
+  });
+
+  describe('isCelebrate', () => {
+    it('returns false if the error object did not originate from celebrate', () => {
+      expect.assertions(1);
+      expect(isCelebrate(Error())).toBe(false);
+    });
+    
+    it('returns false if the error object is not an object', () => {
+      expect.assertions(3);
+      expect(isCelebrate('errr')).toBe(false);
+      expect(isCelebrate(0)).toBe(false);
+      expect(isCelebrate([1,2])).toBe(false);
+    });
+
+    it('returns false if the error object is fasly', () => {
+      expect.assertions(2);
+      expect(isCelebrate(null)).toBe(false);
+      expect(isCelebrate(undefined)).toBe(false);
+    });
+
+    it('returns true if the error object came from celebrate', () => {
+        expect.assertions(1);
+        const middleware = celebrate({
+          headers: {
+            accept: Joi.string().regex(/xml/)
+          }
+        });
+    
+        middleware({
+          headers: {
+            accept: 'application/json'
+          }
+        }, null, (err) => {
+          expect(isCelebrate(err)).toBe(true);
+        });
     });
   });
 });
