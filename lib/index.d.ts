@@ -3,9 +3,10 @@ import { ErrorRequestHandler, RequestHandler } from 'express';
 declare namespace Celebrate {
     /**
     * Creates a Celebrate middleware function.
-    * @param {object} schema object where each key is one of ["params", "headers", "query", "body"] and the value is
+    * @param {Object} schema - object where each key is one of ["params", "headers", "query", "body"] and the value is
     * a Joi schema.
-    * @param {object} config optional configuration options that will be passed directly into Joi.
+    * @param {Object} [config] - optional configuration options that will be passed directly into Joi.
+    * @returns {Function} an express middleware function
     */
     function celebrate(schema: {
         params?: object,
@@ -15,12 +16,20 @@ declare namespace Celebrate {
     }, config?: object): RequestHandler
     /**
      * Creates a Celebrate error handler middleware function.
+     * @returns {Function} an express error handler function
      */
     function errors(): ErrorRequestHandler;
     /**
      * The Joi version Celebrate uses internally.
      */
     export const Joi: object;
+
+    /**
+     * Examines an error object to determine if it originated from the celebrate middleware.
+     * @param {Object} err - error object to check
+     * @returns {boolean}
+     */
+    function isCelebrate(err:object): boolean;
 }
 
 export = Celebrate;
