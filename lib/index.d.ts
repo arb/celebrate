@@ -1,4 +1,5 @@
 import { ErrorRequestHandler, RequestHandler } from 'express';
+import { Root as joi } from 'joi';
 
 declare namespace Celebrate {
     /**
@@ -22,7 +23,7 @@ declare namespace Celebrate {
     /**
      * The Joi version Celebrate uses internally.
      */
-    export const Joi: object;
+    export const Joi: joi
 
     /**
      * Examines an error object to determine if it originated from the celebrate middleware.
