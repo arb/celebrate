@@ -54,7 +54,7 @@ const app = express();
 
 // validate all incoming request headers for the token header
 // if missing or not the correct format, respond with an error
-app.use(Celebrate({
+app.use(celebrate({
  headers: Joi.object({
    token: Joi.string().required().regex(/abc\d{3}/)
  }).unknown()
