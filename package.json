@@ -6,7 +6,8 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "lint": "belly-button -i 'lib/*.js' -f",
-    "test": "npm run lint && jest --ci"
+    "test": "npm run lint && jest --ci",
+    "benchmark": "node benchmarks/index"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,7 @@
     "@types/joi": "13.0.0",
     "artificial": "0.1.x",
     "belly-button": "4.x.x",
+    "benchmark": "2.1.4",
     "body-parser": "1.18.2",
     "expect": "21.2.x",
     "express": "5.0.0-alpha.6",
