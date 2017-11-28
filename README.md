@@ -7,17 +7,18 @@
 
 [![belly-button-style](https://cdn.rawgit.com/continuationlabs/belly-button/master/badge.svg)](https://github.com/continuationlabs/belly-button)
 
-`celebrate` is an Express middleware function that wraps the [joi](https://github.com/hapijs/joi) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, `req.query` and `req.body` (provided you are using `body-parser`).
+`celebrate` is an express middleware function that wraps the [joi](https://github.com/hapijs/joi/tree/v12.0.0) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, `req.query` and `req.body` (provided you are using `body-parser`).
 
 `celebrate` lists joi as a formal dependency. This means that celebrate will always use a predictable, known version of joi during the validation and compilation steps. There are two reasons for this:
 
 1. To ensure that `celebrate` can always use the latest version of joi as soon as it's published
 2. So that `celebrate` can export the version of joi it uses to the consumer to maximize compatibility
 
-Wondering why *another* joi middleware library for Express? Full blog post [here](https://blog.continuation.io/time-to-celebrate/).
+Wondering why *another* joi middleware library for express? Full blog post [here](https://blog.continuation.io/time-to-celebrate/).
 
-## Express Compatibility
-Celebrate is tested and has full compatibility with express 4 and 5. It should work correctly with express 3, but including it in the testing was proving to be more trouble than it's worth. This is primarily because express 3 stores exposes route parameters as an array, rather than an object.
+## express Compatibility
+
+celebrate is tested and has full compatibility with express 4 and 5. It should work correctly with express 3, but including it in the test matrix was more trouble than it's worth. This is primarily because express 3 stores exposes route parameters as an array rather than an object.
 
 ## Usage
 
@@ -70,14 +71,14 @@ app.use(errors());
 
 Returns a `function` with the middleware signature (`(req, res, next)`).
 
-- `schema` - a object where `key` can be one of `'params', 'headers', 'query', and 'body'` and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the `key`s specified will be validated against the incoming `req` object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one of the valid keys. 
-- `[options]` - `joi` [options](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function. Defaults to `{ escapeHtml: true }`. This is differs from the Joi defaults since version 12.
+- `schema` - a object where `key` can be one of `'params'`, `'headers'`, `'query'`, and `'body'` and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the keys specified will be validated against the incoming request object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one of the valid keys. 
+- `[options]` - `joi` [options](https://github.com/hapijs/joi/blob/v12.0.0/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function. Defaults to `{ escapeHtml: true }`.
 
 ### `errors()`
 
-Returns a `function` with the error handler signature (`(err, req, res, next)`). This should be placed with any other error handling middleware to catch Joi validation errors. If the incoming `err` object is a Joi error, `errors()` will respond with a 400 status code and the Joi validation message. Otherwise, it will call `next(err)` and will pass the error along and need to be processed by another error handler.
+Returns a `function` with the error handler signature (`(err, req, res, next)`). This should be placed with any other error handling middleware to catch joi validation errors. If the incoming `err` object is an error originating from celebrate, `errors()` will respond with a 400 status code and the joi validation message. Otherwise, it will call `next(err)` and will pass the error along and will need to be processed by another error handler.
 
-If the error format does not suite your needs, you an encouraged to write your own error handler and check `err.isJoi` to format joi errors to your liking. The full joi error object will be available in your own error handler.
+If the error format does not suite your needs, you are encouraged to write your own error handler and check `isCelebrate(err)` to format celebrate errors to your liking. The full [joi error object](https://github.com/hapijs/joi/blob/v12.0.0/API.md#errors) will be available in your own error handler.
 
 ### `Joi`
 
@@ -102,4 +103,4 @@ If any of the configured validation rules fail, the entire request will be consi
 
 ## Issues
 
-*Before* opening issues on this repo, make sure your joi schema is correct and working as you intended. The bulk of this code is just exposing the joi API as Express middleware. All of the heavy lifting still happens inside joi. You can go [here](https://npm.runkit.com/joi) to verify your joi schema easily.
+*Before* opening issues on this repo, make sure your joi schema is correct and working as you intended. The bulk of this code is just exposing the joi API as express middleware. All of the heavy lifting still happens inside joi. You can go [here](https://npm.runkit.com/joi) to verify your joi schema easily.
