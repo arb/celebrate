@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/continuationlabs/celebrate.git"
+    "url": "git+https://github.com/arb/celebrate.git"
   },
   "keywords": [
     "joi",
@@ -19,12 +19,12 @@
     "express",
     "middleware"
   ],
-  "author": "Continuation Labs <contact@continuation.io> (http://continuation.io/)",
+  "author": "Adam Bretz <arbretz@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/continuationlabs/celebrate/issues"
+    "url": "https://github.com/arb/celebrate/issues"
   },
-  "homepage": "https://github.com/continuationlabs/celebrate#readme",
+  "homepage": "https://github.com/arb/celebrate#readme",
   "dependencies": {
     "escape-html": "1.0.3",
     "fastseries": "1.7.2",
