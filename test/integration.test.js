@@ -1,3 +1,6 @@
+'use strict';
+
+/* eslint-env jest */
 const Express = require('express');
 const Artificial = require('artificial');
 const BodyParser = require('body-parser');
@@ -12,26 +15,26 @@ const Server = () => {
   server.use(BodyParser.json());
   Artificial(server);
   return server;
-}
+};
 
 describe('express integration', () => {
   describe('validations', () => {
     it('req.headers', (done) => {
       expect.assertions(2);
       const server = Server();
-  
+
       server.get('/', celebrate({
         headers: {
           accept: Joi.string().regex(/xml/)
         }
       }, {
-        allowUnknown: true,
+        allowUnknown: true
       }));
-  
-      server.use(errors());  
-   
-      server.inject({ 
-        method: 'GET', 
+
+      server.use(errors());
+
+      server.inject({
+        method: 'GET',
         url: '/',
         headers: {
           accept: 'application/json'
@@ -42,7 +45,7 @@ describe('express integration', () => {
         done();
       });
     });
-  
+
     it('req.params', (done) => {
       expect.assertions(2);
       const server = Server();
@@ -51,40 +54,40 @@ describe('express integration', () => {
           id: Joi.string().token()
         }
       }));
-  
+
       server.use(errors());
-  
+
       server.inject({
         method: 'get',
-        url: '/user/@@',
+        url: '/user/@@'
       }, (res) => {
         expect(res.statusCode).toBe(400);
         expect(JSON.parse(res.payload)).toMatchSnapshot();
         done();
       });
     });
-  
+
     it('req.query', (done) => {
       expect.assertions(2);
       const server = Server();
-  
+
       server.get('/', celebrate({
         query: Joi.object().keys({
           start: Joi.date()
         })
       }));
-  
+
       server.use(errors());
-  
+
       server.inject({
-        url: '/?end=celebrate',
+        url: '/?end=celebrate'
       }, (res) => {
         expect(res.statusCode).toBe(400);
         expect(JSON.parse(res.payload)).toMatchSnapshot();
         done();
       });
     });
-  
+
     it('req.body', (done) => {
       expect.assertions(2);
       const server = Server();
@@ -95,9 +98,9 @@ describe('express integration', () => {
           role: Joi.number().integer()
         }
       }));
-  
+
       server.use(errors());
-  
+
       server.inject({
         url: '/',
         method: 'post',
@@ -116,26 +119,26 @@ describe('express integration', () => {
     it('req.headers', (done) => {
       expect.assertions(1);
       const server = Server();
-  
+
       server.get('/', celebrate({
         headers: {
           accept: Joi.string().regex(/json/),
-          ['secret-header']: Joi.string().default('@@@@@@')
+          'secret-header': Joi.string().default('@@@@@@')
         }
       }, {
-        allowUnknown: true,
+        allowUnknown: true
       }), (req, res) => {
         delete req.headers.host; // this can change computer to computer, so just remove it
-        expect(req.headers).toEqual({ 
+        expect(req.headers).toEqual({
           accept: 'application/json',
           'user-agent': 'shot',
           'secret-header': '@@@@@@'
         });
         res.send();
       });
-     
-      server.inject({ 
-        method: 'GET', 
+
+      server.inject({
+        method: 'GET',
         url: '/',
         headers: {
           accept: 'application/json'
@@ -157,30 +160,30 @@ describe('express integration', () => {
 
       server.inject({
         method: 'get',
-        url: '/user/adam',
+        url: '/user/adam'
       }, () => done());
     });
 
     it('req.query', (done) => {
       expect.assertions(1);
       const server = Server();
-  
+
       server.get('/', celebrate({
         query: Joi.object().keys({
           name: Joi.string().uppercase(),
-          page: Joi.number().default(1),
+          page: Joi.number().default(1)
         })
       }), (req, res) => {
         expect(req.query).toBe({
           name: 'JOHN',
-          page:1
+          page: 1
         });
         res.send();
       });
-  
-  
+
+
       server.inject({
-        url: '/?name=john',
+        url: '/?name=john'
       }, () => done());
     });
 
@@ -191,17 +194,17 @@ describe('express integration', () => {
         body: {
           first: Joi.string().required(),
           last: Joi.string().default('Smith'),
-          role: Joi.string().uppercase(),
+          role: Joi.string().uppercase()
         }
       }), (req, res) => {
-        expect(req.body).toEqual({ 
-          first: 'john', 
-          role: 'ADMIN', 
-          last: 'Smith' 
+        expect(req.body).toEqual({
+          first: 'john',
+          role: 'ADMIN',
+          last: 'Smith'
         });
         res.send();
       });
-  
+
       server.inject({
         url: '/',
         method: 'post',

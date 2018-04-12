@@ -1,5 +1,6 @@
 'use strict';
 
+/* eslint-env jest */
 const expect = require('expect');
 const Celebrate = require('../lib');
 
@@ -198,10 +199,11 @@ describe('Celebrate', () => {
       language: { isJohn: 'must equal "john"' },
       rules: [{
         name: 'isJohn',
-        validate (params, v, state, options) {
+        validate(params, v, state, options) {
           if (v !== 'john') {
             return this.createError('string.isJohn', { v }, state, options);
           }
+          return undefined;
         }
       }]
     });
@@ -266,56 +268,56 @@ describe('Celebrate', () => {
 
   describe('errors()', () => {
     it('responds with a joi error from celebrate middleware', () => {
-        expect.assertions(3);
-        const middleware = celebrate({
-          query: {
-            role: Joi.number().integer().min(4)
-          }
-        });
-        const handler = errors();
-        const next = jest.fn();
-        const res = {
-          status (statusCode) {
-            expect(statusCode).toBe(400);
-            return {
-              send (err) {
-                expect(err).toMatchSnapshot();
-                expect(next).not.toHaveBeenCalled();
-              }
-            };
-          }
-        };
+      expect.assertions(3);
+      const middleware = celebrate({
+        query: {
+          role: Joi.number().integer().min(4)
+        }
+      });
+      const handler = errors();
+      const next = jest.fn();
+      const res = {
+        status(statusCode) {
+          expect(statusCode).toBe(400);
+          return {
+            send(err) {
+              expect(err).toMatchSnapshot();
+              expect(next).not.toHaveBeenCalled();
+            }
+          };
+        }
+      };
 
-        middleware({
-          query: {
-            role: '0'
-          },
-          method: 'GET'
-        }, null, (err) => {
-            handler(err, undefined, res, next);
-        });
+      middleware({
+        query: {
+          role: '0'
+        },
+        method: 'GET'
+      }, null, (err) => {
+        handler(err, undefined, res, next);
+      });
     });
 
     it('passes the error through next if not a joi error from celebrate middleware', () => {
-        let errorDirectlyFromJoi = null;
-        const handler = errors();
-        const res = {
-          status (statusCode) {
-            Code.fail('status called');
-          }
-        };
-        const next = (err) => {
-          expect(err).toEqual(errorDirectlyFromJoi);
-        };
+      let errorDirectlyFromJoi = null;
+      const handler = errors();
+      const res = {
+        status() {
+          throw Error('status called');
+        }
+      };
+      const next = (err) => {
+        expect(err).toEqual(errorDirectlyFromJoi);
+      };
 
-        const schema = Joi.object({
-          role: Joi.number().integer().min(4)
-        });
+      const schema = Joi.object({
+        role: Joi.number().integer().min(4)
+      });
 
-        Joi.validate({ role: '0' }, schema, { abortEarly: false, convert: false }, (err) => {
-          errorDirectlyFromJoi = err;
-          handler(err, undefined, res, next);
-        });
+      Joi.validate({ role: '0' }, schema, { abortEarly: false, convert: false }, (err) => {
+        errorDirectlyFromJoi = err;
+        handler(err, undefined, res, next);
+      });
     });
 
     it('only includes key values if joi returns details', () => {
@@ -328,10 +330,10 @@ describe('Celebrate', () => {
       const handler = errors();
       const next = jest.fn();
       const res = {
-        status (statusCode) {
+        status(statusCode) {
           expect(statusCode).toBe(400);
           return {
-            send (err) {
+            send(err) {
               expect(err).toMatchSnapshot();
               expect(next).not.toHaveBeenCalled();
             }
@@ -342,11 +344,11 @@ describe('Celebrate', () => {
       middleware({
         body: {
           role: '0'
-      },
-      method: 'POST'
+        },
+        method: 'POST'
       }, null, (err) => {
-          err.details = null;
-          handler(err, undefined, res, next);
+        err.details = null; // eslint-disable-line no-param-reassign
+        handler(err, undefined, res, next);
       });
     });
   });
@@ -356,12 +358,12 @@ describe('Celebrate', () => {
       expect.assertions(1);
       expect(isCelebrate(Error())).toBe(false);
     });
-    
+
     it('returns false if the error object is not an object', () => {
       expect.assertions(3);
       expect(isCelebrate('errr')).toBe(false);
       expect(isCelebrate(0)).toBe(false);
-      expect(isCelebrate([1,2])).toBe(false);
+      expect(isCelebrate([1, 2])).toBe(false);
     });
 
     it('returns false if the error object is fasly', () => {
@@ -371,20 +373,20 @@ describe('Celebrate', () => {
     });
 
     it('returns true if the error object came from celebrate', () => {
-        expect.assertions(1);
-        const middleware = celebrate({
-          headers: {
-            accept: Joi.string().regex(/xml/)
-          }
-        });
-    
-        middleware({
-          headers: {
-            accept: 'application/json'
-          }
-        }, null, (err) => {
-          expect(isCelebrate(err)).toBe(true);
-        });
+      expect.assertions(1);
+      const middleware = celebrate({
+        headers: {
+          accept: Joi.string().regex(/xml/)
+        }
+      });
+
+      middleware({
+        headers: {
+          accept: 'application/json'
+        }
+      }, null, (err) => {
+        expect(isCelebrate(err)).toBe(true);
+      });
     });
   });
 });

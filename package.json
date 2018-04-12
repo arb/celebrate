@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "lint": "belly-button -i 'lib/*.js' -f",
+    "lint": "eslint lib test --fix",
     "test": "npm run lint && jest --ci",
     "benchmark": "node benchmarks/index"
   },
@@ -34,9 +34,11 @@
     "@types/express": "4.x.x",
     "@types/joi": "13.0.0",
     "artificial": "0.1.x",
-    "belly-button": "4.x.x",
     "benchmark": "2.1.4",
     "body-parser": "1.18.2",
+    "eslint": "4.19.x",
+    "eslint-config-airbnb-base": "12.1.x",
+    "eslint-plugin-import": "2.11.x",
     "expect": "21.2.x",
     "express": "5.0.0-alpha.6",
     "jest": "21.2.x"
