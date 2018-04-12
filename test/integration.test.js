@@ -1,3 +1,5 @@
+'use strict';
+
 /* eslint-env jest */
 const Express = require('express');
 const Artificial = require('artificial');

@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
   extends: 'airbnb-base',
   env: {
@@ -6,6 +8,7 @@ module.exports = {
   rules: {
     'prefer-destructuring': 'off',
     'no-underscore-dangle': 'off',
-    'comma-dangle': ['error', 'never']
+    'comma-dangle': ['error', 'never'],
+    'strict': 'off',
   }
 };

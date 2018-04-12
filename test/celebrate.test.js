@@ -1,3 +1,5 @@
+'use strict';
+
 /* eslint-env jest */
 const expect = require('expect');
 const Celebrate = require('../lib');
