@@ -1,11 +1,8 @@
-sudo: false
 language: node_js
 node_js:
-    - "4"
-    - "6"
-    - "8"
-    - "node"
-
+    - 6
+    - 8
+    - node
 env:
     - EXPRESS_VERSION="4"
     - EXPRESS_VERSION="5.0.0-alpha.6"

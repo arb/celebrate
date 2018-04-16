@@ -1,10 +1,11 @@
 {
   "name": "celebrate",
   "version": "7.0.6",
-  "description": "A joi validation middleware for Express.",
+  "description": "A Joi validation middleware for Express.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
+    "clean": "rm -rf coverage",
     "lint": "eslint lib test --fix",
     "test": "npm run lint && jest --ci",
     "benchmark": "node benchmarks/index"
@@ -26,22 +27,22 @@
   },
   "homepage": "https://github.com/arb/celebrate#readme",
   "dependencies": {
-    "escape-html": "1.0.3",
-    "fastseries": "1.7.2",
-    "joi": "12.x.x"
+    "escape-html": "^1.0.3",
+    "fastseries": "^1.7.2",
+    "joi": "^13.1.2"
   },
   "devDependencies": {
-    "@types/express": "4.x.x",
-    "@types/joi": "13.0.0",
-    "artificial": "0.1.x",
-    "benchmark": "2.1.4",
-    "body-parser": "1.18.2",
-    "eslint": "4.19.x",
-    "eslint-config-airbnb-base": "12.1.x",
-    "eslint-plugin-import": "2.11.x",
-    "expect": "21.2.x",
-    "express": "5.0.0-alpha.6",
-    "jest": "21.2.x"
+    "@types/express": "^4.x.x",
+    "@types/joi": "^13.0.7",
+    "artificial": "^0.1.x",
+    "benchmark": "^2.1.4",
+    "body-parser": "^1.18.2",
+    "eslint": "^4.19.x",
+    "eslint-config-airbnb-base": "^12.1.x",
+    "eslint-plugin-import": "^2.11.x",
+    "expect": "^22.4.x",
+    "express": "^5.0.0-alpha.6",
+    "jest": "^22.4.x"
   },
   "engines": {
     "node": ">=4.0.0"
