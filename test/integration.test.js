@@ -4,10 +4,10 @@
 const Express = require('express');
 const Artificial = require('artificial');
 const BodyParser = require('body-parser');
-const Celebrate = require('../lib');
+const Joi = require('joi');
+const Celebrate = require('../lib')(Joi);
 
 const celebrate = Celebrate.celebrate;
-const Joi = Celebrate.Joi;
 const errors = Celebrate.errors;
 
 const Server = () => {

@@ -9,11 +9,6 @@
 
 `celebrate` is an express middleware function that wraps the [joi](https://github.com/hapijs/joi/tree/v12.0.0) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, `req.query` and `req.body` (provided you are using `body-parser`).
 
-`celebrate` lists joi as a formal dependency. This means that celebrate will always use a predictable, known version of joi during the validation and compilation steps. There are two reasons for this:
-
-1. To ensure that `celebrate` can always use the latest version of joi as soon as it's published
-2. So that `celebrate` can export the version of joi it uses to the consumer to maximize compatibility
-
 Wondering why *another* joi middleware library for express? Full blog post [here](https://medium.com/@adambretz/time-to-celebrate-27ccfc656d7f).
 
 ## express Compatibility
@@ -26,7 +21,8 @@ Example of using `celebrate` on a single POST route to validate `req.body`.
 ```js
 const express = require('express');
 const BodyParser = require('body-parser');
-const { celebrate, Joi, errors } = require('celebrate');
+const Joi = require('joi');
+const { celebrate, errors } = require('celebrate')(Joi);
 
 const app = express();
 app.use(BodyParser.json());
@@ -50,7 +46,8 @@ app.use(errors());
 Example of using `celebrate` to validate all incoming requests to ensure the `token` header is present and matches the supplied regular expression.
 ```js
 const express = require('express');
-const { celebrate, Joi, errors } = require('celebrate');
+const Joi = require('joi');
+const { celebrate, errors } = require('celebrate')(Joi);
 const app = express();
 
 // validate all incoming request headers for the token header
@@ -66,6 +63,8 @@ app.use(errors());
 ```
 
 ## API
+
+`celebrate` exports a single, top-level function that expects a single parameter, the `Joi` object.
 
 ### `celebrate(schema, [options])`
 
