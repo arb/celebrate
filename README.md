@@ -64,7 +64,8 @@ app.use(errors());
 
 ## API
 
-`celebrate` exports a single, top-level function that expects a single parameter, the `Joi` object.
+`celebrate` exports a single, top-level function that expects a single parameter, the `joi` object and returns an object with the following methods
+
 
 ### `celebrate(schema, [options])`
 
