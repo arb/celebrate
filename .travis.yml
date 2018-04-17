@@ -14,7 +14,7 @@ env:
 
 install:
     - npm install -g json
-    - json -I -f package.json -e "this.devDependencies.express=\"$EXPRESS_VERSION\"; this.devDependencies.express=\"$JOI_VERSION\""
+    - json -I -f package.json -e "this.devDependencies.express=\"$EXPRESS_VERSION\"; this.devDependencies.joi=\"$JOI_VERSION\""
     - npm install
 
 matrix:
