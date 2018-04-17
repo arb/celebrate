@@ -1,11 +1,11 @@
 'use strict';
 
 /* eslint-env jest */
+const Joi = require('joi');
 const expect = require('expect');
-const Celebrate = require('../lib');
+const Celebrate = require('../lib')(Joi);
 
 const celebrate = Celebrate.celebrate;
-const Joi = Celebrate.Joi;
 const errors = Celebrate.errors;
 const isCelebrate = Celebrate.isCelebrate;
 

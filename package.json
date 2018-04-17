@@ -27,8 +27,7 @@
   "homepage": "https://github.com/arb/celebrate#readme",
   "dependencies": {
     "escape-html": "1.0.3",
-    "fastseries": "1.7.2",
-    "joi": "12.x.x"
+    "fastseries": "1.7.2"
   },
   "devDependencies": {
     "@types/express": "4.x.x",
@@ -41,7 +40,8 @@
     "eslint-plugin-import": "2.11.x",
     "expect": "21.2.x",
     "express": "5.0.0-alpha.6",
-    "jest": "21.2.x"
+    "jest": "21.2.x",
+    "joi": "12.x.x"
   },
   "engines": {
     "node": ">=4.0.0"
