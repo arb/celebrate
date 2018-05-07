@@ -28,7 +28,7 @@
   "dependencies": {
     "escape-html": "1.0.3",
     "fastseries": "1.7.2",
-    "joi": "12.x.x"
+    "joi": "13.x.x"
   },
   "devDependencies": {
     "@types/express": "4.x.x",
@@ -39,11 +39,11 @@
     "eslint": "4.19.x",
     "eslint-config-airbnb-base": "12.1.x",
     "eslint-plugin-import": "2.11.x",
-    "expect": "21.2.x",
+    "expect": "22.x.x",
     "express": "5.0.0-alpha.6",
-    "jest": "21.2.x"
+    "jest": "22.x.x"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=8.9.0"
   }
 }

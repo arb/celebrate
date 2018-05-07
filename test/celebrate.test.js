@@ -1,13 +1,11 @@
-'use strict';
-
 /* eslint-env jest */
 const expect = require('expect');
-const Celebrate = require('../lib');
-
-const celebrate = Celebrate.celebrate;
-const Joi = Celebrate.Joi;
-const errors = Celebrate.errors;
-const isCelebrate = Celebrate.isCelebrate;
+const {
+  celebrate,
+  Joi,
+  errors,
+  isCelebrate,
+} = require('../lib');
 
 describe('Celebrate', () => {
   it('throws an error if using an invalid schema', () => {
@@ -16,9 +14,9 @@ describe('Celebrate', () => {
       celebrate({
         query: {
           name: Joi.string(),
-          age: Joi.number()
+          age: Joi.number(),
         },
-        foo: Joi.string()
+        foo: Joi.string(),
       });
     }).toThrow('"foo" is not allowed');
 
@@ -35,14 +33,14 @@ describe('Celebrate', () => {
     expect.assertions(2);
     const middleware = celebrate({
       headers: {
-        accept: Joi.string().regex(/xml/)
-      }
+        accept: Joi.string().regex(/xml/),
+      },
     });
 
     middleware({
       headers: {
-        accept: 'application/json'
-      }
+        accept: 'application/json',
+      },
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"accept" with value "application&#x2f;json" fails to match the required pattern: /xml/');
@@ -53,14 +51,14 @@ describe('Celebrate', () => {
     expect.assertions(2);
     const middleware = celebrate({
       params: {
-        id: Joi.string().token()
-      }
+        id: Joi.string().token(),
+      },
     });
 
     middleware({
       params: {
-        id: '@@@'
-      }
+        id: '@@@',
+      },
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"id" must only contain alpha-numeric and underscore characters');
@@ -71,14 +69,14 @@ describe('Celebrate', () => {
     expect.assertions(2);
     const middleware = celebrate({
       query: Joi.object().keys({
-        start: Joi.date()
-      })
+        start: Joi.date(),
+      }),
     });
 
     middleware({
       query: {
-        end: 1
-      }
+        end: 1,
+      },
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"end" is not allowed');
@@ -91,16 +89,16 @@ describe('Celebrate', () => {
       body: {
         first: Joi.string().required(),
         last: Joi.string(),
-        role: Joi.number().integer()
-      }
+        role: Joi.number().integer(),
+      },
     });
 
     middleware({
       body: {
         first: 'john',
-        last: 123
+        last: 123,
       },
-      method: 'POST'
+      method: 'POST',
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"last" must be a string');
@@ -111,29 +109,29 @@ describe('Celebrate', () => {
     expect.assertions(2);
     const middleware = celebrate({
       params: {
-        id: Joi.string().required()
+        id: Joi.string().required(),
       },
       query: Joi.object().keys({
-        start: Joi.date()
+        start: Joi.date(),
       }),
       body: {
         first: Joi.string().required(),
         last: Joi.string(),
-        role: Joi.number().integer()
-      }
+        role: Joi.number().integer(),
+      },
     });
 
     middleware({
       params: {
-        id: '1'
+        id: '1',
       },
       query: {
-        end: false
+        end: false,
       },
       body: {
         first: 'john',
-        last: 123
-      }
+        last: 123,
+      },
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"end" is not allowed');
@@ -145,18 +143,18 @@ describe('Celebrate', () => {
     const req = {
       body: {
         first: 'john',
-        last: 'doe'
+        last: 'doe',
       },
       query: undefined,
-      method: 'POST'
+      method: 'POST',
     };
     const middleware = celebrate({
       body: {
         first: Joi.string().required(),
         last: Joi.string(),
-        role: Joi.number().integer().default('admin')
+        role: Joi.number().integer().default('admin'),
       },
-      query: Joi.number()
+      query: Joi.number(),
     });
 
     middleware(req, null, (err) => {
@@ -164,7 +162,7 @@ describe('Celebrate', () => {
       expect(req.body).toEqual({
         first: 'john',
         last: 'doe',
-        role: 'admin'
+        role: 'admin',
       });
       expect(req.query).toBeUndefined();
     });
@@ -176,16 +174,16 @@ describe('Celebrate', () => {
       body: {
         first: Joi.string().required(),
         last: Joi.string(),
-        role: Joi.number().integer()
-      }
+        role: Joi.number().integer(),
+      },
     });
 
     middleware({
       body: {
         first: 'john',
-        last: 123
+        last: 123,
       },
-      method: 'GET'
+      method: 'GET',
     }, null, (err) => {
       expect(err).toBe(null);
     });
@@ -204,23 +202,23 @@ describe('Celebrate', () => {
             return this.createError('string.isJohn', { v }, state, options);
           }
           return undefined;
-        }
-      }]
+        },
+      }],
     });
 
     const middleware = celebrate({
       body: {
         first: _Joi.string().required().isJohn(),
-        role: _Joi.number().integer()
-      }
+        role: _Joi.number().integer(),
+      },
     });
 
     middleware({
       body: {
         first: 'george',
-        role: 123
+        role: 123,
       },
-      method: 'POST'
+      method: 'POST',
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"first" must equal "john"');
@@ -231,15 +229,15 @@ describe('Celebrate', () => {
     expect.assertions(2);
     const middleware = celebrate({
       query: Joi.object().keys({
-        page: Joi.number()
-      })
+        page: Joi.number(),
+      }),
     }, { stripUnknown: true });
     const req = {
       query: {
         start: Date.now(),
-        page: 1
+        page: 1,
       },
-      method: 'GET'
+      method: 'GET',
     };
 
     middleware(req, null, (err) => {
@@ -252,14 +250,14 @@ describe('Celebrate', () => {
     expect.assertions(2);
     const middleware = celebrate({
       headers: {
-        accept: Joi.string().regex(/xml/)
-      }
+        accept: Joi.string().regex(/xml/),
+      },
     }, { escapeHtml: false });
 
     middleware({
       headers: {
-        accept: 'application/json'
-      }
+        accept: 'application/json',
+      },
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
       expect(err.details[0].message).toBe('"accept" with value "application/json" fails to match the required pattern: /xml/');
@@ -271,8 +269,8 @@ describe('Celebrate', () => {
       expect.assertions(3);
       const middleware = celebrate({
         query: {
-          role: Joi.number().integer().min(4)
-        }
+          role: Joi.number().integer().min(4),
+        },
       });
       const handler = errors();
       const next = jest.fn();
@@ -283,16 +281,16 @@ describe('Celebrate', () => {
             send(err) {
               expect(err).toMatchSnapshot();
               expect(next).not.toHaveBeenCalled();
-            }
+            },
           };
-        }
+        },
       };
 
       middleware({
         query: {
-          role: '0'
+          role: '0',
         },
-        method: 'GET'
+        method: 'GET',
       }, null, (err) => {
         handler(err, undefined, res, next);
       });
@@ -304,14 +302,14 @@ describe('Celebrate', () => {
       const res = {
         status() {
           throw Error('status called');
-        }
+        },
       };
       const next = (err) => {
         expect(err).toEqual(errorDirectlyFromJoi);
       };
 
       const schema = Joi.object({
-        role: Joi.number().integer().min(4)
+        role: Joi.number().integer().min(4),
       });
 
       Joi.validate({ role: '0' }, schema, { abortEarly: false, convert: false }, (err) => {
@@ -324,8 +322,8 @@ describe('Celebrate', () => {
       expect.assertions(3);
       const middleware = celebrate({
         body: {
-          first: Joi.string().required()
-        }
+          first: Joi.string().required(),
+        },
       });
       const handler = errors();
       const next = jest.fn();
@@ -336,16 +334,16 @@ describe('Celebrate', () => {
             send(err) {
               expect(err).toMatchSnapshot();
               expect(next).not.toHaveBeenCalled();
-            }
+            },
           };
-        }
+        },
       };
 
       middleware({
         body: {
-          role: '0'
+          role: '0',
         },
-        method: 'POST'
+        method: 'POST',
       }, null, (err) => {
         err.details = null; // eslint-disable-line no-param-reassign
         handler(err, undefined, res, next);
@@ -376,14 +374,14 @@ describe('Celebrate', () => {
       expect.assertions(1);
       const middleware = celebrate({
         headers: {
-          accept: Joi.string().regex(/xml/)
-        }
+          accept: Joi.string().regex(/xml/),
+        },
       });
 
       middleware({
         headers: {
-          accept: 'application/json'
-        }
+          accept: 'application/json',
+        },
       }, null, (err) => {
         expect(isCelebrate(err)).toBe(true);
       });

@@ -23,7 +23,7 @@ declare namespace Celebrate {
     /**
      * The Joi version Celebrate uses internally.
      */
-    export const Joi: joi
+    export const Joi: joi;
 
     /**
      * Examines an error object to determine if it originated from the celebrate middleware.
