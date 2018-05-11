@@ -1,11 +1,25 @@
-![Celebrate](https://github.com/continuationlabs/celebrate/raw/master/images/logo.png)
-
-<sub>Logo design by chris.ruppert@gmail.com</sub>
+[![celebrate](https://github.com/arb/celebrate/raw/master/images/logo.svg?sanitize=1)](https://www.npmjs.org/package/celebrate)
 
 [![Current Version](https://img.shields.io/npm/v/celebrate.svg)](https://www.npmjs.org/package/celebrate)
 [![Build Status](https://travis-ci.org/arb/celebrate.svg?branch=master)](https://travis-ci.org/arb/celebrate)
 [![airbnb-style](https://img.shields.io/badge/eslint-airbnb-4B32C3.svg)](https://github.com/airbnb/javascript)
 
+<table>
+  <tbody>
+    <tr>
+      <td>Sponsored by</td>
+      <td>
+        <a href="https://github.com/webflow/">
+          <img 
+            height="100"
+            src="https://github.com/arb/celebrate/raw/master/images/webflow-logo-blue.svg?sanitize=1" 
+            alt="Webflow"
+          />
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 `celebrate` is an express middleware function that wraps the [joi](https://github.com/hapijs/joi/tree/v12.0.0) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, `req.query` and `req.body` (provided you are using `body-parser`).
 
