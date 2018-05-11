@@ -1,14 +1,14 @@
-'use strict';
+
 
 /* eslint-env jest */
 const Express = require('express');
 const Artificial = require('artificial');
 const BodyParser = require('body-parser');
-const Celebrate = require('../lib');
-
-const celebrate = Celebrate.celebrate;
-const Joi = Celebrate.Joi;
-const errors = Celebrate.errors;
+const {
+  celebrate,
+  Joi,
+  errors,
+} = require('../lib');
 
 const Server = () => {
   const server = Express();
@@ -25,10 +25,10 @@ describe('express integration', () => {
 
       server.get('/', celebrate({
         headers: {
-          accept: Joi.string().regex(/xml/)
-        }
+          accept: Joi.string().regex(/xml/),
+        },
       }, {
-        allowUnknown: true
+        allowUnknown: true,
       }));
 
       server.use(errors());
@@ -37,8 +37,8 @@ describe('express integration', () => {
         method: 'GET',
         url: '/',
         headers: {
-          accept: 'application/json'
-        }
+          accept: 'application/json',
+        },
       }, (res) => {
         expect(res.statusCode).toBe(400);
         expect(JSON.parse(res.payload)).toMatchSnapshot();
@@ -51,15 +51,15 @@ describe('express integration', () => {
       const server = Server();
       server.get('/user/:id', celebrate({
         params: {
-          id: Joi.string().token()
-        }
+          id: Joi.string().token(),
+        },
       }));
 
       server.use(errors());
 
       server.inject({
         method: 'get',
-        url: '/user/@@'
+        url: '/user/@@',
       }, (res) => {
         expect(res.statusCode).toBe(400);
         expect(JSON.parse(res.payload)).toMatchSnapshot();
@@ -73,14 +73,14 @@ describe('express integration', () => {
 
       server.get('/', celebrate({
         query: Joi.object().keys({
-          start: Joi.date()
-        })
+          start: Joi.date(),
+        }),
       }));
 
       server.use(errors());
 
       server.inject({
-        url: '/?end=celebrate'
+        url: '/?end=celebrate',
       }, (res) => {
         expect(res.statusCode).toBe(400);
         expect(JSON.parse(res.payload)).toMatchSnapshot();
@@ -95,8 +95,8 @@ describe('express integration', () => {
         body: {
           first: Joi.string().required(),
           last: Joi.string(),
-          role: Joi.number().integer()
-        }
+          role: Joi.number().integer(),
+        },
       }));
 
       server.use(errors());
@@ -106,8 +106,8 @@ describe('express integration', () => {
         method: 'post',
         payload: {
           first: 'john',
-          last: 123
-        }
+          last: 123,
+        },
       }, (res) => {
         expect(res.statusCode).toBe(400);
         expect(JSON.parse(res.payload)).toMatchSnapshot();
@@ -123,16 +123,16 @@ describe('express integration', () => {
       server.get('/', celebrate({
         headers: {
           accept: Joi.string().regex(/json/),
-          'secret-header': Joi.string().default('@@@@@@')
-        }
+          'secret-header': Joi.string().default('@@@@@@'),
+        },
       }, {
-        allowUnknown: true
+        allowUnknown: true,
       }), (req, res) => {
         delete req.headers.host; // this can change computer to computer, so just remove it
         expect(req.headers).toEqual({
           accept: 'application/json',
           'user-agent': 'shot',
-          'secret-header': '@@@@@@'
+          'secret-header': '@@@@@@',
         });
         res.send();
       });
@@ -141,8 +141,8 @@ describe('express integration', () => {
         method: 'GET',
         url: '/',
         headers: {
-          accept: 'application/json'
-        }
+          accept: 'application/json',
+        },
       }, () => done());
     });
 
@@ -151,8 +151,8 @@ describe('express integration', () => {
       const server = Server();
       server.get('/user/:id', celebrate({
         params: {
-          id: Joi.string().uppercase()
-        }
+          id: Joi.string().uppercase(),
+        },
       }), (req, res) => {
         expect(req.params.id).toBe('ADAM');
         res.send();
@@ -160,7 +160,7 @@ describe('express integration', () => {
 
       server.inject({
         method: 'get',
-        url: '/user/adam'
+        url: '/user/adam',
       }, () => done());
     });
 
@@ -171,19 +171,19 @@ describe('express integration', () => {
       server.get('/', celebrate({
         query: Joi.object().keys({
           name: Joi.string().uppercase(),
-          page: Joi.number().default(1)
-        })
+          page: Joi.number().default(1),
+        }),
       }), (req, res) => {
         expect(req.query).toBe({
           name: 'JOHN',
-          page: 1
+          page: 1,
         });
         res.send();
       });
 
 
       server.inject({
-        url: '/?name=john'
+        url: '/?name=john',
       }, () => done());
     });
 
@@ -194,13 +194,13 @@ describe('express integration', () => {
         body: {
           first: Joi.string().required(),
           last: Joi.string().default('Smith'),
-          role: Joi.string().uppercase()
-        }
+          role: Joi.string().uppercase(),
+        },
       }), (req, res) => {
         expect(req.body).toEqual({
           first: 'john',
           role: 'ADMIN',
-          last: 'Smith'
+          last: 'Smith',
         });
         res.send();
       });
@@ -210,8 +210,8 @@ describe('express integration', () => {
         method: 'post',
         payload: {
           first: 'john',
-          role: 'admin'
-        }
+          role: 'admin',
+        },
       }, () => done());
     });
   });
