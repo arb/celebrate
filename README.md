@@ -21,7 +21,7 @@
   </tbody>
 </table>
 
-`celebrate` is an express middleware function that wraps the [joi](https://github.com/hapijs/joi/tree/v12.0.0) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, `req.query` and `req.body` (provided you are using `body-parser`).
+`celebrate` is an express middleware function that wraps the [joi](https://github.com/hapijs/joi/tree/master) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, `req.query` and `req.body` (provided you are using `body-parser`).
 
 `celebrate` lists joi as a formal dependency. This means that celebrate will always use a predictable, known version of joi during the validation and compilation steps. There are two reasons for this:
 
@@ -86,17 +86,17 @@ app.use(errors());
 Returns a `function` with the middleware signature (`(req, res, next)`).
 
 - `schema` - a object where `key` can be one of `'params'`, `'headers'`, `'query'`, and `'body'` and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the keys specified will be validated against the incoming request object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one of the valid keys. 
-- `[options]` - `joi` [options](https://github.com/hapijs/joi/blob/v12.0.0/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function. Defaults to `{ escapeHtml: true }`.
+- `[options]` - `joi` [options](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function. Defaults to `{ escapeHtml: true }`.
 
 ### `errors()`
 
 Returns a `function` with the error handler signature (`(err, req, res, next)`). This should be placed with any other error handling middleware to catch joi validation errors. If the incoming `err` object is an error originating from celebrate, `errors()` will respond with a 400 status code and the joi validation message. Otherwise, it will call `next(err)` and will pass the error along and will need to be processed by another error handler.
 
-If the error format does not suite your needs, you are encouraged to write your own error handler and check `isCelebrate(err)` to format celebrate errors to your liking. The full [joi error object](https://github.com/hapijs/joi/blob/v12.0.0/API.md#errors) will be available in your own error handler.
+If the error format does not suite your needs, you are encouraged to write your own error handler and check `isCelebrate(err)` to format celebrate errors to your liking. The full [joi error object](https://github.com/hapijs/joi/blob/master/API.md#errors) will be available in your own error handler.
 
 ### `Joi`
 
-`celebrate` exports the version of joi it is using internally. For maximum compatibility, you should use this version when passing in any validation schemas.
+`celebrate` exports the version of joi it is using internally. For maximum compatibility, you should use this version when creating schemas used with celebrate.
 
 ### `isCelebrate(err)`
 
