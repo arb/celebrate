@@ -1,5 +1,6 @@
 module.exports = {
   verbose: true,
+  testURL: 'http://localhost/',
   collectCoverageFrom: ['lib/index.js'],
   collectCoverage: true,
   coverageThreshold: {
