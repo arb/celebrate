@@ -1,8 +1,8 @@
 [![celebrate](https://github.com/arb/celebrate/raw/master/images/logo.svg?sanitize=1)](https://www.npmjs.org/package/celebrate)
 
-[![Current Version](https://img.shields.io/npm/v/celebrate.svg)](https://www.npmjs.org/package/celebrate)
-[![Build Status](https://travis-ci.org/arb/celebrate.svg?branch=master)](https://travis-ci.org/arb/celebrate)
-[![airbnb-style](https://img.shields.io/badge/eslint-airbnb-4B32C3.svg)](https://github.com/airbnb/javascript)
+[![Current Version](https://flat.badgen.net/npm/v/celebrate)](https://www.npmjs.org/package/celebrate)
+[![Build Status](https://flat.badgen.net/travis/arb/celebrate)](https://travis-ci.org/arb/celebrate)
+[![airbnb-style](https://flat.badgen.net/badge/eslint/airbnb/ff5a5f)](https://github.com/airbnb/javascript)
 
 <table>
   <tbody>
