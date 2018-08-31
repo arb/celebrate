@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Celebrate errors() only includes key values if joi returns details 1`] = `
+exports[`errors() only includes key values if joi returns details 1`] = `
 Object {
   "error": "Bad Request",
   "message": "child \\"first\\" fails because [\\"first\\" is required]",
@@ -12,7 +12,7 @@ Object {
 }
 `;
 
-exports[`Celebrate errors() responds with a joi error from celebrate middleware 1`] = `
+exports[`errors() responds with a joi error from celebrate middleware 1`] = `
 Object {
   "error": "Bad Request",
   "message": "child \\"role\\" fails because [\\"role\\" must be larger than or equal to 4]",
