@@ -27,7 +27,6 @@
   "homepage": "https://github.com/arb/celebrate#readme",
   "dependencies": {
     "escape-html": "1.0.3",
-    "fastseries": "1.7.2",
     "joi": "13.x.x"
   },
   "devDependencies": {
