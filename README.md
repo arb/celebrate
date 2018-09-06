@@ -3,6 +3,7 @@
 [![Current Version](https://flat.badgen.net/npm/v/celebrate)](https://www.npmjs.org/package/celebrate)
 [![Build Status](https://flat.badgen.net/travis/arb/celebrate)](https://travis-ci.org/arb/celebrate)
 [![airbnb-style](https://flat.badgen.net/badge/eslint/airbnb/ff5a5f)](https://github.com/airbnb/javascript)
+[![Code Coverage](https://flat.badgen.net/codecov/c/github/arb/celebrate)](https://codecov.io/gh/arb/celebrate)
 
 <table>
   <tbody>
