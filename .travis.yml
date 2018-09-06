@@ -9,6 +9,12 @@ env:
     - EXPRESS_VERSION="5.0.0-alpha.6"
 
 install:
+    - npm install -g codecov
     - npm install -g json
     - json -I -f package.json -e "this.devDependencies.express=\"$EXPRESS_VERSION\""
     - npm install
+
+script:
+    - npm test
+    - codecov
+

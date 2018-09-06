@@ -2,6 +2,7 @@ module.exports = {
   verbose: true,
   testURL: 'http://localhost/',
   collectCoverageFrom: ['lib/index.js'],
+  coverageDirectory: './coverage',
   collectCoverage: true,
   coverageThreshold: {
     global: {
