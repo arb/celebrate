@@ -31,6 +31,11 @@
 
 Wondering why *another* joi middleware library for express? Full blog post [here](https://medium.com/@adambretz/time-to-celebrate-27ccfc656d7f).
 
+⚠️**Mutation Warning**⚠️
+If you use any of joi's updating validation APIs (`defualt`, `rename`, etc.) `celebrate` will override the source value with the changes applied by joi. 
+
+For example, if you validate `req.query` and have a `default` value in your joi schema, if the incoming `req.query` is missing a value for default, during validation `celebrate` will overrite the original `req.query` with the result of `joi.validate`. This is done so that once `req` has been validated, you can be sure all the inputs are valid and ready to consume in your handler functions and you don't need to re-write all your handlers to look for the query values in `res.locals.*`. 
+
 ## express Compatibility
 
 celebrate is tested and has full compatibility with express 4 and 5. It should work correctly with express 3, but including it in the test matrix was more trouble than it's worth. This is primarily because express 3 stores exposes route parameters as an array rather than an object.
