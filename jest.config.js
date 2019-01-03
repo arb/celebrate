@@ -1,9 +1,7 @@
 module.exports = {
-  verbose: true,
-  testURL: 'http://localhost/',
+  collectCoverage: true,
   collectCoverageFrom: ['lib/index.js'],
   coverageDirectory: './coverage',
-  collectCoverage: true,
   coverageThreshold: {
     global: {
       branches: 100,
@@ -12,4 +10,6 @@ module.exports = {
       statements: 100,
     },
   },
+  testEnvironment: 'node',
+  verbose: true,
 };

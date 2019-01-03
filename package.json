@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@types/express": "4.x.x",
-    "@types/joi": "13.0.0",
+    "@types/joi": "14.x.x",
     "artificial": "0.1.x",
     "benchmark": "2.1.4",
     "body-parser": "1.18.2",
@@ -39,7 +39,8 @@
     "eslint-config-airbnb-base": "12.1.x",
     "eslint-plugin-import": "2.11.x",
     "expect": "23.x.x",
-    "express": "5.0.0-alpha.6",
+    "express": "next",
+    "faker": "4.1.x",
     "jest": "23.x.x"
   },
   "engines": {
