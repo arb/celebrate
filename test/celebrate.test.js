@@ -7,6 +7,8 @@ const {
   isCelebrate,
 } = require('../lib');
 
+const { name, random, date } = require('faker');
+
 describe('celebrate()', () => {
   describe.each`
     schema | expected
@@ -22,15 +24,15 @@ describe('celebrate()', () => {
 });
 
   describe.each`
-    name | schema | req | message
+    segment | schema | req | message
     ${'req.headers'} | ${{ headers: { accept: Joi.string().regex(/xml/) } }} | ${{ headers: { accept: 'application/json' } }} | ${'"accept" with value "application&#x2f;json" fails to match the required pattern: /xml/'}
     ${'req.params'} | ${{ params: { id: Joi.string().token() } }} | ${{ params: { id: '@@@' } }} | ${'"id" must only contain alpha-numeric and underscore characters'}
-    ${'req.query'} | ${{ query: Joi.object().keys({ start: Joi.date() }) }} | ${{ query: { end: 1 } }} | ${'"end" is not allowed'}
-    ${'req.body'} | ${{ body: { first: Joi.string().required(), last: Joi.string(), role: Joi.number().integer() } }} | ${{ body: { first: 'john', last: 123 }, method: 'POST' }} | ${'"last" must be a string'}
+    ${'req.query'} | ${{ query: Joi.object().keys({ start: Joi.date() }) }} | ${{ query: { end: random.number() } }} | ${'"end" is not allowed'}
+    ${'req.body'} | ${{ body: { first: Joi.string().required(), last: Joi.string(), role: Joi.number().integer() } }} | ${{ body: { first: name.firstName(), last: random.number() }, method: 'POST' }} | ${'"last" must be a string'}
     `('celebate middleware', ({
-  schema, req, message, name,
+  schema, req, message, segment,
 }) => {
-  it(`validates ${name}`, () => {
+  it(`validates ${segment}`, () => {
     expect.assertions(2);
     const middleware = celebrate(schema);
 
@@ -59,14 +61,14 @@ describe('celebrate()', () => {
 
     middleware({
       params: {
-        id: '1',
+        id: random.alphaNumeric(10),
       },
       query: {
-        end: false,
+        end: random.boolean(),
       },
       body: {
-        first: 'john',
-        last: 123,
+        first: name.firstName(),
+        last: name.lastName(),
       },
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
@@ -76,10 +78,13 @@ describe('celebrate()', () => {
 
   it('applys any joi transorms back to the object', () => {
     expect.assertions(3);
+    const first = name.firstName();
+    const last = name.lastName();
+    const role = name.jobTitle();
     const req = {
       body: {
-        first: 'john',
-        last: 'doe',
+        first,
+        last,
       },
       query: undefined,
       method: 'POST',
@@ -88,7 +93,7 @@ describe('celebrate()', () => {
       body: {
         first: Joi.string().required(),
         last: Joi.string(),
-        role: Joi.number().integer().default('admin'),
+        role: Joi.number().integer().default(role),
       },
       query: Joi.number(),
     });
@@ -96,9 +101,9 @@ describe('celebrate()', () => {
     middleware(req, null, (err) => {
       expect(err).toBe(null);
       expect(req.body).toEqual({
-        first: 'john',
-        last: 'doe',
-        role: 'admin',
+        first,
+        last,
+        role,
       });
       expect(req.query).toBeUndefined();
     });
@@ -116,8 +121,8 @@ describe('celebrate()', () => {
 
     middleware({
       body: {
-        first: 'john',
-        last: 123,
+        first: name.firstName(),
+        last: name.lastName(),
       },
       method: 'GET',
     }, null, (err) => {
@@ -151,8 +156,8 @@ describe('celebrate()', () => {
 
     middleware({
       body: {
-        first: 'george',
-        role: 123,
+        first: name.firstName(),
+        role: random.number(),
       },
       method: 'POST',
     }, null, (err) => {
@@ -170,7 +175,7 @@ describe('celebrate()', () => {
     }, { stripUnknown: true });
     const req = {
       query: {
-        start: Date.now(),
+        start: date.recent(),
         page: 1,
       },
       method: 'GET',
@@ -225,7 +230,7 @@ describe('errors()', () => {
 
     middleware({
       query: {
-        role: '0',
+        role: random.number({ min: 0, max: 3 }),
       },
       method: 'GET',
     }, null, (err) => {
@@ -249,7 +254,9 @@ describe('errors()', () => {
       role: Joi.number().integer().min(4),
     });
 
-    Joi.validate({ role: '0' }, schema, { abortEarly: false, convert: false }, (err) => {
+    Joi.validate({
+      role: random.word(),
+    }, schema, { abortEarly: false, convert: false }, (err) => {
       errorDirectlyFromJoi = err;
       handler(err, undefined, res, next);
     });
@@ -278,7 +285,7 @@ describe('errors()', () => {
 
     middleware({
       body: {
-        role: '0',
+        role: random.word(),
       },
       method: 'POST',
     }, null, (err) => {
@@ -314,7 +321,7 @@ describe('isCelebrate', () => {
 
     middleware({
       headers: {
-        accept: 'application/json',
+        accept: random.number(),
       },
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
