@@ -5,8 +5,9 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "lint": "eslint lib test --fix",
-    "test": "npm run lint && jest --ci",
+    "test": "is-ci 'test:ci' 'test:local'",
+    "test:local": "jest --watch",
+    "test:ci": "jest --ci",
     "benchmark": "node benchmarks/index"
   },
   "repository": {
@@ -35,13 +36,15 @@
     "artificial": "0.1.x",
     "benchmark": "2.1.4",
     "body-parser": "1.18.2",
-    "eslint": "4.19.x",
-    "eslint-config-airbnb-base": "12.1.x",
-    "eslint-plugin-import": "2.11.x",
+    "eslint": "5.x.x",
+    "eslint-config-airbnb-base": "13.x.x",
+    "eslint-plugin-import": "2.x.x",
     "expect": "23.x.x",
     "express": "next",
     "faker": "4.1.x",
-    "jest": "23.x.x"
+    "is-ci-cli": "^1.1.1",
+    "jest": "23.x.x",
+    "jest-runner-eslint": "^0.7.1"
   },
   "engines": {
     "node": ">=8.9.0"
