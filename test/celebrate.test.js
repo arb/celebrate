@@ -1,5 +1,6 @@
 /* eslint-env jest */
 const expect = require('expect');
+const { name, random, date } = require('faker');
 const {
   celebrate,
   Joi,
@@ -7,7 +8,6 @@ const {
   isCelebrate,
 } = require('../lib');
 
-const { name, random, date } = require('faker');
 
 describe('celebrate()', () => {
   describe.each`
