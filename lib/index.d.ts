@@ -13,6 +13,8 @@ declare namespace Celebrate {
         params?: object,
         headers?: object,
         query?: object,
+        cookies?: object,
+        signedCookies?: object,
         body?: object,
     }, config?: object): RequestHandler
     /**

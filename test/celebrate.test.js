@@ -29,6 +29,8 @@ describe('celebrate()', () => {
     ${'req.params'} | ${{ params: { id: Joi.string().token() } }} | ${{ params: { id: '@@@' } }} | ${'"id" must only contain alpha-numeric and underscore characters'}
     ${'req.query'} | ${{ query: Joi.object().keys({ start: Joi.date() }) }} | ${{ query: { end: random.number() } }} | ${'"end" is not allowed'}
     ${'req.body'} | ${{ body: { first: Joi.string().required(), last: Joi.string(), role: Joi.number().integer() } }} | ${{ body: { first: name.firstName(), last: random.number() }, method: 'POST' }} | ${'"last" must be a string'}
+    ${'req.cookies'} | ${{ cookies: { state: Joi.string().required() } }} | ${{ cookies: { state: random.number() } }} | ${'"state" must be a string'}
+    ${'req.signedCookies'} | ${{ cookies: { uid: Joi.string().required() } }} | ${{ cookies: { uid: random.number() } }} | ${'"uid" must be a string'}
     `('celebate middleware', ({
   schema, req, message, segment,
 }) => {
