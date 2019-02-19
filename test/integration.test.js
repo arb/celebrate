@@ -6,6 +6,7 @@ const Artificial = require('artificial');
 const BodyParser = require('body-parser');
 const CookieParser = require('cookie-parser');
 const signature = require('cookie-signature');
+const { random } = require('faker');
 const {
   celebrate,
   Joi,
@@ -14,7 +15,7 @@ const {
 
 const Server = () => {
   const server = Express();
-  server.use(CookieParser('secret'));
+  server.use(CookieParser(random.alphaNumeric()));
   server.use(BodyParser.json());
   Artificial(server);
   return server;
