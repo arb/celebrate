@@ -22,7 +22,13 @@
   </tbody>
 </table>
 
-`celebrate` is an express middleware function that wraps the [joi](https://github.com/hapijs/joi/tree/master) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, `req.query` and `req.body` (provided you are using `body-parser`).
+`celebrate` is an express middleware function that wraps the [joi](https://github.com/hapijs/joi/tree/master) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, `req.query` and the middleware below when provided with their respective modules.
+
+The middleware will also validate:
+
+* `req.body` — provided you are using `body-parser`
+* `req.cookies` — provided you are using `cookie-parser`
+* `req.signedCookies` — provided you are using `cookie-parser`
 
 `celebrate` lists joi as a formal dependency. This means that celebrate will always use a predictable, known version of joi during the validation and compilation steps. There are two reasons for this:
 
@@ -76,13 +82,32 @@ const app = express();
 // validate all incoming request headers for the token header
 // if missing or not the correct format, respond with an error
 app.use(celebrate({
- headers: Joi.object({
-   token: Joi.string().required().regex(/abc\d{3}/)
- }).unknown()
+  headers: Joi.object({
+    token: Joi.string().required().regex(/abc\d{3}/)
+  }).unknown()
 }));
 app.get('/', (req, res) => { res.send('hello world'); });
 app.get('/foo', (req, res) => { res.send('a foo request'); });
 app.use(errors());
+```
+
+Example of using `celebrate` with `cookie-parser`.
+```js
+const express = require('express');
+const CookieParser = require('cookie-parser');
+const { celebrate, Joi, errors } = require('celebrate');
+
+const app = express();
+app.use(CookieParser('top secret'));
+
+// validate request if access token is provided
+app.post('/protected', celebrate({
+  signedCookies: Joi.object({
+    accessToken: Joi.string().required()
+  }).unknown()
+}), (req, res) => {
+  // At this point, req.signedCookies has been validated
+});
 ```
 
 ## API
@@ -117,7 +142,9 @@ Returns `true` if the provided `err` object originated from the `celebrate` midd
 1. `req.headers`
 2. `req.params`
 3. `req.query`
-4. `req.body`
+4. `req.cookies`
+5. `req.signedCookies`
+6. `req.body`
 
 If any of the configured validation rules fail, the entire request will be considered invalid and the rest of the validation will be short-circuited and the validation error will be passed into `next`. 
 

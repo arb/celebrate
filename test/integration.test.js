@@ -4,6 +4,9 @@
 const Express = require('express');
 const Artificial = require('artificial');
 const BodyParser = require('body-parser');
+const CookieParser = require('cookie-parser');
+const signature = require('cookie-signature');
+const { random } = require('faker');
 const {
   celebrate,
   Joi,
@@ -12,6 +15,7 @@ const {
 
 const Server = () => {
   const server = Express();
+  server.use(CookieParser(random.alphaNumeric()));
   server.use(BodyParser.json());
   Artificial(server);
   return server;
@@ -81,6 +85,56 @@ describe('express integration', () => {
 
       server.inject({
         url: '/?end=celebrate',
+      }, (res) => {
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.payload)).toMatchSnapshot();
+        done();
+      });
+    });
+
+    it('req.cookies', (done) => {
+      expect.assertions(2);
+      const server = Server();
+      server.post('/', celebrate({
+        cookies: {
+          state: Joi.number().required(),
+        },
+      }));
+
+      server.use(errors());
+
+      server.inject({
+        url: '/',
+        method: 'post',
+        headers: {
+          Cookie: 'state=notanumber',
+        },
+      }, (res) => {
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.payload)).toMatchSnapshot();
+        done();
+      });
+    });
+
+    it('req.signedCookies', (done) => {
+      expect.assertions(2);
+      const server = Server();
+      server.get('/', celebrate({
+        signedCookies: {
+          secureState: Joi.number().required(),
+        },
+      }));
+
+      server.use(errors());
+
+      const val = signature.sign('notanumber', 'secret');
+
+      server.inject({
+        url: '/',
+        method: 'get',
+        headers: {
+          Cookie: `state=s:${val}`,
+        },
       }, (res) => {
         expect(res.statusCode).toBe(400);
         expect(JSON.parse(res.payload)).toMatchSnapshot();

@@ -14,6 +14,20 @@ Object {
 }
 `;
 
+exports[`express integration validations req.cookies 1`] = `
+Object {
+  "error": "Bad Request",
+  "message": "child \\"state\\" fails because [\\"state\\" must be a number]",
+  "statusCode": 400,
+  "validation": Object {
+    "keys": Array [
+      "state",
+    ],
+    "source": "cookies",
+  },
+}
+`;
+
 exports[`express integration validations req.headers 1`] = `
 Object {
   "error": "Bad Request",
@@ -52,6 +66,20 @@ Object {
       "end",
     ],
     "source": "query",
+  },
+}
+`;
+
+exports[`express integration validations req.signedCookies 1`] = `
+Object {
+  "error": "Bad Request",
+  "message": "child \\"secureState\\" fails because [\\"secureState\\" is required]",
+  "statusCode": 400,
+  "validation": Object {
+    "keys": Array [
+      "secureState",
+    ],
+    "source": "signedCookies",
   },
 }
 `;
