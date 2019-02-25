@@ -22,13 +22,13 @@
   </tbody>
 </table>
 
-`celebrate` is an express middleware function that wraps the [joi](https://github.com/hapijs/joi/tree/master) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, `req.query` and the middleware below when provided with their respective modules.
+`celebrate` is an express middleware function that wraps the [joi](https://github.com/hapijs/joi/tree/master) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, and `req.query`.
 
 The middleware will also validate:
 
-* `req.body` — provided you are using `body-parser`
-* `req.cookies` — provided you are using `cookie-parser`
-* `req.signedCookies` — provided you are using `cookie-parser`
+* `req.body` — provided you are using [`body-parser`](https://github.com/expressjs/body-parser)
+* `req.cookies` — provided you are using [`cookie-parser`](https://github.com/expressjs/cookie-parser)
+* `req.signedCookies` — provided you are using [`cookie-parser`](https://github.com/expressjs/cookie-parser)
 
 `celebrate` lists joi as a formal dependency. This means that celebrate will always use a predictable, known version of joi during the validation and compilation steps. There are two reasons for this:
 
@@ -112,12 +112,12 @@ app.post('/protected', celebrate({
 
 ## API
 
-### `celebrate(schema, [options])`
+### `celebrate(schema, [joiOptions])`
 
 Returns a `function` with the middleware signature (`(req, res, next)`).
 
 - `schema` - a object where `key` can be one of `'params'`, `'headers'`, `'query'`, and `'body'` and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the keys specified will be validated against the incoming request object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one of the valid keys. 
-- `[options]` - `joi` [options](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function. Defaults to `{ escapeHtml: true }`.
+- `[joiOptions]` - `joi` [options](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function. Defaults to `{ escapeHtml: true }`.
 
 ### `errors()`
 
