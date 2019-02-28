@@ -116,7 +116,7 @@ app.post('/protected', celebrate({
 
 Returns a `function` with the middleware signature (`(req, res, next)`).
 
-- `schema` - a object where `key` can be one of `'params'`, `'headers'`, `'query'`, and `'body'` and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the keys specified will be validated against the incoming request object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one of the valid keys. 
+- `schema` - a object where `key` can be one of `'params'`, `'headers'`, `'query'`, `'cookies'`, `'signedCookies'` and `'body'` and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the keys specified will be validated against the incoming request object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one of the valid keys. 
 - `[joiOptions]` - `joi` [options](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function. Defaults to `{ escapeHtml: true }`.
 
 ### `errors()`
