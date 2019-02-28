@@ -6,7 +6,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "is-ci 'test:ci' 'test:local'",
-    "test:local": "jest --watch",
+    "test:local": "jest --watch --verbose",
     "test:ci": "jest --ci",
     "benchmark": "node benchmarks/index"
   },
