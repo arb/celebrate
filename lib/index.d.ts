@@ -1,25 +1,45 @@
 import { ErrorRequestHandler, RequestHandler } from 'express';
-import { Root as joi } from 'joi';
+import { Root as joi, ValidationOptions } from 'joi';
 
 declare namespace Celebrate {
     /**
     * Creates a Celebrate middleware function.
-    * @param {Object} schema - object where each key is one of ["params", "headers", "query", "body"] and the value is
-    * a Joi schema.
-    * @param {Object} [joiOptions] - optional configuration options that will be passed directly into Joi.
-    * @returns {Function} an express middleware function
     */
     function celebrate(schema: {
+        /**
+         * When `params` is set, `joi` will validate `req.params` with the supplied schema.
+         */
         params?: object,
+        /**
+         * When `headers` is set, `joi` will validate `req.headers` with the supplied schema.
+         */
         headers?: object,
+        /**
+         * When `query` is set, `joi` will validate `req.query` with the supplied schema.
+         */
         query?: object,
+        /**
+         * When `cookies` is set, `joi` will validate `req.cookies` with the supplied schema.
+         */
         cookies?: object,
+        /**
+         * When `signedCookies` is set, `joi` will validate `req.signedCookies` with the supplied schema.
+         */
         signedCookies?: object,
+        /**
+         * When `body` is set, `joi` will validate `req.body` with the supplied schema.
+         */
         body?: object,
-    }, joiOptions?: object): RequestHandler
+    },  
+    joiOptions?: ValidationOptions,
+    celebrateOptions?: {
+        /**
+         * When `true` uses the entire `req` object as the `context` value during validation. 
+         */
+       reqContext: boolean, 
+    }): RequestHandler
     /**
      * Creates a Celebrate error handler middleware function.
-     * @returns {Function} an express error handler function
      */
     function errors(): () => ErrorRequestHandler;
     /**
@@ -29,10 +49,8 @@ declare namespace Celebrate {
 
     /**
      * Examines an error object to determine if it originated from the celebrate middleware.
-     * @param {Object} err - error object to check
-     * @returns {boolean}
      */
-    function isCelebrate(err:object): boolean;
+    function isCelebrate(err: object): boolean;
 }
 
 export = Celebrate;

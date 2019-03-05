@@ -269,4 +269,66 @@ describe('express integration', () => {
       }, () => done());
     });
   });
+  describe('reqContext', () => {
+    it('passes req as Joi context during validation', (done) => {
+      expect.assertions(2);
+      const server = Server();
+
+      server.post('/:userId', celebrate({
+        body: {
+          id: Joi.number().only(Joi.ref('$params.userId')),
+        },
+        params: {
+          userId: Joi.number().integer().required(),
+        },
+      }, null, {
+        reqContext: true,
+      }), (req, res) => {
+        expect(req.body.id).toEqual(req.params.userId);
+        res.send();
+      });
+
+      server.inject({
+        method: 'POST',
+        url: '/12345',
+        payload: {
+          id: 12345,
+        },
+      }, (res) => {
+        expect(res.statusCode).toBe(200);
+        done();
+      });
+    });
+    it('fails validation based on req values', (done) => {
+      expect.assertions(2);
+      const server = Server();
+
+      server.post('/:userId', celebrate({
+        body: {
+          id: Joi.number().only(Joi.ref('$params.userId')),
+        },
+        params: {
+          userId: Joi.number().integer().required(),
+        },
+      }, null, {
+        reqContext: true,
+      }), (req, res) => {
+        res.send();
+      });
+
+      server.use(errors());
+
+      server.inject({
+        method: 'POST',
+        url: '/123',
+        payload: {
+          id: 12345,
+        },
+      }, (res) => {
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.payload)).toMatchSnapshot();
+        done();
+      });
+    });
+  });
 });
