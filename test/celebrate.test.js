@@ -206,6 +206,90 @@ describe('celebrate()', () => {
       expect(err.details[0].message).toBe('"accept" with value "application/json" fails to match the required pattern: /xml/');
     });
   });
+
+  describe('contexts', () => {
+    it('supports static reference', () => {
+      expect.assertions(2);
+      const middleware = celebrate({
+        body: {
+          id: Joi.number().only(Joi.ref('$id')),
+        },
+      }, {
+        context: {
+          id: 100,
+        },
+      });
+
+      middleware({
+        method: 'POST',
+        body: {
+          id: random.number({ min: 1, max: 99 }),
+        },
+      }, null, (err) => {
+        expect(isCelebrate(err)).toBe(true);
+        expect(err.details[0].message).toBe('"id" must be one of [context:id]');
+      });
+    });
+
+    it('supports a request reference (fail)', () => {
+      expect.assertions(2);
+      const middleware = celebrate({
+        params: {
+          userId: Joi.number().integer().required(),
+        },
+        body: {
+          id: Joi.number().only(Joi.ref('$params.userId')),
+        },
+      }, null, {
+        reqContext: true,
+      });
+
+      middleware({
+        method: 'POST',
+        params: {
+          userId: 10,
+        },
+        body: {
+          id: random.number({ min: 1, max: 9 }),
+        },
+      }, null, (err) => {
+        expect(isCelebrate(err)).toBe(true);
+        expect(err.details[0].message).toBe('"id" must be one of [context:params.userId]');
+      });
+    });
+
+    it('supports a request reference (pass)', () => {
+      expect.assertions(1);
+      const middleware = celebrate({
+        params: {
+          userId: Joi.number().integer().required(),
+        },
+        body: {
+          id: Joi.number().only(Joi.ref('$params.userId')),
+        },
+      }, {
+        context: {
+          params: {
+            userId: 5,
+          },
+        },
+      }, {
+        reqContext: true,
+      });
+
+      middleware({
+        method: 'POST',
+        params: {
+          userId: 10,
+        },
+        body: {
+          id: 10,
+        },
+      }, null, (err) => {
+        expect(isCelebrate(err)).toBe(false);
+      });
+    });
+  });
 });
 
 describe('errors()', () => {

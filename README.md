@@ -112,7 +112,7 @@ app.post('/protected', celebrate({
 
 ## API
 
-### `celebrate(schema, [joiOptions])`
+### `celebrate(schema, [joiOptions], [celebrateOptions])`
 
 Returns a `function` with the middleware signature (`(req, res, next)`).
 
