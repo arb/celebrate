@@ -7,6 +7,7 @@ declare namespace Celebrate {
     * @param {Object} schema - object where each key is one of ["params", "headers", "query", "body"] and the value is
     * a Joi schema.
     * @param {Object} [joiOptions] - optional configuration options that will be passed directly into Joi.
+    * @param {Object} [celebrateOptions] - optional configuration options for the celebrate middleware.
     * @returns {Function} an express middleware function
     */
     function celebrate(schema: {
@@ -16,7 +17,11 @@ declare namespace Celebrate {
         cookies?: object,
         signedCookies?: object,
         body?: object,
-    }, joiOptions?: object): RequestHandler
+    },  
+    joiOptions?: object,
+    celebrateOptions?: {
+       reqContext: boolean, 
+    }): RequestHandler
     /**
      * Creates a Celebrate error handler middleware function.
      * @returns {Function} an express error handler function

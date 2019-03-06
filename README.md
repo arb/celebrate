@@ -116,14 +116,21 @@ app.post('/protected', celebrate({
 
 Returns a `function` with the middleware signature (`(req, res, next)`).
 
-- `schema` - a object where `key` can be one of `'params'`, `'headers'`, `'query'`, `'cookies'`, `'signedCookies'` and `'body'` and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the keys specified will be validated against the incoming request object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one of the valid keys. 
+- `schema` - an object where `key` can be one of `'params'`, `'headers'`, `'query'`, `'cookies'`, `'signedCookies'` and `'body'` and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the keys specified will be validated against the incoming request object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one of the valid keys. 
 - `[joiOptions]` - `joi` [options](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function. Defaults to `{ escapeHtml: true }`.
+- `[celebrateOptions]` - an optional object with the following keys. Defaults to `{}`.
+  - `reqContext` - uses the incoming `req` object as the `context` value during `joi` validation. If set, this will trump the value of `joiOptions.context`. This is useful if you want to validate part of the request object against another part of the request object. See the tests for more details.
 
 ### `errors()`
 
 Returns a `function` with the error handler signature (`(err, req, res, next)`). This should be placed with any other error handling middleware to catch joi validation errors. If the incoming `err` object is an error originating from celebrate, `errors()` will respond with a 400 status code and the joi validation message. Otherwise, it will call `next(err)` and will pass the error along and will need to be processed by another error handler.
 
-If the error format does not suite your needs, you are encouraged to write your own error handler and check `isCelebrate(err)` to format celebrate errors to your liking. The full [joi error object](https://github.com/hapijs/joi/blob/master/API.md#errors) will be available in your own error handler.
+If the error format does not suite your needs, you are encouraged to write your own error handler and check `isCelebrate(err)` to format celebrate errors to your liking. 
+
+Errors originating from `celebrate` will be an object with the following keys:
+  - `error` - The full [joi error object](https://github.com/hapijs/joi/blob/master/API.md#errors).
+  - `meta` - An object with useful information for creating error responses. Contains the following keys:
+    - `source` - A string indicating which segment of the request failed validation. One of `['params', 'headers', 'query', 'cookies', 'signedCookies', 'body']`.
 
 ### `Joi`
 
