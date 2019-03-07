@@ -6,6 +6,8 @@ node_js:
     - "11"
     - "node"
 
+cache: npm
+
 env:
     - EXPRESS_VERSION="latest"
     - EXPRESS_VERSION="next"
@@ -14,7 +16,7 @@ install:
     - npm install -g codecov
     - npm install -g json
     - json -I -f package.json -e "this.devDependencies.express=\"$EXPRESS_VERSION\""
-    - npm install
+    - npm ci
 
 script:
     - npm test
