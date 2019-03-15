@@ -1,9 +1,9 @@
 [![celebrate](https://github.com/arb/celebrate/raw/master/images/logo.svg?sanitize=1)](https://www.npmjs.org/package/celebrate)
 
-[![Current Version](https://flat.badgen.net/npm/v/celebrate)](https://www.npmjs.org/package/celebrate)
-[![Build Status](https://flat.badgen.net/travis/arb/celebrate)](https://travis-ci.org/arb/celebrate)
-[![airbnb-style](https://flat.badgen.net/badge/eslint/airbnb/ff5a5f)](https://github.com/airbnb/javascript)
-[![Code Coverage](https://flat.badgen.net/codecov/c/github/arb/celebrate)](https://codecov.io/gh/arb/celebrate)
+[![Current Version](https://flat.badgen.net/npm/v/celebrate?icon=npm)](https://www.npmjs.org/package/celebrate)
+[![Build Status](https://flat.badgen.net/travis/arb/celebrate?icon=travis)](https://travis-ci.org/arb/celebrate)
+[![airbnb-style](https://flat.badgen.net/badge/eslint/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
+[![Code Coverage](https://flat.badgen.net/codecov/c/github/arb/celebrate?icon=codecov)](https://codecov.io/gh/arb/celebrate)
 
 <table>
   <tbody>
