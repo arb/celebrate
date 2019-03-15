@@ -1,3 +1,6 @@
+const watchPathIgnorePatterns = ['<rootDir>/node_modules/'];
+const testEnvironment = 'node';
+
 module.exports = {
   collectCoverage: true,
   collectCoverageFrom: ['<rootDir>/lib/index.js'],
@@ -12,12 +15,16 @@ module.exports = {
   },
   projects: [{
     displayName: 'test',
-    testEnvironment: 'node',
+    testEnvironment,
+    // Hack because of broken jest https://github.com/facebook/jest/issues/8088
+    watchPathIgnorePatterns,
   }, {
     displayName: 'linter',
     runner: 'jest-runner-eslint',
-    testEnvironment: 'node',
+    testEnvironment,
     testMatch: ['<rootDir>/lib/**/*.js', '<rootDir>/test/**/*.js', '<rootDir>/jest.config.js'],
+    // Hack because of broken jest https://github.com/facebook/jest/issues/8088
+    watchPathIgnorePatterns,
   }],
   watchPlugins: ['jest-runner-eslint/watch-fix'],
 };
