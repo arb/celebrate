@@ -37,16 +37,31 @@ The middleware will also validate:
 
 Wondering why *another* joi middleware library for express? Full blog post [here](https://medium.com/@adambretz/time-to-celebrate-27ccfc656d7f).
 
-⚠️**Mutation Warning**⚠️
-If you use any of joi's updating validation APIs (`defualt`, `rename`, etc.) `celebrate` will override the source value with the changes applied by joi. 
+<!-- toc -->
 
-For example, if you validate `req.query` and have a `default` value in your joi schema, if the incoming `req.query` is missing a value for default, during validation `celebrate` will overrite the original `req.query` with the result of `joi.validate`. This is done so that once `req` has been validated, you can be sure all the inputs are valid and ready to consume in your handler functions and you don't need to re-write all your handlers to look for the query values in `res.locals.*`. 
+- [express Compatibility](#express-compatibility)
+- [Mutation Warning](#mutation-warning)
+- [Example Usage](#example-usage)
+- [API](#api)
+  - [`celebrate(schema, [joiOptions], [celebrateOptions])`](#celebrateschema-joioptions-celebrateoptions)
+  - [`errors()`](#errors)
+  - [`Joi`](#joi)
+  - [`isCelebrate(err)`](#iscelebrateerr)
+- [Validation Order](#validation-order)
+- [Issues](#issues)
+
+<!-- tocstop -->
 
 ## express Compatibility
 
 celebrate is tested and has full compatibility with express 4 and 5. It should work correctly with express 3, but including it in the test matrix was more trouble than it's worth. This is primarily because express 3 stores exposes route parameters as an array rather than an object.
 
-## Usage
+## Mutation Warning
+If you use any of joi's updating validation APIs (`defualt`, `rename`, etc.) `celebrate` will override the source value with the changes applied by joi. 
+
+For example, if you validate `req.query` and have a `default` value in your joi schema, if the incoming `req.query` is missing a value for default, during validation `celebrate` will overrite the original `req.query` with the result of `joi.validate`. This is done so that once `req` has been validated, you can be sure all the inputs are valid and ready to consume in your handler functions and you don't need to re-write all your handlers to look for the query values in `res.locals.*`.
+
+## Example Usage
 
 Example of using `celebrate` on a single POST route to validate `req.body`.
 ```js
@@ -91,26 +106,9 @@ app.get('/foo', (req, res) => { res.send('a foo request'); });
 app.use(errors());
 ```
 
-Example of using `celebrate` with `cookie-parser`.
-```js
-const express = require('express');
-const CookieParser = require('cookie-parser');
-const { celebrate, Joi, errors } = require('celebrate');
-
-const app = express();
-app.use(CookieParser('top secret'));
-
-// validate request if access token is provided
-app.post('/protected', celebrate({
-  signedCookies: Joi.object({
-    accessToken: Joi.string().required()
-  }).unknown()
-}), (req, res) => {
-  // At this point, req.signedCookies has been validated
-});
-```
-
 ## API
+
+`celebrate` does not have a defualt export. The following methods encompass the public API.
 
 ### `celebrate(schema, [joiOptions], [celebrateOptions])`
 
@@ -137,16 +135,16 @@ Returns `true` if the provided `err` object originated from the `celebrate` midd
 
 - `err` - an error object
 
-## Order
+## Validation Order
 
 `celebrate` validates `req` values in the following order:
 
 1. `req.headers`
 2. `req.params`
 3. `req.query`
-4. `req.cookies`
-5. `req.signedCookies`
-6. `req.body`
+4. `req.cookies` (_assuming `cookie-parser` is being used_)
+5. `req.signedCookies` (_assuming `cookie-parser` is being used_)
+6. `req.body` (_assuming `body-parser` is being used_)
 
 If any of the configured validation rules fail, the entire request will be considered invalid and the rest of the validation will be short-circuited and the validation error will be passed into `next`. 
 
