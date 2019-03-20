@@ -8,7 +8,9 @@
     "test": "is-ci 'test:ci' 'test:local'",
     "test:local": "jest --watch --verbose",
     "test:ci": "jest --ci",
-    "benchmark": "node benchmarks/index"
+    "benchmark": "node utils/benchmark",
+    "toc": "node utils/generate-toc",
+    "version": "npm run toc && git add README.md"
   },
   "repository": {
     "type": "git",
@@ -46,7 +48,8 @@
     "faker": "4.1.x",
     "is-ci-cli": "1.1.x",
     "jest": "24.x.x",
-    "jest-runner-eslint": "0.7.x"
+    "jest-runner-eslint": "0.7.x",
+    "markdown-toc": "1.2.x"
   },
   "engines": {
     "node": ">=8.9.0"
