@@ -30,11 +30,11 @@
   "homepage": "https://github.com/arb/celebrate#readme",
   "dependencies": {
     "escape-html": "1.0.3",
-    "joi": "14.x.x"
+    "joi": "14.x.x",
+    "@types/joi": "14.x.x"
   },
   "devDependencies": {
     "@types/express": "4.x.x",
-    "@types/joi": "14.x.x",
     "artificial": "0.1.x",
     "benchmark": "2.1.x",
     "body-parser": "1.18.x",
