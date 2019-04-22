@@ -13,7 +13,8 @@ describe('celebrate()', () => {
   describe.each`
     schema | expected
     ${false} | ${'"value" must be an object'}
-    ${undefined} | ${'"value" must have at least 1 children'}
+    ${undefined} | ${'"value" is required'}
+    ${{}} | ${'"value" must have at least 1 children'}
     ${{ query: { name: Joi.string(), age: Joi.number() }, foo: Joi.string() }} | ${'"foo" is not allowed'}
     `('celebrate($schema)', ({ schema, expected }) => {
   it('throws an error', () => {
