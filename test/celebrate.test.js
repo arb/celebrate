@@ -12,11 +12,12 @@ const {
 describe('celebrate()', () => {
   describe.each`
     schema | expected
-    ${false} | ${'"value" must have at least 1 children'}
-    ${undefined} | ${'"value" must have at least 1 children'}
+    ${false} | ${'"value" must be an object'}
+    ${undefined} | ${'"value" is required'}
+    ${{}} | ${'"value" must have at least 1 children'}
     ${{ query: { name: Joi.string(), age: Joi.number() }, foo: Joi.string() }} | ${'"foo" is not allowed'}
-    `('celebrate(schema)', ({ schema, expected }) => {
-  it(`throws an error with ${expected}`, () => {
+    `('celebrate($schema)', ({ schema, expected }) => {
+  it('throws an error', () => {
     expect(() => {
       celebrate(schema);
     }).toThrow(expected);
@@ -25,28 +26,29 @@ describe('celebrate()', () => {
 
   describe.each`
     segment | schema | req | message
-    ${'req.headers'} | ${{ headers: { accept: Joi.string().regex(/xml/) } }} | ${{ headers: { accept: 'application/json' } }} | ${'"accept" with value "application&#x2f;json" fails to match the required pattern: /xml/'}
-    ${'req.params'} | ${{ params: { id: Joi.string().token() } }} | ${{ params: { id: '@@@' } }} | ${'"id" must only contain alpha-numeric and underscore characters'}
-    ${'req.query'} | ${{ query: Joi.object().keys({ start: Joi.date() }) }} | ${{ query: { end: random.number() } }} | ${'"end" is not allowed'}
-    ${'req.body'} | ${{ body: { first: Joi.string().required(), last: Joi.string(), role: Joi.number().integer() } }} | ${{ body: { first: name.firstName(), last: random.number() }, method: 'POST' }} | ${'"last" must be a string'}
-    ${'req.cookies'} | ${{ cookies: { state: Joi.string().required() } }} | ${{ cookies: { state: random.number() } }} | ${'"state" must be a string'}
-    ${'req.signedCookies'} | ${{ cookies: { uid: Joi.string().required() } }} | ${{ cookies: { uid: random.number() } }} | ${'"uid" must be a string'}
+    ${'headers'} | ${{ headers: { accept: Joi.string().regex(/xml/) } }} | ${{ headers: { accept: 'application/json' } }} | ${'"accept" with value "application&#x2f;json" fails to match the required pattern: /xml/'}
+    ${'params'} | ${{ params: { id: Joi.string().token() } }} | ${{ params: { id: '@@@' } }} | ${'"id" must only contain alpha-numeric and underscore characters'}
+    ${'query'} | ${{ query: Joi.object().keys({ start: Joi.date() }) }} | ${{ query: { end: random.number() } }} | ${'"end" is not allowed'}
+    ${'body'} | ${{ body: { first: Joi.string().required(), last: Joi.string(), role: Joi.number().integer() } }} | ${{ body: { first: name.firstName(), last: random.number() }, method: 'POST' }} | ${'"last" must be a string'}
+    ${'cookies'} | ${{ cookies: { state: Joi.string().required() } }} | ${{ cookies: { state: random.number() } }} | ${'"state" must be a string'}
+    ${'signedCookies'} | ${{ signedCookies: { uid: Joi.string().required() } }} | ${{ signedCookies: { uid: random.number() } }} | ${'"uid" must be a string'}
     `('celebate middleware', ({
   schema, req, message, segment,
 }) => {
   it(`validates ${segment}`, () => {
-    expect.assertions(2);
+    expect.assertions(3);
     const middleware = celebrate(schema);
 
     middleware(req, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
-      expect(err.details[0].message).toBe(message);
+      expect(err.joi.details[0].message).toBe(message);
+      expect(err.meta.source).toBe(segment);
     });
   });
 });
 
   it('errors on the first validation problem (params, query, body)', () => {
-    expect.assertions(2);
+    expect.assertions(3);
     const middleware = celebrate({
       params: {
         id: Joi.string().required(),
@@ -74,7 +76,8 @@ describe('celebrate()', () => {
       },
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
-      expect(err.details[0].message).toBe('"end" is not allowed');
+      expect(err.joi.details[0].message).toBe('"end" is not allowed');
+      expect(err.meta.source).toBe('query');
     });
   });
 
@@ -164,7 +167,7 @@ describe('celebrate()', () => {
       method: 'POST',
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
-      expect(err.details[0].message).toBe('"first" must equal "john"');
+      expect(err.joi.details[0].message).toBe('"first" must equal "john"');
     });
   });
 
@@ -203,7 +206,7 @@ describe('celebrate()', () => {
       },
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
-      expect(err.details[0].message).toBe('"accept" with value "application/json" fails to match the required pattern: /xml/');
+      expect(err.joi.details[0].message).toBe('"accept" with value "application/json" fails to match the required pattern: /xml/');
     });
   });
 
@@ -226,7 +229,7 @@ describe('celebrate()', () => {
       },
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
-      expect(err.details[0].message).toBe('"id" must be one of [context:id]');
+      expect(err.joi.details[0].message).toBe('"id" must be one of [context:id]');
     });
   });
 
@@ -253,7 +256,7 @@ describe('celebrate()', () => {
       },
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
-      expect(err.details[0].message).toBe('"id" must be one of [context:params.userId]');
+      expect(err.joi.details[0].message).toBe('"id" must be one of [context:params.userId]');
     });
   });
 });
@@ -291,26 +294,22 @@ describe('errors()', () => {
   });
 
   it('passes the error through next if not a joi error from celebrate middleware', () => {
-    let errorDirectlyFromJoi = null;
     const handler = errors();
     const res = {
       status() {
         throw Error('status called');
       },
     };
-    const next = (err) => {
-      expect(err).toEqual(errorDirectlyFromJoi);
-    };
 
     const schema = Joi.object({
       role: Joi.number().integer().min(4),
     });
 
-    Joi.validate({
+    const { error } = Joi.validate({
       role: random.word(),
-    }, schema, { abortEarly: false, convert: false }, (err) => {
-      errorDirectlyFromJoi = err;
-      handler(err, undefined, res, next);
+    }, schema);
+    handler(error, undefined, res, (e) => {
+      expect(e).toEqual(error);
     });
   });
 
@@ -341,7 +340,7 @@ describe('errors()', () => {
       },
       method: 'POST',
     }, null, (err) => {
-      err.details = null; // eslint-disable-line no-param-reassign
+      err.joi.details = null; // eslint-disable-line no-param-reassign
       handler(err, undefined, res, next);
     });
   });
