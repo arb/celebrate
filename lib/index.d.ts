@@ -1,5 +1,5 @@
 import { ErrorRequestHandler, RequestHandler } from 'express';
-import { Root as joi, ValidationOptions } from 'joi';
+import { Root as joi, ValidationOptions } from '@hapi/joi';
 
 declare namespace Celebrate {
     /**
