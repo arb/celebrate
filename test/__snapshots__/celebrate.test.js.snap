@@ -25,3 +25,23 @@ Object {
   },
 }
 `;
+
+exports[`format() returns a formatted error object with options 1`] = `
+Object {
+  "joi": [ValidationError: "value" must be a string],
+  "meta": Object {
+    "source": "body",
+  },
+  Symbol(celebrated): true,
+}
+`;
+
+exports[`format() returns a formatted error object without options 1`] = `
+Object {
+  "joi": [ValidationError: "value" must be a string],
+  "meta": Object {
+    "source": "body",
+  },
+  Symbol(celebrated): false,
+}
+`;

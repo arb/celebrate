@@ -6,6 +6,7 @@ const {
   Joi,
   errors,
   isCelebrate,
+  format,
 } = require('../lib');
 
 
@@ -346,7 +347,7 @@ describe('errors()', () => {
   });
 });
 
-describe('isCelebrate', () => {
+describe('isCelebrate()', () => {
   describe.each`
         value | expected
         ${Error()} | ${false}
@@ -355,7 +356,7 @@ describe('isCelebrate', () => {
         ${[0, 1]} | ${false}
         ${null} | ${false}
         ${undefined} | ${false}
-      `('$value', ({ value, expected }) => {
+      `('isCelebrate($value)', ({ value, expected }) => {
   it(`returns ${expected}`, () => {
     expect.assertions(1);
     expect(isCelebrate(value)).toBe(expected);
@@ -377,5 +378,37 @@ describe('isCelebrate', () => {
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
     });
+  });
+});
+
+describe('format()', () => {
+  // Need a real Joi error to use in a few places for these tests
+  const result = Joi.validate(null, Joi.string().valid('foo'));
+  describe.each`
+    value
+    ${null}
+    ${undefined}
+    ${Error()}
+    `('format($value)', ({ value }) => {
+  it('throws an error', () => {
+    expect.assertions(1);
+    expect(() => format(value)).toThrow();
+  });
+});
+  it('throws an error if the source is not a valid string', () => {
+    expect.assertions(1);
+    expect(() => format(result, 'foo')).toThrow(Joi.ValidationError);
+  });
+  it('throws an error if the option arguments is incorrect', () => {
+    expect.assertions(1);
+    expect(() => format(result, 'body', false)).toThrow(Joi.ValidationError);
+  });
+  it('returns a formatted error object without options', () => {
+    expect.assertions(1);
+    expect(format(result, 'body')).toMatchSnapshot();
+  });
+  it('returns a formatted error object with options', () => {
+    expect.assertions(1);
+    expect(format(result, 'body', { celebrated: true })).toMatchSnapshot();
   });
 });
