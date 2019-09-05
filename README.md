@@ -151,6 +151,7 @@ Formats the incomming values into the shape of celebrate [errors](#errors())
   - `celebrated` -  `bool` that, when `true`, adds `Symbol('celebrated'): true` to the result object. This indicates this error as originating from `celebrate`. You'd likely want to set this to `true` if you want the celebrate error handler to handle errors originating from the `format` function that you call in user-land code. Defaults to `false`. 
 <details>
   <summary>Sample usage</summary>
+
   ```js
     const result = Joi.validate(req.params.id, Joi.string().valid('foo'), { abortEarly: false });
     const err = format(result, 'params');
