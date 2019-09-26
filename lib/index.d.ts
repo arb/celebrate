@@ -1,5 +1,10 @@
 import { ErrorRequestHandler, RequestHandler } from 'express';
-import { Root as joi, ValidationOptions } from '@hapi/joi';
+import { 
+    Root as joi, 
+    ValidationOptions, 
+    ValidationError, 
+    ValidationResult 
+} from '@hapi/joi';
 
 declare namespace Celebrate {
     /**
@@ -51,6 +56,18 @@ declare namespace Celebrate {
      * Examines an error object to determine if it originated from the celebrate middleware.
      */
     function isCelebrate(err: object): boolean;
+
+    /**
+     * Format a joi error into a standard object
+     */
+    function format(err: ValidationResult<object>, 
+        source: "params" | "headers" | "query" | "cookies" | "signedCookies" | "body", 
+        opts?: { celebrated: boolean }): {
+        meta: {
+            source: "params" | "headers" | "query" | "cookies" | "signedCookies" | "body"
+        },
+        joi: ValidationError,
+    }
 }
 
 export = Celebrate;
