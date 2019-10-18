@@ -3,7 +3,7 @@
 exports[`errors() includes more information when abourtEarly is false 1`] = `
 Object {
   "error": "Bad Request",
-  "message": "child \\"role\\" fails because [\\"role\\" must be larger than or equal to 4]. child \\"name\\" fails because [\\"name\\" is required]",
+  "message": "\\"role\\" must be larger than or equal to 4. \\"name\\" is required",
   "statusCode": 400,
   "validation": Object {
     "keys": Array [
@@ -18,7 +18,7 @@ Object {
 exports[`errors() only includes key values if joi returns details 1`] = `
 Object {
   "error": "Bad Request",
-  "message": "child \\"first\\" fails because [\\"first\\" is required]",
+  "message": "\\"first\\" is required",
   "statusCode": 400,
   "validation": Object {
     "keys": Array [],
@@ -30,7 +30,7 @@ Object {
 exports[`errors() responds with a joi error from celebrate middleware 1`] = `
 Object {
   "error": "Bad Request",
-  "message": "child \\"role\\" fails because [\\"role\\" must be larger than or equal to 4]",
+  "message": "\\"role\\" must be larger than or equal to 4",
   "statusCode": 400,
   "validation": Object {
     "keys": Array [
@@ -43,7 +43,7 @@ Object {
 
 exports[`format() returns a formatted error object with options 1`] = `
 Object {
-  "joi": [ValidationError: "value" must be a string],
+  "joi": [ValidationError: "value" must be [foo]],
   "meta": Object {
     "source": "body",
   },
@@ -53,7 +53,7 @@ Object {
 
 exports[`format() returns a formatted error object without options 1`] = `
 Object {
-  "joi": [ValidationError: "value" must be a string],
+  "joi": [ValidationError: "value" must be [foo]],
   "meta": Object {
     "source": "body",
   },
