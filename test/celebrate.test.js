@@ -345,6 +345,40 @@ describe('errors()', () => {
       handler(err, undefined, res, next);
     });
   });
+
+  it('includes more information when abourtEarly is false', () => {
+    expect.assertions(3);
+    const middleware = celebrate({
+      query: {
+        role: Joi.number().required().integer().min(4),
+        name: Joi.string().required(),
+      },
+    }, {
+      abortEarly: false,
+    });
+    const handler = errors();
+    const next = jest.fn();
+    const res = {
+      status(statusCode) {
+        expect(statusCode).toBe(400);
+        return {
+          send(err) {
+            expect(err).toMatchSnapshot();
+            expect(next).not.toHaveBeenCalled();
+          },
+        };
+      },
+    };
+
+    middleware({
+      query: {
+        role: random.number({ min: 0, max: 3 }),
+      },
+      method: 'GET',
+    }, null, (err) => {
+      handler(err, undefined, res, next);
+    });
+  });
 });
 
 describe('isCelebrate()', () => {

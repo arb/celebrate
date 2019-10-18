@@ -1,5 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`errors() includes more information when abourtEarly is false 1`] = `
+Object {
+  "error": "Bad Request",
+  "message": "child \\"role\\" fails because [\\"role\\" must be larger than or equal to 4]. child \\"name\\" fails because [\\"name\\" is required]",
+  "statusCode": 400,
+  "validation": Object {
+    "keys": Array [
+      "role",
+      "name",
+    ],
+    "source": "query",
+  },
+}
+`;
+
 exports[`errors() only includes key values if joi returns details 1`] = `
 Object {
   "error": "Bad Request",
