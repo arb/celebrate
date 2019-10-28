@@ -40,7 +40,7 @@ describe('celebrate()', () => {
     expect.assertions(3);
     const middleware = celebrate(schema);
 
-    middleware(req, null, (err) => {
+    return middleware(req, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
       expect(err.joi.details[0].message).toBe(message);
       expect(err.meta.source).toBe(segment);
@@ -64,7 +64,7 @@ describe('celebrate()', () => {
       },
     });
 
-    middleware({
+    return middleware({
       params: {
         id: random.alphaNumeric(10),
       },
@@ -104,7 +104,7 @@ describe('celebrate()', () => {
       query: Joi.number(),
     });
 
-    middleware(req, null, (err) => {
+    return middleware(req, null, (err) => {
       expect(err).toBe(null);
       expect(req.body).toEqual({
         first,
@@ -125,7 +125,7 @@ describe('celebrate()', () => {
       },
     });
 
-    middleware({
+    return middleware({
       body: {
         first: name.firstName(),
         last: name.lastName(),
@@ -187,7 +187,7 @@ describe('celebrate()', () => {
       method: 'GET',
     };
 
-    middleware(req, null, (err) => {
+    return middleware(req, null, (err) => {
       expect(err).toBe(null);
       expect(req.query).toEqual({ page: 1 });
     });
@@ -201,7 +201,7 @@ describe('celebrate()', () => {
       },
     }, { escapeHtml: false });
 
-    middleware({
+    return middleware({
       headers: {
         accept: 'application/json',
       },
@@ -223,7 +223,7 @@ describe('celebrate()', () => {
       },
     });
 
-    middleware({
+    return middleware({
       method: 'POST',
       body: {
         id: random.number({ min: 1, max: 99 }),
@@ -247,7 +247,7 @@ describe('celebrate()', () => {
       reqContext: true,
     });
 
-    middleware({
+    return middleware({
       method: 'POST',
       params: {
         userId: 10,
@@ -284,7 +284,7 @@ describe('errors()', () => {
       },
     };
 
-    middleware({
+    return middleware({
       query: {
         role: random.number({ min: 0, max: 3 }),
       },
@@ -336,7 +336,7 @@ describe('errors()', () => {
       },
     };
 
-    middleware({
+    return middleware({
       body: {
         role: random.word(),
       },
@@ -371,7 +371,7 @@ describe('errors()', () => {
       },
     };
 
-    middleware({
+    return middleware({
       query: {
         role: random.number({ min: 0, max: 3 }),
       },
@@ -406,7 +406,7 @@ describe('isCelebrate()', () => {
       },
     });
 
-    middleware({
+    return middleware({
       headers: {
         accept: random.number(),
       },
