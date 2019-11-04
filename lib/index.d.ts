@@ -46,7 +46,7 @@ declare namespace Celebrate {
     /**
      * Creates a Celebrate error handler middleware function.
      */
-    function errors(): () => ErrorRequestHandler;
+    function errors(): ErrorRequestHandler;
     /**
      * The Joi version Celebrate uses internally.
      */
