@@ -83,7 +83,6 @@ describe('celebrate()', () => {
   });
 
   it('applys any joi transorms back to the object', () => {
-    expect.assertions(3);
     const first = name.firstName();
     const last = name.lastName();
     const role = name.jobTitle();
