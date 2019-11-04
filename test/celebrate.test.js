@@ -136,31 +136,30 @@ describe('celebrate()', () => {
     });
   });
 
-  it.skip('works with Joi.extend()', () => {
+  it('works with Joi.extend()', () => {
     expect.assertions(2);
-    const _Joi = Joi.extend({
-      base: Joi.string(),
-      name: 'string',
-      language: { isJohn: 'must equal "john"' },
-      rules: [{
-        name: 'isJohn',
-        validate(params, v, state, options) {
-          if (v !== 'john') {
-            return this.createError('string.isJohn', { v }, state, options);
-          }
-          return undefined;
-        },
-      }],
-    });
+    const f = Joi.extend((joi) => ({
+      type: 'john',
+      base: joi.string(),
+      messages: {
+        'john.base': '"{#label}" must equal "john"',
+      },
+      validate(value, helpers) {
+        if (value !== 'john') {
+          return { value, errors: helpers.error('john.base') };
+        }
+        return { value, errors: null };
+      },
+    }));
 
     const middleware = celebrate({
       body: {
-        first: _Joi.string().required().isJohn(),
-        role: _Joi.number().integer(),
+        first: f.john(),
+        role: f.number().integer(),
       },
     });
 
-    middleware({
+    return middleware({
       body: {
         first: name.firstName(),
         role: random.number(),
