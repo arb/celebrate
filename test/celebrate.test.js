@@ -21,7 +21,7 @@ describe('celebrate()', () => {
   it('throws an error', () => {
     expect(() => {
       celebrate(schema);
-    }).toThrow(Joi.ValidationError);
+    }).toThrow();
   });
 });
 
@@ -430,11 +430,11 @@ describe('format()', () => {
 });
   it('throws an error if the source is not a valid string', () => {
     expect.assertions(1);
-    expect(() => format(result, 'foo')).toThrow(Joi.ValidationError);
+    expect(() => format(result, 'foo')).toThrow();
   });
   it('throws an error if the option arguments is incorrect', () => {
     expect.assertions(1);
-    expect(() => format(result, 'body', false)).toThrow(Joi.ValidationError);
+    expect(() => format(result, 'body', false)).toThrow();
   });
   it('returns a formatted error object without options', () => {
     expect.assertions(1);
