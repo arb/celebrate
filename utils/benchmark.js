@@ -30,4 +30,4 @@ suite.on('complete', function suiteComplete() {
   }
 });
 
-suite.run();
+suite.run({ async: true });
