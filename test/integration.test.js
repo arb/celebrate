@@ -10,6 +10,7 @@ const Teamwork = require('@hapi/teamwork');
 const {
   celebrate,
   Joi,
+  Segments,
 } = require('../lib');
 
 const Server = () => {
@@ -29,7 +30,7 @@ describe('validations', () => {
     const next = jest.fn();
 
     server.get('/', celebrate({
-      headers: {
+      [Segments.HEADERS]: {
         accept: Joi.string().regex(/xml/),
       },
     }, {
@@ -39,7 +40,7 @@ describe('validations', () => {
     server.inject({
       method: 'GET',
       url: '/',
-      headers: {
+      [Segments.HEADERS]: {
         accept: 'application/json',
       },
     }, team.attend.bind(team));
@@ -57,7 +58,7 @@ describe('validations', () => {
     const next = jest.fn();
 
     server.get('/user/:id', celebrate({
-      params: {
+      [Segments.PARAMS]: {
         id: Joi.string().token(),
       },
     }), next);
@@ -80,7 +81,7 @@ describe('validations', () => {
     const next = jest.fn();
 
     server.get('/', celebrate({
-      query: Joi.object().keys({
+      [Segments.QUERY]: Joi.object().keys({
         start: Joi.date(),
       }),
     }), next);
@@ -110,7 +111,7 @@ describe('validations', () => {
     server.inject({
       url: '/',
       method: 'post',
-      headers: {
+      [Segments.HEADERS]: {
         Cookie: 'state=notanumber',
       },
     }, team.attend.bind(team));
@@ -128,7 +129,7 @@ describe('validations', () => {
     const next = jest.fn();
 
     server.get('/', celebrate({
-      signedCookies: {
+      [Segments.SIGNEDCOOKIES]: {
         secureState: Joi.number().required(),
       },
     }), next);
@@ -138,7 +139,7 @@ describe('validations', () => {
     server.inject({
       url: '/',
       method: 'get',
-      headers: {
+      [Segments.HEADERS]: {
         Cookie: `state=s:${val}`,
       },
     }, team.attend.bind(team));
@@ -156,7 +157,7 @@ describe('validations', () => {
     const next = jest.fn();
 
     server.post('/', celebrate({
-      body: {
+      [Segments.BODY]: {
         first: Joi.string().required(),
         last: Joi.string(),
         role: Joi.number().integer(),
@@ -186,7 +187,7 @@ describe('update req values', () => {
     const team = new Teamwork();
 
     server.get('/', celebrate({
-      headers: {
+      [Segments.HEADERS]: {
         accept: Joi.string().regex(/json/),
         'secret-header': Joi.string().default('@@@@@@'),
       },
@@ -200,7 +201,7 @@ describe('update req values', () => {
     server.inject({
       method: 'GET',
       url: '/',
-      headers: {
+      [Segments.HEADERS]: {
         accept: 'application/json',
       },
     });
@@ -220,7 +221,7 @@ describe('update req values', () => {
     const team = new Teamwork();
 
     server.get('/user/:id', celebrate({
-      params: {
+      [Segments.PARAMS]: {
         id: Joi.string().uppercase(),
       },
     }), team.attend.bind(team));
@@ -241,7 +242,7 @@ describe('update req values', () => {
     const team = new Teamwork();
 
     server.get('/', celebrate({
-      query: Joi.object().keys({
+      [Segments.QUERY]: Joi.object().keys({
         name: Joi.string().uppercase(),
         page: Joi.number().default(1),
       }),
@@ -266,7 +267,7 @@ describe('update req values', () => {
     const team = new Teamwork();
 
     server.post('/', celebrate({
-      body: {
+      [Segments.BODY]: {
         first: Joi.string().required(),
         last: Joi.string().default('Smith'),
         role: Joi.string().uppercase(),
@@ -298,10 +299,10 @@ describe('reqContext', () => {
     const team = new Teamwork({ meetings: 2 });
 
     server.post('/:userId', celebrate({
-      body: {
+      [Segments.BODY]: {
         id: Joi.number().valid(Joi.ref('$params.userId')),
       },
-      params: {
+      [Segments.PARAMS]: {
         userId: Joi.number().integer().required(),
       },
     }, null, {
@@ -331,10 +332,10 @@ describe('reqContext', () => {
     const next = jest.fn();
 
     server.post('/:userId', celebrate({
-      body: {
+      [Segments.BODY]: {
         id: Joi.number().valid(Joi.ref('$params.userId')),
       },
-      params: {
+      [Segments.PARAMS]: {
         userId: Joi.number().integer().required(),
       },
     }, null, {

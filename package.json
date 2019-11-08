@@ -30,8 +30,7 @@
   "homepage": "https://github.com/arb/celebrate#readme",
   "dependencies": {
     "@hapi/joi": "16.x.x",
-    "escape-html": "1.0.3",
-    "lodash.get": "4.4.x"
+    "escape-html": "1.0.3"
   },
   "devDependencies": {
     "@hapi/teamwork": "3.3.x",
