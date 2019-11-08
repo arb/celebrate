@@ -299,7 +299,7 @@ describe('reqContext', () => {
 
     server.post('/:userId', celebrate({
       body: {
-        id: Joi.number().only(Joi.ref('$params.userId')),
+        id: Joi.number().valid(Joi.ref('$params.userId')),
       },
       params: {
         userId: Joi.number().integer().required(),
@@ -332,7 +332,7 @@ describe('reqContext', () => {
 
     server.post('/:userId', celebrate({
       body: {
-        id: Joi.number().only(Joi.ref('$params.userId')),
+        id: Joi.number().valid(Joi.ref('$params.userId')),
       },
       params: {
         userId: Joi.number().integer().required(),

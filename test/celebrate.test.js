@@ -12,22 +12,22 @@ const {
 
 describe('celebrate()', () => {
   describe.each`
-    schema | expected
-    ${false} | ${'"value" must be an object'}
-    ${undefined} | ${'"value" is required'}
-    ${{}} | ${'"value" must have at least 1 children'}
-    ${{ query: { name: Joi.string(), age: Joi.number() }, foo: Joi.string() }} | ${'"foo" is not allowed'}
-    `('celebrate($schema)', ({ schema, expected }) => {
+    schema
+    ${false}
+    ${undefined}
+    ${{}}
+    ${{ query: { name: Joi.string(), age: Joi.number() }, foo: Joi.string() }}
+    `('celebrate($schema)', ({ schema }) => {
   it('throws an error', () => {
     expect(() => {
       celebrate(schema);
-    }).toThrow(expected);
+    }).toThrow();
   });
 });
 
   describe.each`
     segment | schema | req | message
-    ${'headers'} | ${{ headers: { accept: Joi.string().regex(/xml/) } }} | ${{ headers: { accept: 'application/json' } }} | ${'"accept" with value "application&#x2f;json" fails to match the required pattern: /xml/'}
+    ${'headers'} | ${{ headers: { accept: Joi.string().regex(/xml/) } }} | ${{ headers: { accept: 'application/json' } }} | ${'"accept" with value "application/json" fails to match the required pattern: /xml/'}
     ${'params'} | ${{ params: { id: Joi.string().token() } }} | ${{ params: { id: '@@@' } }} | ${'"id" must only contain alpha-numeric and underscore characters'}
     ${'query'} | ${{ query: Joi.object().keys({ start: Joi.date() }) }} | ${{ query: { end: random.number() } }} | ${'"end" is not allowed'}
     ${'body'} | ${{ body: { first: Joi.string().required(), last: Joi.string(), role: Joi.number().integer() } }} | ${{ body: { first: name.firstName(), last: random.number() }, method: 'POST' }} | ${'"last" must be a string'}
@@ -40,7 +40,7 @@ describe('celebrate()', () => {
     expect.assertions(3);
     const middleware = celebrate(schema);
 
-    middleware(req, null, (err) => {
+    return middleware(req, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
       expect(err.joi.details[0].message).toBe(message);
       expect(err.meta.source).toBe(segment);
@@ -64,7 +64,7 @@ describe('celebrate()', () => {
       },
     });
 
-    middleware({
+    return middleware({
       params: {
         id: random.alphaNumeric(10),
       },
@@ -83,7 +83,6 @@ describe('celebrate()', () => {
   });
 
   it('applys any joi transorms back to the object', () => {
-    expect.assertions(3);
     const first = name.firstName();
     const last = name.lastName();
     const role = name.jobTitle();
@@ -104,7 +103,7 @@ describe('celebrate()', () => {
       query: Joi.number(),
     });
 
-    middleware(req, null, (err) => {
+    return middleware(req, null, (err) => {
       expect(err).toBe(null);
       expect(req.body).toEqual({
         first,
@@ -125,7 +124,7 @@ describe('celebrate()', () => {
       },
     });
 
-    middleware({
+    return middleware({
       body: {
         first: name.firstName(),
         last: name.lastName(),
@@ -138,29 +137,28 @@ describe('celebrate()', () => {
 
   it('works with Joi.extend()', () => {
     expect.assertions(2);
-    const _Joi = Joi.extend({
-      base: Joi.string(),
-      name: 'string',
-      language: { isJohn: 'must equal "john"' },
-      rules: [{
-        name: 'isJohn',
-        validate(params, v, state, options) {
-          if (v !== 'john') {
-            return this.createError('string.isJohn', { v }, state, options);
-          }
-          return undefined;
-        },
-      }],
-    });
+    const f = Joi.extend((joi) => ({
+      type: 'john',
+      base: joi.string(),
+      messages: {
+        'john.base': '"{#label}" must equal "john"',
+      },
+      validate(value, helpers) {
+        if (value !== 'john') {
+          return { value, errors: helpers.error('john.base') };
+        }
+        return { value, errors: null };
+      },
+    }));
 
     const middleware = celebrate({
       body: {
-        first: _Joi.string().required().isJohn(),
-        role: _Joi.number().integer(),
+        first: f.john(),
+        role: f.number().integer(),
       },
     });
 
-    middleware({
+    return middleware({
       body: {
         first: name.firstName(),
         role: random.number(),
@@ -187,7 +185,7 @@ describe('celebrate()', () => {
       method: 'GET',
     };
 
-    middleware(req, null, (err) => {
+    return middleware(req, null, (err) => {
       expect(err).toBe(null);
       expect(req.query).toEqual({ page: 1 });
     });
@@ -201,7 +199,7 @@ describe('celebrate()', () => {
       },
     }, { escapeHtml: false });
 
-    middleware({
+    return middleware({
       headers: {
         accept: 'application/json',
       },
@@ -215,7 +213,7 @@ describe('celebrate()', () => {
     expect.assertions(2);
     const middleware = celebrate({
       body: {
-        id: Joi.number().only(Joi.ref('$id')),
+        id: Joi.number().valid(Joi.ref('$id')),
       },
     }, {
       context: {
@@ -223,14 +221,14 @@ describe('celebrate()', () => {
       },
     });
 
-    middleware({
+    return middleware({
       method: 'POST',
       body: {
         id: random.number({ min: 1, max: 99 }),
       },
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
-      expect(err.joi.details[0].message).toBe('"id" must be one of [context:id]');
+      expect(err.joi.details[0].message).toBe('"id" must be [ref:global:id]');
     });
   });
 
@@ -241,13 +239,13 @@ describe('celebrate()', () => {
         userId: Joi.number().integer().required(),
       },
       body: {
-        id: Joi.number().only(Joi.ref('$params.userId')),
+        id: Joi.number().valid(Joi.ref('$params.userId')),
       },
     }, null, {
       reqContext: true,
     });
 
-    middleware({
+    return middleware({
       method: 'POST',
       params: {
         userId: 10,
@@ -257,7 +255,7 @@ describe('celebrate()', () => {
       },
     }, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
-      expect(err.joi.details[0].message).toBe('"id" must be one of [context:params.userId]');
+      expect(err.joi.details[0].message).toBe('"id" must be [ref:global:params.userId]');
     });
   });
 });
@@ -284,7 +282,7 @@ describe('errors()', () => {
       },
     };
 
-    middleware({
+    return middleware({
       query: {
         role: random.number({ min: 0, max: 3 }),
       },
@@ -306,9 +304,10 @@ describe('errors()', () => {
       role: Joi.number().integer().min(4),
     });
 
-    const { error } = Joi.validate({
+    const { error } = schema.validate({
       role: random.word(),
-    }, schema);
+    });
+
     handler(error, undefined, res, (e) => {
       expect(e).toEqual(error);
     });
@@ -335,13 +334,47 @@ describe('errors()', () => {
       },
     };
 
-    middleware({
+    return middleware({
       body: {
         role: random.word(),
       },
       method: 'POST',
     }, null, (err) => {
       err.joi.details = null; // eslint-disable-line no-param-reassign
+      handler(err, undefined, res, next);
+    });
+  });
+
+  it('includes more information when abourtEarly is false', () => {
+    expect.assertions(3);
+    const middleware = celebrate({
+      query: {
+        role: Joi.number().required().integer().min(4),
+        name: Joi.string().required(),
+      },
+    }, {
+      abortEarly: false,
+    });
+    const handler = errors();
+    const next = jest.fn();
+    const res = {
+      status(statusCode) {
+        expect(statusCode).toBe(400);
+        return {
+          send(err) {
+            expect(err).toMatchSnapshot();
+            expect(next).not.toHaveBeenCalled();
+          },
+        };
+      },
+    };
+
+    return middleware({
+      query: {
+        role: random.number({ min: 0, max: 3 }),
+      },
+      method: 'GET',
+    }, null, (err) => {
       handler(err, undefined, res, next);
     });
   });
@@ -371,7 +404,7 @@ describe('isCelebrate()', () => {
       },
     });
 
-    middleware({
+    return middleware({
       headers: {
         accept: random.number(),
       },
@@ -383,7 +416,7 @@ describe('isCelebrate()', () => {
 
 describe('format()', () => {
   // Need a real Joi error to use in a few places for these tests
-  const result = Joi.validate(null, Joi.string().valid('foo'));
+  const result = Joi.string().valid('foo').validate(null);
   describe.each`
     value
     ${null}
@@ -397,11 +430,11 @@ describe('format()', () => {
 });
   it('throws an error if the source is not a valid string', () => {
     expect.assertions(1);
-    expect(() => format(result, 'foo')).toThrow(Joi.ValidationError);
+    expect(() => format(result, 'foo')).toThrow();
   });
   it('throws an error if the option arguments is incorrect', () => {
     expect.assertions(1);
-    expect(() => format(result, 'body', false)).toThrow(Joi.ValidationError);
+    expect(() => format(result, 'body', false)).toThrow();
   });
   it('returns a formatted error object without options', () => {
     expect.assertions(1);

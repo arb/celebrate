@@ -29,14 +29,14 @@
   },
   "homepage": "https://github.com/arb/celebrate#readme",
   "dependencies": {
-    "@hapi/joi": "15.x.x",
+    "@hapi/joi": "16.x.x",
     "escape-html": "1.0.3",
     "lodash.get": "4.4.x"
   },
   "devDependencies": {
     "@hapi/teamwork": "3.3.x",
     "@types/express": "4.x.x",
-    "@types/hapi__joi": "15.x.x",
+    "@types/hapi__joi": "16.x.x",
     "artificial": "1.x.x",
     "benchmark": "2.1.x",
     "body-parser": "1.19.x",
