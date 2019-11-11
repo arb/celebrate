@@ -60,7 +60,7 @@ declare namespace Celebrate {
     /**
      * Format a joi error into a standard object
      */
-    function format(err: ValidationResult<object>, 
+    function format(err: ValidationResult, 
         source: "params" | "headers" | "query" | "cookies" | "signedCookies" | "body", 
         opts?: { celebrated: boolean }): {
         meta: {
