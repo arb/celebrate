@@ -6,6 +6,15 @@ import {
     ValidationResult 
 } from '@hapi/joi';
 
+enum Segments {
+    PARAMS="params",
+    HEADERS="headers",
+    QUERY="query",
+    COOKIES="cookies",
+    SIGNEDCOOKIES="signedCookies",
+    BODY="body"
+}
+
 declare namespace Celebrate {
     /**
     * Creates a Celebrate middleware function.
@@ -60,14 +69,18 @@ declare namespace Celebrate {
     /**
      * Format a joi error into a standard object
      */
-    function format(err: ValidationResult<object>, 
-        source: "params" | "headers" | "query" | "cookies" | "signedCookies" | "body", 
+    function format(err: ValidationError, 
+        source: Segment,
         opts?: { celebrated: boolean }): {
         meta: {
-            source: "params" | "headers" | "query" | "cookies" | "signedCookies" | "body"
+            source: Segment
         },
         joi: ValidationError,
-    }
+    };
+    /**
+     * The different segments of req celebrate can valiate against
+     */
+    export const Segments: Segments;
 }
 
 export = Celebrate;

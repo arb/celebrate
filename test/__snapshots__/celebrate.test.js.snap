@@ -41,6 +41,26 @@ Object {
 }
 `;
 
+exports[`format() [async] returns a formatted error object without options 1`] = `
+Object {
+  "joi": [ValidationError: "value" must be [foo]],
+  "meta": Object {
+    "source": "body",
+  },
+  Symbol(celebrated): false,
+}
+`;
+
+exports[`format() [sync] returns a formatted error object without options 1`] = `
+Object {
+  "joi": [ValidationError: "value" must be [foo]],
+  "meta": Object {
+    "source": "body",
+  },
+  Symbol(celebrated): false,
+}
+`;
+
 exports[`format() returns a formatted error object with options 1`] = `
 Object {
   "joi": [ValidationError: "value" must be [foo]],
@@ -48,15 +68,5 @@ Object {
     "source": "body",
   },
   Symbol(celebrated): true,
-}
-`;
-
-exports[`format() returns a formatted error object without options 1`] = `
-Object {
-  "joi": [ValidationError: "value" must be [foo]],
-  "meta": Object {
-    "source": "body",
-  },
-  Symbol(celebrated): false,
 }
 `;

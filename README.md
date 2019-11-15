@@ -69,18 +69,18 @@ Example of using celebrate on a single POST route to validate `req.body`.
 ```js
 const express = require('express');
 const BodyParser = require('body-parser');
-const { celebrate, Joi, errors } = require('celebrate');
+const { celebrate, Joi, errors, Segments } = require('celebrate');
 
 const app = express();
 app.use(BodyParser.json());
 
 app.post('/signup', celebrate({
-  body: Joi.object().keys({
+  [Segments.BODY]: Joi.object().keys({
     name: Joi.string().required(),
     age: Joi.number().integer(),
     role: Joi.string().default('admin')
   }),
-  query: {
+  [Segments.QUERY]: {
     token: Joi.string().token().required()
   }
 }), (req, res) => {
@@ -93,13 +93,13 @@ app.use(errors());
 Example of using celebrate to validate all incoming requests to ensure the `token` header is present and matches the supplied regular expression.
 ```js
 const express = require('express');
-const { celebrate, Joi, errors } = require('celebrate');
+const { celebrate, Joi, errors, Segments } = require('celebrate');
 const app = express();
 
 // validate all incoming request headers for the token header
 // if missing or not the correct format, respond with an error
 app.use(celebrate({
-  headers: Joi.object({
+  [Segments.HEADERS]: Joi.object({
     token: Joi.string().required().regex(/abc\d{3}/)
   }).unknown()
 }));
@@ -116,8 +116,8 @@ celebrate does not have a default export. The following methods encompass the pu
 
 Returns a `function` with the middleware signature (`(req, res, next)`).
 
-- `schema` - an `object` where `key` can be one of `'params'`, `'headers'`, `'query'`, `'cookies'`, `'signedCookies'` and `'body'` and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the keys specified will be validated against the incoming request object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one valid key. 
-- `[joiOptions]` - optional `object` containing joi [options](https://github.com/hapijs/joi/blob/master/API.md#validatevalue-schema-options-callback) that are passed directly into the `validate` function. Defaults to `{ escapeHtml: true }`.
+- `schema` - an `object` where `key` can be one of the values from [`Segments`](#segments) and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the keys specified will be validated against the incoming request object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one valid key. 
+- `[joiOptions]` - optional `object` containing joi [options](https://github.com/hapijs/joi/blob/master/API.md#anyvalidatevalue-options) that are passed directly into the `validate` function. Defaults to `{ warnings: true }`.
 - `[celebrateOptions]` - an optional `object` with the following keys. Defaults to `{}`.
   - `reqContext` - `bool` value that instructs joi to use the incoming `req` object as the `context` value during joi validation. If set, this will trump the value of `joiOptions.context`. This is useful if you want to validate part of the request object against another part of the request object. See the tests for more details.
 
@@ -130,11 +130,26 @@ If the error format does not suite your needs, you are encouraged to write your 
 Errors origintating from `celebrate()` are objects with the following keys:
 - `joi` - The full [joi error object](https://github.com/hapijs/joi/blob/master/API.md#errors).
 - `meta` - On `object` with the following keys:
-  - `source` - A `string` indicating the step where the validation failed. Will be one of `'params'`, `'headers'`, `'query'`, `'cookies'`, `'signedCookies'`, or `'body'`
+  - `source` - A [`Segments`](#segments) indicating the step where the validation failed.
 
 ### `Joi`
 
 celebrate exports the version of joi it is using internally. For maximum compatibility, you should use this version when creating schemas used with celebrate.
+
+### `Segments`
+
+An enum containing all the segments of `req` objects that celebrate *can* valiate against.
+
+```js
+{
+  BODY: 'body',
+  COOKIES: 'cookies',
+  HEADERS: 'headers',
+  PARAMS: 'params',
+  QUERY: 'query',
+  SIGNEDCOOKIES: 'signedCookies',
+}
+```
 
 ### `isCelebrate(err)`
 
@@ -142,12 +157,12 @@ Returns `true` if the provided `err` object originated from the `celebrate` midd
 
 - `err` - an error object
 
-### `format(err, source, [opts])`
+### `format(err, segment, [opts])`
 
 Formats the incomming values into the shape of celebrate [errors](#errors())
 
 - `err` - a Joi validation error object
-- `source` - A `string` indicating the step where the validation failed. Will be one of `'params'`, `'headers'`, `'query'`, `'cookies'`, `'signedCookies'`, or `'body'`
+- `source` - A [`Segment`](#segments) indicating the step where the validation failed.
 - `[opts]` - optional `object` with the following keys
   - `celebrated` -  `bool` that, when `true`, adds `Symbol('celebrated'): true` to the result object. This indicates this error as originating from `celebrate`. You'd likely want to set this to `true` if you want the celebrate error handler to handle errors originating from the `format` function that you call in user-land code. Defaults to `false`. 
 <details>
@@ -155,7 +170,7 @@ Formats the incomming values into the shape of celebrate [errors](#errors())
 
   ```js
     const result = Joi.validate(req.params.id, Joi.string().valid('foo'), { abortEarly: false });
-    const err = format(result, 'params');
+    const err = format(result.error, Segments.PARAMS);
   ```
 </details>
 
