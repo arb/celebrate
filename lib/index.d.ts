@@ -6,16 +6,16 @@ import {
     ValidationResult 
 } from '@hapi/joi';
 
-enum Segments {
-    PARAMS="params",
-    HEADERS="headers",
-    QUERY="query",
-    COOKIES="cookies",
-    SIGNEDCOOKIES="signedCookies",
-    BODY="body"
-}
 
 declare namespace Celebrate {
+    declare enum Segments {
+        PARAMS="params",
+        HEADERS="headers",
+        QUERY="query",
+        COOKIES="cookies",
+        SIGNEDCOOKIES="signedCookies",
+        BODY="body"
+    }
     /**
     * Creates a Celebrate middleware function.
     */
@@ -67,20 +67,11 @@ declare namespace Celebrate {
     function isCelebrate(err: object): boolean;
 
     /**
-     * Format a joi error into a standard object
+     * The standard error used by Celebrate
      */
-    function format(err: ValidationError, 
-        source: Segment,
-        opts?: { celebrated: boolean }): {
-        meta: {
-            source: Segment
-        },
-        joi: ValidationError,
-    };
-    /**
-     * The different segments of req celebrate can valiate against
-     */
-    export const Segments: Segments;
+    declare class CelebrateError {
+        constructor(error: ValidationError, segment: Segments, opts?: { celebrated: boolean }) {}
+    }
 }
 
 export = Celebrate;

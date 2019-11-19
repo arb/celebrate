@@ -6,10 +6,9 @@ const {
   Joi,
   errors,
   isCelebrate,
-  format,
+  CelebrateError,
   Segments,
 } = require('../lib');
-
 
 describe('celebrate()', () => {
   describe.each`
@@ -415,7 +414,7 @@ describe('isCelebrate()', () => {
   });
 });
 
-describe('format()', () => {
+describe('CelebrateError()', () => {
   const schema = Joi.string().valid('foo');
   // Need a real Joi error to use in a few places for these tests
   const result = schema.validate(null);
@@ -425,32 +424,50 @@ describe('format()', () => {
     ${undefined}
     ${Error()}
     ${{}}
-    `('format($value)', ({ value }) => {
+    `('CelebrateError($value)', ({ value }) => {
   it('throws an error', () => {
     expect.assertions(1);
-    expect(() => format(value)).toThrow();
+    expect(() => CelebrateError(value)).toThrow();
   });
 });
   it('throws an error if the source is not a valid string', () => {
     expect.assertions(1);
-    expect(() => format(result.error, 'foo')).toThrow();
+    expect(() => CelebrateError(result.error, 'foo')).toThrow();
   });
   it('throws an error if the option arguments is incorrect', () => {
     expect.assertions(1);
-    expect(() => format(result.error, 'body', false)).toThrow();
+    expect(() => CelebrateError(result.error, 'body', false)).toThrow();
   });
   it('returns a formatted error object with options', () => {
-    expect.assertions(1);
-    expect(format(result.error, 'body', { celebrated: true })).toMatchSnapshot();
+    expect.assertions(2);
+    const err = CelebrateError(result.error, 'body', { celebrated: true });
+    expect(err).toMatchObject({
+      joi: expect.any(Joi.ValidationError),
+      meta: { source: 'body' },
+      message: expect.any(String),
+    });
+    expect(isCelebrate(err)).toBe(true);
   });
-  it('[sync] returns a formatted error object without options', () => {
-    expect.assertions(1);
-    expect(format(result.error, 'body')).toMatchSnapshot();
+  it('[sync] returns a CelebrateError object without options', () => {
+    expect.assertions(2);
+    const err = CelebrateError(result.error, 'body');
+    expect(err).toMatchObject({
+      joi: expect.any(Joi.ValidationError),
+      meta: { source: 'body' },
+      message: expect.any(String),
+    });
+    expect(isCelebrate(err)).toBe(false);
   });
-  it('[async] returns a formatted error object without options', () => {
-    expect.assertions(1);
+  it('[async] returns a CelebrateError object without options', () => {
+    expect.assertions(2);
     return schema.validateAsync(null).catch((e) => {
-      expect(format(e, 'body')).toMatchSnapshot();
+      const err = CelebrateError(e, 'body');
+      expect(err).toMatchObject({
+        joi: expect.any(Joi.ValidationError),
+        meta: { source: 'body' },
+        message: expect.any(String),
+      });
+      expect(isCelebrate(err)).toBe(false);
     });
   });
 });
