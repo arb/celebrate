@@ -127,10 +127,7 @@ Returns a `function` with the error handler signature (`(err, req, res, next)`).
 
 If the error format does not suite your needs, you are encouraged to write your own and check `isCelebrate(err)` to format celebrate errors to your liking. 
 
-Errors origintating from `celebrate()` are objects with the following keys:
-- `joi` - The full [joi error object](https://github.com/hapijs/joi/blob/master/API.md#errors).
-- `meta` - On `object` with the following keys:
-  - `source` - A [`Segments`](#segments) indicating the step where the validation failed.
+Errors origintating from `celebrate()` are [`CelebrateError`](#celebrateerrorerr-segment-opts)) objects.
 
 ### `Joi`
 
@@ -151,28 +148,27 @@ An enum containing all the segments of `req` objects that celebrate *can* valiat
 }
 ```
 
-### `isCelebrate(err)`
-
-Returns `true` if the provided `err` object originated from the `celebrate` middleware, and `false` otherwise. Useful if you want to write your own error handler for celebrate errors.
-
-- `err` - an error object
-
-### `format(err, segment, [opts])`
-
-Formats the incomming values into the shape of celebrate [errors](#errors())
+### `CelebrateError(err, segment, [opts])`
+A factory function for creating celebrate errors.
 
 - `err` - a Joi validation error object
-- `source` - A [`Segment`](#segments) indicating the step where the validation failed.
+- `segment` - A [`Segment`](#segments) indicating the step where the validation failed.
 - `[opts]` - optional `object` with the following keys
-  - `celebrated` -  `bool` that, when `true`, adds `Symbol('celebrated'): true` to the result object. This indicates this error as originating from `celebrate`. You'd likely want to set this to `true` if you want the celebrate error handler to handle errors originating from the `format` function that you call in user-land code. Defaults to `false`. 
+  - `celebrated` - `bool` that, when `true`, adds `Symbol('celebrated'): true` to the result object. This indicates this error as originating from `celebrate`. You'd likely want to set this to `true` if you want the celebrate error handler to handle errors originating from the `format` function that you call in user-land code. Defaults to `false`. 
 <details>
   <summary>Sample usage</summary>
 
   ```js
     const result = Joi.validate(req.params.id, Joi.string().valid('foo'), { abortEarly: false });
-    const err = format(result.error, Segments.PARAMS);
+    const err = CelebrateError(result.error, Segments.PARAMS);
   ```
 </details>
+
+### `isCelebrate(err)`
+
+Returns `true` if the provided `err` object originated from the `celebrate` middleware, and `false` otherwise. Useful if you want to write your own error handler for celebrate errors.
+
+- `err` - an error object
 
 ## Validation Order
 
