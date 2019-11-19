@@ -149,7 +149,8 @@ An enum containing all the segments of `req` objects that celebrate *can* valiat
 ```
 
 ### `CelebrateError(err, segment, [opts])`
-Creates a new `CelebrateError` similar to the ones `celebrate` generates.
+
+A factory function for creating celebrate errors.
 
 - `err` - a Joi validation error object
 - `segment` - A [`Segment`](#segments) indicating the step where the validation failed.
