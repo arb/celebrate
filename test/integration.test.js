@@ -356,3 +356,72 @@ describe('reqContext', () => {
     expect(next).not.toHaveBeenCalled();
   });
 });
+
+describe('multiple-runs', () => {
+  test('continues to set default values', () => {
+    expect.assertions(10);
+    const server = Server();
+
+    server.get('/', celebrate({
+      [Segments.HEADERS]: {
+        accept: Joi.string().regex(/json/),
+        'secret-header': Joi.string().default('@@@@@@'),
+      },
+    }, {
+      allowUnknown: true,
+    }), (req, res) => {
+      delete req.headers.host; // this can change computer to computer, so just remove it
+      res.send(req.headers);
+    });
+
+    const attempts = Array.from({ length: 10 }, () => new Promise((resolve) => server.inject({
+      method: 'GET',
+      url: '/',
+      headers: {
+        accept: 'application/json',
+      },
+    }, (r) => {
+      resolve(JSON.parse(r.payload));
+    })));
+
+    return Promise.all(attempts).then((v) => {
+      v.forEach((headers) => {
+        expect(headers).toEqual({
+          accept: 'application/json',
+          'user-agent': 'shot',
+          'secret-header': '@@@@@@',
+        });
+      });
+    });
+  });
+
+  test('continues to validate values', () => {
+    expect.assertions(10);
+    const server = Server();
+
+    server.post('/', celebrate({
+      [Segments.BODY]: {
+        name: Joi.string().required(),
+      },
+    }));
+
+    const attempts = Array.from({ length: 10 }, () => new Promise((resolve) => server.inject({
+      method: 'POST',
+      url: '/',
+      payload: {
+        age: random.number(),
+      },
+      headers: {
+        accept: 'application/json',
+      },
+    }, (r) => {
+      resolve(r.statusCode);
+    })));
+
+    return Promise.all(attempts).then((v) => {
+      v.forEach((statusCode) => {
+        expect(statusCode).toEqual(500);
+      });
+    });
+  });
+});
