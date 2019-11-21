@@ -8,7 +8,7 @@ import {
 
 
 declare namespace Celebrate {
-    declare enum Segments {
+    enum Segments {
         PARAMS="params",
         HEADERS="headers",
         QUERY="query",
@@ -69,8 +69,8 @@ declare namespace Celebrate {
     /**
      * The standard error used by Celebrate
      */
-    declare class CelebrateError {
-        constructor(error: ValidationError, segment: Segments, opts?: { celebrated: boolean }) {}
+    class CelebrateError {
+        constructor(error: ValidationError, segment: Segments, opts?: { celebrated: boolean })
     }
 }
 
