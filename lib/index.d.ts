@@ -8,6 +8,11 @@ import {
 
 
 declare namespace Celebrate {
+    declare interface CelebrateErrorInterface extends Error {
+        joi: ValidationError;
+        message: string;
+        meta: { segment: Segments }
+    };
     declare enum Segments {
         PARAMS="params",
         HEADERS="headers",
@@ -15,7 +20,7 @@ declare namespace Celebrate {
         COOKIES="cookies",
         SIGNEDCOOKIES="signedCookies",
         BODY="body"
-    }
+    };
     /**
     * Creates a Celebrate middleware function.
     */
@@ -69,9 +74,7 @@ declare namespace Celebrate {
     /**
      * The standard error used by Celebrate
      */
-    declare class CelebrateError {
-        constructor(error: ValidationError, segment: Segments, opts?: { celebrated: boolean }) {}
-    }
+    function CelebrateError(error: ValidationError, segment: Segments, opts?: { celebrated: boolean }): CelebrateErrorInterface;
 }
 
 export = Celebrate;
