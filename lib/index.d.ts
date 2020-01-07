@@ -60,7 +60,7 @@ export interface SchemaOptions {
 /**
 * Creates a Celebrate middleware function.
 */
-export declare function celebrate(schema: SchemaOptions, joiOptions?: ValidationOptions, celebrateOptions?: CelebrateOptions): RequestHandler;
+export declare function celebrate(schema: SchemaOptions, joiOptions?: ValidationOptions, opts?: CelebrateOptions): RequestHandler;
 
 /**
  * Creates a Celebrate error handler middleware function.

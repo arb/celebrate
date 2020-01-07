@@ -21,7 +21,7 @@ describe('celebrate()', () => {
   it('throws an error', () => {
     expect(() => {
       celebrate(schema);
-    }).toThrow();
+    }).toThrow(Joi.ValidationError);
   });
 });
 
@@ -427,16 +427,16 @@ describe('CelebrateError()', () => {
     `('CelebrateError($value)', ({ value }) => {
   it('throws an error', () => {
     expect.assertions(1);
-    expect(() => CelebrateError(value)).toThrow();
+    expect(() => CelebrateError(value)).toThrow('"error" must be a Joi error');
   });
 });
   it('throws an error if the source is not a valid string', () => {
     expect.assertions(1);
-    expect(() => CelebrateError(result.error, 'foo')).toThrow();
+    expect(() => CelebrateError(result.error, 'foo')).toThrow(Joi.ValidationError);
   });
   it('throws an error if the option arguments is incorrect', () => {
     expect.assertions(1);
-    expect(() => CelebrateError(result.error, 'body', false)).toThrow();
+    expect(() => CelebrateError(result.error, 'body', false)).toThrow(Joi.ValidationError);
   });
   it('returns a formatted error object with options', () => {
     expect.assertions(2);
