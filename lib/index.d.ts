@@ -68,11 +68,6 @@ export declare function celebrate(schema: SchemaOptions, joiOptions?: Validation
 export declare function errors(): ErrorRequestHandler;
 
 /**
- * The Joi version Celebrate uses internally.
- */
-export declare const Joi: joi;
-
-/**
  * Examines an error object to determine if it originated from the celebrate middleware.
  */
 export declare function isCelebrate(err: object): boolean;
