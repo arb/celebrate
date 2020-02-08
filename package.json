@@ -1,5 +1,5 @@
 {
-  "name": "celebrate",
+  "name": "lite-celebrate",
   "version": "11.0.1",
   "description": "A joi validation middleware for Express.",
   "main": "lib/index.js",
@@ -9,33 +9,39 @@
     "test:local": "jest --watch --verbose",
     "test:ci": "jest --ci",
     "benchmark": "node utils/benchmark",
-    "toc": "node utils/generate-toc",
-    "version": "npm run toc && git add README.md"
+    "toc": "node utils/generate-toc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arb/celebrate.git"
+    "url": "https://github.com/abdelrahman-elkady/lite-celebrate"
   },
   "keywords": [
     "joi",
+    "lite-celebrate",
     "validation",
     "express",
     "middleware"
   ],
   "author": "Adam Bretz <arbretz@gmail.com>",
   "license": "MIT",
+  "contributors": [
+    {
+      "name": "Abdelrahman Elkady <abdelrahman-elkady>",
+      "email": "elkadyabdelrahman@gmail.com"
+    }
+  ],
   "bugs": {
-    "url": "https://github.com/arb/celebrate/issues"
+    "url": "https://github.com/abdelrahman-elkady/lite-celebrate"
   },
-  "homepage": "https://github.com/arb/celebrate#readme",
+  "homepage": "https://github.com/abdelrahman-elkady/lite-celebrate",
   "dependencies": {
-    "@hapi/joi": "16.x.x",
     "escape-html": "1.0.3"
   },
   "devDependencies": {
-    "@hapi/teamwork": "3.3.x",
+    "@hapi/joi": "^17.1.0",
+    "@hapi/teamwork": "4.0.x",
     "@types/express": "4.x.x",
-    "@types/hapi__joi": "16.x.x",
+    "@types/hapi__joi": "^16.0.9",
     "artificial": "1.x.x",
     "benchmark": "2.1.x",
     "body-parser": "1.19.x",
@@ -44,13 +50,16 @@
     "eslint": "6.x.x",
     "eslint-config-airbnb-base": "14.x.x",
     "eslint-plugin-import": "2.x.x",
-    "expect": "24.x.x",
+    "expect": "25.x.x",
     "express": "next",
     "faker": "4.1.x",
-    "is-ci-cli": "1.1.x",
-    "jest": "24.x.x",
+    "is-ci-cli": "2.0.x",
+    "jest": "25.x.x",
     "jest-runner-eslint": "0.7.x",
     "markdown-toc": "1.2.x"
+  },
+  "peerDependencies": {
+    "@hapi/joi": "^17.1.0"
   },
   "engines": {
     "node": ">=10.0.0"

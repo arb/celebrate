@@ -1,3 +1,5 @@
+const { peerDependencies } = require('./package.json');
+
 module.exports = {
   extends: 'airbnb-base',
   env: {
@@ -5,5 +7,10 @@ module.exports = {
   },
   rules: {
     'no-underscore-dangle': 'off',
-  }
+
+    'import/no-unresolved': [
+      'error',
+      { ignore: Object.keys(peerDependencies) },
+    ]
+  },
 };
