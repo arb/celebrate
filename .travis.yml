@@ -15,7 +15,7 @@ install:
     - npm install -g codecov
     - npm install -g json
     - json -I -f package.json -e "this.devDependencies.express=\"$EXPRESS_VERSION\""
-    - npm ci
+    - npm install
 
 script:
     - npm test

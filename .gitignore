@@ -19,3 +19,4 @@ complexity.md
 .vscode
 .eslintcache
 coverage/**
+**/package-lock.json
