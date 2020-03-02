@@ -141,7 +141,7 @@ describe('celebrate()', () => {
       type: 'john',
       base: joi.string(),
       messages: {
-        'john.base': '"{#label}" must equal "john"',
+        'john.base': '{#label} must equal "john"',
       },
       validate(value, helpers) {
         if (value !== 'john') {

@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/arb/celebrate#readme",
   "dependencies": {
-    "@hapi/joi": "16.x.x",
+    "@hapi/joi": "17.x.x",
     "escape-html": "1.0.3"
   },
   "devDependencies": {
@@ -44,11 +44,11 @@
     "eslint": "6.x.x",
     "eslint-config-airbnb-base": "14.x.x",
     "eslint-plugin-import": "2.x.x",
-    "expect": "24.x.x",
+    "expect": "25.x.x",
     "express": "next",
     "faker": "4.1.x",
-    "is-ci-cli": "1.1.x",
-    "jest": "24.x.x",
+    "is-ci-cli": "2.x.x",
+    "jest": "25.x.x",
     "jest-runner-eslint": "0.7.x",
     "markdown-toc": "1.2.x"
   },
