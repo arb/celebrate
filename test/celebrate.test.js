@@ -1,6 +1,8 @@
 /* eslint-env jest */
 const expect = require('expect');
-const { name, random, date } = require('faker');
+const {
+  name, random, date, internet,
+} = require('faker');
 const {
   celebrate,
   Joi,
@@ -86,12 +88,14 @@ describe('celebrate()', () => {
     const first = name.firstName();
     const last = name.lastName();
     const role = name.jobTitle();
+    const browser = internet.domainWord();
     const req = {
       [Segments.BODY]: {
         first,
         last,
       },
       [Segments.QUERY]: undefined,
+      [Segments.COOKIES]: { browser: undefined, agent: 'Node' },
       method: 'POST',
     };
     const middleware = celebrate({
@@ -101,6 +105,10 @@ describe('celebrate()', () => {
         role: Joi.number().integer().default(role),
       },
       [Segments.QUERY]: Joi.number(),
+      [Segments.COOKIES]: Joi.object().keys({
+        browser: Joi.string().default(browser),
+        agent: Joi.string().uppercase().required(),
+      }),
     });
 
     return middleware(req, null, (err) => {
@@ -111,6 +119,10 @@ describe('celebrate()', () => {
         role,
       });
       expect(req.query).toBeUndefined();
+      expect(req.cookies).toEqual({
+        browser,
+        agent: 'NODE',
+      });
     });
   });
 
