@@ -4,6 +4,7 @@
 [![Build Status](https://flat.badgen.net/travis/arb/celebrate?icon=travis)](https://travis-ci.org/arb/celebrate)
 [![airbnb-style](https://flat.badgen.net/badge/eslint/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
 [![Code Coverage](https://flat.badgen.net/codecov/c/github/arb/celebrate?icon=codecov)](https://codecov.io/gh/arb/celebrate)
+[![Total Downloads](https://badgen.net/npm/dt/celebrate?&color=cyan)](https://www.npmjs.org/package/celebrate)
 
 <table>
   <tbody>
