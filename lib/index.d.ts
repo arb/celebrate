@@ -65,7 +65,7 @@ export declare function celebrate(requestRules: SchemaOptions, joiOpts?: Validat
 /**
  * Creates a Celebrate error handler middleware function.
  */
-export declare function errors(): ErrorRequestHandler;
+export declare function errors(opts?: { statusCode: number }): ErrorRequestHandler;
 
 /**
  * The Joi version Celebrate uses internally.

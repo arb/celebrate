@@ -1,5 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`errors() honors the configuration options 1`] = `
+Object {
+  "error": "Conflict",
+  "message": "\\"role\\" must be larger than or equal to 4",
+  "statusCode": 409,
+  "validation": Object {
+    "keys": Array [
+      "role",
+    ],
+    "source": "query",
+  },
+}
+`;
+
 exports[`errors() includes more information when abourtEarly is false 1`] = `
 Object {
   "error": "Bad Request",

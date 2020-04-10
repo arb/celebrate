@@ -390,6 +390,44 @@ describe('errors()', () => {
       handler(err, undefined, res, next);
     });
   });
+
+  it('honors the configuration options', () => {
+    expect.assertions(4);
+    const middleware = celebrate({
+      [Segments.QUERY]: {
+        role: Joi.number().integer().min(4),
+      },
+    });
+    const statusCode = 409;
+    const handler = errors({ statusCode });
+    const next = jest.fn();
+    const res = {
+      status(code) {
+        expect(code).toBe(statusCode);
+        return {
+          send(err) {
+            expect(err).toHaveProperty('statusCode', 409);
+            expect(err).toMatchSnapshot();
+            expect(next).not.toHaveBeenCalled();
+          },
+        };
+      },
+    };
+
+    return middleware({
+      [Segments.QUERY]: {
+        role: random.number({ min: 0, max: 3 }),
+      },
+      method: 'GET',
+    }, null, (err) => {
+      handler(err, undefined, res, next);
+    });
+  });
+
+  it('throws an error for goofy satus codes', () => {
+    expect(() => errors({ statusCode: 499 })).toThrow(Joi.ValidationError);
+    expect(() => errors({ statusCode: 200 })).toThrow(Joi.ValidationError);
+  });
 });
 
 describe('isCelebrate()', () => {
