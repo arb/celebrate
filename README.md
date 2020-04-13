@@ -123,13 +123,16 @@ Returns a `function` with the middleware signature (`(req, res, next)`).
 - `[opts]` - an optional `object` with the following keys. Defaults to `{}`.
   - `reqContext` - `bool` value that instructs joi to use the incoming `req` object as the `context` value during joi validation. If set, this will trump the value of `joiOptions.context`. This is useful if you want to validate part of the request object against another part of the request object. See the tests for more details.
 
-### `errors()`
+### `errors([opts])`
 
-Returns a `function` with the error handler signature (`(err, req, res, next)`). This should be placed with any other error handling middleware to catch celebrate errors. If the incoming `err` object is an error originating from celebrate, `errors()` will respond with a 400 status code and the joi validation message. Otherwise, it will call `next(err)` and will pass the error along and will need to be processed by another error handler.
+Returns a `function` with the error handler signature (`(err, req, res, next)`). This should be placed with any other error handling middleware to catch celebrate errors. If the incoming `err` object is an error originating from celebrate, `errors()` will respond a pre-build error object. Otherwise, it will call `next(err)` and will pass the error along and will need to be processed by another error handler.
 
-If the error format does not suite your needs, you are encouraged to write your own and check `isCelebrate(err)` to format celebrate errors to your liking. 
+- `[opts]` - an optional `object` with the following keys
+  - `statusCode` - `number` that will be used for the response status code in the event of an error. Must be greater than 399 and less than 600. It must also be a number available to the node [HTTP module](https://nodejs.org/api/http.html#http_http_status_codes). Defaults to 400.
 
-Errors origintating from `celebrate()` are [`CelebrateError`](#celebrateerrorerr-segment-opts)) objects.
+If the error response format does not suite your needs, you are encouraged to write your own and check `isCelebrate(err)` to format celebrate errors to your liking. 
+
+Errors origintating from the `celebrate()` middleware are [`CelebrateError`](#celebrateerrorerr-segment-opts) objects.
 
 ### `Joi`
 
