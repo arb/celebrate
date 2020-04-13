@@ -45,7 +45,7 @@ Wondering why *another* joi middleware library for express? Full blog post [here
 - [Example Usage](#example-usage)
 - [API](#api)
   - [`celebrate(schema, [joiOptions], [opts])`](#celebrateschema-joioptions-opts)
-  - [`errors()`](#errors)
+  - [`errors([opts])`](#errorsopts)
   - [`Joi`](#joi)
   - [`Segments`](#segments)
   - [`CelebrateError(error, segment, [opts])`](#celebrateerrorerror-segment-opts)
