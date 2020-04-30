@@ -59,12 +59,6 @@ Wondering why *another* joi middleware library for express? Full blog post [here
 
 celebrate is tested and has full compatibility with express 4 and 5. It likely works correctly with express 3, but including it in the test matrix was more trouble than it's worth. This is primarily because express 3 exposes route parameters as an array rather than an object.
 
-## Mutation Warning
-
-If you use any of joi's updating validation APIs (`default`, `rename`, etc.) `celebrate` will override the source value with the changes applied by joi. 
-
-For example, if you validate `req.query` and have a `default` value in your joi schema, if the incoming `req.query` is missing a value for default, during validation `celebrate` will overrite the original `req.query` with the result of `joi.validate`. This is done so that once `req` has been validated, you can be sure all the inputs are valid and ready to consume in your handler functions and you don't need to re-write all your handlers to look for the query values in `res.locals.*`.
-
 ## Example Usage
 
 Example of using celebrate on a single POST route to validate `req.body`.
@@ -132,7 +126,7 @@ Returns a `function` with the error handler signature (`(err, req, res, next)`).
 
 If the error response format does not suite your needs, you are encouraged to write your own and check `isCelebrate(err)` to format celebrate errors to your liking. 
 
-Errors origintating from the `celebrate()` middleware are [`CelebrateError`](#celebrateerrorerr-segment-opts) objects.
+Errors origintating from the `celebrate()` middleware are [`CelebrateError`](##celebrateerrorerror-segment-opts) objects.
 
 ### `Joi`
 
@@ -176,7 +170,9 @@ Returns `true` if the provided `err` object originated from the `celebrate` midd
 
 - `err` - an error object
 
-## Validation Order
+## Additional Details
+
+### Validation Order
 
 celebrate validates request values in the following order:
 
@@ -188,6 +184,16 @@ celebrate validates request values in the following order:
 6. `req.body` (_assuming `body-parser` is being used_)
 
 If any of the configured validation rules fail, the entire request will be considered invalid and the rest of the validation will be short-circuited and the validation error will be passed into `next`. 
+
+### Mutation Warning
+
+If you use any of joi's updating validation APIs (`default`, `rename`, etc.) `celebrate` will override the source value with the changes applied by joi. 
+
+For example, if you validate `req.query` and have a `default` value in your joi schema, if the incoming `req.query` is missing a value for default, during validation `celebrate` will overrite the original `req.query` with the result of `joi.validate`. This is done so that once `req` has been validated, you can be sure all the inputs are valid and ready to consume in your handler functions and you don't need to re-write all your handlers to look for the query values in `res.locals.*`.
+
+### Additional Info
+
+According the the HTTP spec, `GET` requests should _not_ include a body in the request payload. For that reason, `celebrate` does not validate the body on `GET` requests. 
 
 ## Issues
 
