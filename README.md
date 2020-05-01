@@ -41,7 +41,6 @@ Wondering why *another* joi middleware library for express? Full blog post [here
 <!-- toc -->
 
 - [express Compatibility](#express-compatibility)
-- [Mutation Warning](#mutation-warning)
 - [Example Usage](#example-usage)
 - [API](#api)
   - [`celebrate(schema, [joiOptions], [opts])`](#celebrateschema-joioptions-opts)
@@ -50,7 +49,10 @@ Wondering why *another* joi middleware library for express? Full blog post [here
   - [`Segments`](#segments)
   - [`CelebrateError(error, segment, [opts])`](#celebrateerrorerror-segment-opts)
   - [`isCelebrate(err)`](#iscelebrateerr)
-- [Validation Order](#validation-order)
+- [Additional Details](#additional-details)
+  - [Validation Order](#validation-order)
+  - [Mutation Warning](#mutation-warning)
+  - [Additional Info](#additional-info)
 - [Issues](#issues)
 
 <!-- tocstop -->
