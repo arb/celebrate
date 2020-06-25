@@ -128,7 +128,7 @@ Returns a `function` with the error handler signature (`(err, req, res, next)`).
 
 If the error response format does not suite your needs, you are encouraged to write your own and check `isCelebrate(err)` to format celebrate errors to your liking. 
 
-Errors origintating from the `celebrate()` middleware are [`CelebrateError`](##celebrateerrorerror-segment-opts) objects.
+Errors origintating from the `celebrate()` middleware are [`CelebrateError`](#celebrateerrorerror-segment-opts) objects.
 
 ### `Joi`
 
