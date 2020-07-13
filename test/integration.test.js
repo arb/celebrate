@@ -1,4 +1,3 @@
-
 /* eslint-env jest */
 const Express = require('express');
 const Artificial = require('artificial');
@@ -20,7 +19,6 @@ const Server = () => {
   Artificial(server);
   return server;
 };
-
 
 describe('validations', () => {
   test('req.headers', async () => {
@@ -247,7 +245,6 @@ describe('update req values', () => {
         page: Joi.number().default(1),
       }),
     }), team.attend.bind(team));
-
 
     server.inject({
       url: '/?name=john',
