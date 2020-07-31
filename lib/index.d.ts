@@ -22,6 +22,25 @@ interface CelebrateInternalError {
     meta: { source: Segments };
 }
 
+interface Celebrator1x1 {
+  (joiOpts: ValidationOptions): Celebrator1x2;
+  (joiOpts: ValidationOptions, requestRules: SchemaOptions): RequestHandler;
+}
+
+interface Celebrator1x2 {
+  (requestRules: SchemaOptions): RequestHandler;
+}
+
+interface Celebrator {
+    (opts: CelebrateOptions): Celebrator1x1;
+    (opts: CelebrateOptions, joiOpts: ValidationOptions): Celebrator1x2;
+    (
+        opts: CelebrateOptions,
+        joiOpts: ValidationOptions,
+        requestRules: SchemaOptions
+    ): RequestHandler;
+  }
+
 export interface CelebrateOptions {
     /**
      * When `true` uses the entire `req` object as the `context` value during validation.
@@ -56,11 +75,15 @@ export interface SchemaOptions {
     body?: object;
 }
 
-
 /**
-* Creates a Celebrate middleware function.
+* Creates a celebrate middleware function.
 */
 export declare function celebrate(requestRules: SchemaOptions, joiOpts?: ValidationOptions, opts?: CelebrateOptions): RequestHandler;
+
+/**
+ * Curried version of `celebrate`.
+ */
+export declare const celebrator: Celebrator;
 
 /**
  * Creates a Celebrate error handler middleware function.
