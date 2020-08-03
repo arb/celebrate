@@ -22,18 +22,18 @@ interface CelebrateInternalError {
     meta: { source: Segments };
 }
 
-interface Celebrator1x1 {
-  (joiOpts: ValidationOptions): Celebrator1x2;
+interface Celebrator1 {
+  (joiOpts: ValidationOptions): Celebrator2;
   (joiOpts: ValidationOptions, requestRules: SchemaOptions): RequestHandler;
 }
 
-interface Celebrator1x2 {
+interface Celebrator2 {
   (requestRules: SchemaOptions): RequestHandler;
 }
 
 interface Celebrator {
-    (opts: CelebrateOptions): Celebrator1x1;
-    (opts: CelebrateOptions, joiOpts: ValidationOptions): Celebrator1x2;
+    (opts: CelebrateOptions): Celebrator1;
+    (opts: CelebrateOptions, joiOpts: ValidationOptions): Celebrator2;
     (
         opts: CelebrateOptions,
         joiOpts: ValidationOptions,
