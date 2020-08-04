@@ -119,6 +119,64 @@ Returns a `function` with the middleware signature (`(req, res, next)`).
 - `[opts]` - an optional `object` with the following keys. Defaults to `{}`.
   - `reqContext` - `bool` value that instructs joi to use the incoming `req` object as the `context` value during joi validation. If set, this will trump the value of `joiOptions.context`. This is useful if you want to validate part of the request object against another part of the request object. See the tests for more details.
 
+### `celebrator([opts], [joiOptions], schema)`
+
+This is a curried version of [`celebrate`](#celebrateschema-joioptions-opts). It is curried with `lodash.curryRight` so it can be called in all the various fashions that [API supports](https://lodash.com/docs/4.17.15#curryRight). Returns a `function` with the middleware signature (`(req, res, next)`).
+
+- `[opts]` - an optional `object` with the following keys. Defaults to `{}`.
+  - `reqContext` - `bool` value that instructs joi to use the incoming `req` object as the `context` value during joi validation. If set, this will trump the value of `joiOptions.context`. This is useful if you want to validate part of the request object against another part of the request object. See the tests for more details.
+  - `[joiOpts]` - optional `object` containing joi [options](https://github.com/hapijs/joi/blob/master/API.md#anyvalidatevalue-options) that are passed directly into the `validate` function. Defaults to `{ warnings: true }`.
+  - `requestRules` - an `object` where `key` can be one of the values from [`Segments`](#segments) and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the keys specified will be validated against the incoming request object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one valid key. 
+
+<details>
+  <summary>Sample usage</summary>
+
+  This is an example use of curried celebrate in a real server.
+
+  ```js
+    const express = require('express');
+    const { celebrator, Joi, errors, Segments } = require('celebrate');
+    const app = express();
+
+    // now every instance of `celebrate` will use these same options so you only
+    // need to do it once.
+    const celebrate = celebrator({ reqContext: true }, { convert: true });
+
+    // validate all incoming request headers for the token header
+    // if missing or not the correct format, respond with an error
+    app.use(celebrate({
+      [Segments.HEADERS]: Joi.object({
+        token: Joi.string().required().regex(/abc\d{3}/)
+      }).unknown()
+    }));
+    app.get('/', celebrate({
+      [Segments.HEADERS]: Joi.object({
+        name: Joi.string().required()
+      })
+    }), (req, res) => { res.send('hello world'); });
+    app.use(errors());
+  ```
+  
+  Here are some examples of other ways to call `celebrator`
+
+  ```js
+    const opts = { reqContext: true };
+    const joiOpts = { convert: true };
+    const schema = {
+      [Segments.HEADERS]: Joi.object({
+        name: Joi.string().required()
+      })
+    };
+
+    let c = celebrator(opts)(joiOpts)(schema);
+    c = celebrator(opts, joiOpts)(schema);
+    c = celebrator(opts)(joiOpts, schema);
+    c = celebrator(opts, joiOpts, schema);
+
+    // c would function the same in all of these cases.
+  ```
+</details>
+
 ### `errors([opts])`
 
 Returns a `function` with the error handler signature (`(err, req, res, next)`). This should be placed with any other error handling middleware to catch celebrate errors. If the incoming `err` object is an error originating from celebrate, `errors()` will respond a pre-build error object. Otherwise, it will call `next(err)` and will pass the error along and will need to be processed by another error handler.

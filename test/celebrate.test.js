@@ -10,6 +10,7 @@ const {
   isCelebrate,
   CelebrateError,
   Segments,
+  celebrator,
 } = require('../lib');
 
 describe('celebrate()', () => {
@@ -38,9 +39,14 @@ describe('celebrate()', () => {
     `('celebate middleware', ({
   schema, req, message, segment,
 }) => {
-  it(`validates ${segment}`, () => {
+  describe.each`
+  fn | kind
+  ${celebrate} | ${'celebrate'}
+  ${celebrator(undefined, undefined)} | ${'celebrator'}
+  `('', ({ fn, kind }) => {
+  it(`validates ${segment} correctly with ${kind}`, () => {
     expect.assertions(3);
-    const middleware = celebrate(schema);
+    const middleware = fn(schema);
 
     return middleware(req, null, (err) => {
       expect(isCelebrate(err)).toBe(true);
@@ -48,6 +54,7 @@ describe('celebrate()', () => {
       expect(err.meta.source).toBe(segment);
     });
   });
+});
 });
 
   it('errors on the first validation problem (params, query, body)', () => {
