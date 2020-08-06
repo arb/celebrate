@@ -3,7 +3,7 @@
 exports[`errors() honors the configuration options 1`] = `
 Object {
   "error": "Conflict",
-  "message": "\\"role\\" must be larger than or equal to 4",
+  "message": "\\"role\\" must be greater than or equal to 4",
   "statusCode": 409,
   "validation": Object {
     "keys": Array [
@@ -17,7 +17,7 @@ Object {
 exports[`errors() includes more information when abourtEarly is false 1`] = `
 Object {
   "error": "Bad Request",
-  "message": "\\"role\\" must be larger than or equal to 4. \\"name\\" is required",
+  "message": "\\"role\\" must be greater than or equal to 4. \\"name\\" is required",
   "statusCode": 400,
   "validation": Object {
     "keys": Array [
@@ -44,7 +44,7 @@ Object {
 exports[`errors() responds with a joi error from celebrate middleware 1`] = `
 Object {
   "error": "Bad Request",
-  "message": "\\"role\\" must be larger than or equal to 4",
+  "message": "\\"role\\" must be greater than or equal to 4",
   "statusCode": 400,
   "validation": Object {
     "keys": Array [
