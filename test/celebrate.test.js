@@ -368,38 +368,6 @@ describe('errors()', () => {
     });
   });
 
-  it('only includes key values if joi returns details', () => {
-    expect.assertions(3);
-    const middleware = celebrate({
-      [Segments.BODY]: {
-        first: Joi.string().required(),
-      },
-    });
-    const handler = errors();
-    const next = jest.fn();
-    const res = {
-      status(statusCode) {
-        expect(statusCode).toBe(400);
-        return {
-          send(err) {
-            expect(err).toMatchSnapshot();
-            expect(next).not.toHaveBeenCalled();
-          },
-        };
-      },
-    };
-
-    return middleware({
-      [Segments.BODY]: {
-        role: random.word(),
-      },
-      method: 'POST',
-    }, null, (err) => {
-      err.joi.details = null; // eslint-disable-line no-param-reassign
-      handler(err, undefined, res, next);
-    });
-  });
-
   it('includes more information when abourtEarly is false', () => {
     expect.assertions(3);
     const middleware = celebrate({
@@ -507,58 +475,42 @@ describe('isCelebrate()', () => {
   });
 });
 
-describe.skip('CelebrateError()', () => {
+describe('CelebrateError()', () => {
   const schema = Joi.string().valid('foo');
   // Need a real Joi error to use in a few places for these tests
   const result = schema.validate(null);
-  describe.each`
-    value
-    ${null}
-    ${undefined}
-    ${Error()}
-    ${{}}
-    `('CelebrateError($value)', ({ value }) => {
-  it('throws an error', () => {
-    expect.assertions(1);
-    expect(() => CelebrateError(value)).toThrow('"error" must be a Joi error');
-  });
-});
-  it('throws an error if the source is not a valid string', () => {
-    expect.assertions(1);
-    expect(() => CelebrateError(result.error, 'foo')).toThrow(Joi.ValidationError);
-  });
-  it('throws an error if the option arguments is incorrect', () => {
-    expect.assertions(1);
-    expect(() => CelebrateError(result.error, 'body', false)).toThrow(Joi.ValidationError);
-  });
   it('returns a formatted error object with options', () => {
     expect.assertions(2);
-    const err = CelebrateError(result.error, 'body', { celebrated: true });
+    const err = new CelebrateError(undefined, { celebrated: true });
+    err.add(Segments.BODY, result);
+
     expect(err).toMatchObject({
-      joi: expect.any(Joi.ValidationError),
-      meta: { source: 'body' },
-      message: expect.any(String),
+      message: 'celebrate request validation failed',
+      details: new Map([[Segments.BODY, result]]),
     });
     expect(isCelebrate(err)).toBe(true);
   });
-  it('[sync] returns a CelebrateError object without options', () => {
+  it('[sync] returns a CelebrateError object with custom message', () => {
     expect.assertions(2);
-    const err = CelebrateError(result.error, 'body');
+    const message = 'my custom error message';
+    const err = new CelebrateError(message);
+    err.add(Segments.BODY, result);
+
     expect(err).toMatchObject({
-      joi: expect.any(Joi.ValidationError),
-      meta: { source: 'body' },
-      message: expect.any(String),
+      message,
+      details: new Map([[Segments.BODY, result]]),
     });
     expect(isCelebrate(err)).toBe(false);
   });
   it('[async] returns a CelebrateError object without options', () => {
     expect.assertions(2);
     return schema.validateAsync(null).catch((e) => {
-      const err = CelebrateError(e, 'body');
+      const err = new CelebrateError();
+      err.add(Segments.QUERY, e);
+
       expect(err).toMatchObject({
-        joi: expect.any(Joi.ValidationError),
-        meta: { source: 'body' },
-        message: expect.any(String),
+        message: 'celebrate request validation failed',
+        details: new Map([[Segments.QUERY, e]]),
       });
       expect(isCelebrate(err)).toBe(false);
     });
