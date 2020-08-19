@@ -104,7 +104,7 @@ describe('celebrate()', () => {
         role: Joi.number().integer().required(),
       },
     }, undefined, {
-      validateMode: 'full',
+      mode: 'full',
     });
 
     return middleware({
@@ -482,7 +482,7 @@ describe('CelebrateError()', () => {
   it('returns a formatted error object with options', () => {
     expect.assertions(2);
     const err = new CelebrateError(undefined, { celebrated: true });
-    err.add(Segments.BODY, result);
+    err.include(Segments.BODY, result);
 
     expect(err).toMatchObject({
       message: 'celebrate request validation failed',
@@ -494,7 +494,7 @@ describe('CelebrateError()', () => {
     expect.assertions(2);
     const message = 'my custom error message';
     const err = new CelebrateError(message);
-    err.add(Segments.BODY, result);
+    err.include(Segments.BODY, result);
 
     expect(err).toMatchObject({
       message,
@@ -506,7 +506,7 @@ describe('CelebrateError()', () => {
     expect.assertions(2);
     return schema.validateAsync(null).catch((e) => {
       const err = new CelebrateError();
-      err.add(Segments.QUERY, e);
+      err.include(Segments.QUERY, e);
 
       expect(err).toMatchObject({
         message: 'celebrate request validation failed',

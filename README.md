@@ -208,20 +208,31 @@ An enum containing all the segments of `req` objects that celebrate *can* valiat
 }
 ```
 
-### `CelebrateError(error, segment, [opts])`
+### `new CelebrateError([message], [opts])`
 
-A factory function for creating celebrate errors.
+Creates a new `CelebrateError` object.
 
-- `err` - a Joi validation error object
-- `segment` - A [`Segment`](#segments) indicating the step where the validation failed.
+- `message` - optional `string` message. Defaults to `'celebrate request validation failed'`
 - `[opts]` - optional `object` with the following keys
   - `celebrated` - `bool` that, when `true`, adds `Symbol('celebrated'): true` to the result object. This indicates this error as originating from `celebrate`. You'd likely want to set this to `true` if you want the celebrate error handler to handle errors originating from the `format` function that you call in user-land code. Defaults to `false`. 
+
+`CelebrateError`s extend JavaScript build in `Error` objects. It does not have any additional public properties.
+
+#### `celebrateError.include(segment, joiError)
+
+Instance method that adds a joi error to the details of the current `CelebrateError` object.
+
+- `segment` - A [`Segment`](#segments) indicating the step where the validation failed.
+- `joiError` - a Joi validation error object
+
+
 <details>
   <summary>Sample usage</summary>
 
   ```js
     const result = Joi.validate(req.params.id, Joi.string().valid('foo'), { abortEarly: false });
-    const err = CelebrateError(result.error, Segments.PARAMS);
+    const err = new CelebrateError(undefined, { celebrated: true });
+    err.add(Segments.PARAMS, result);
   ```
 </details>
 
