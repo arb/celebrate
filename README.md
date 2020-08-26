@@ -119,6 +119,7 @@ Returns a `function` with the middleware signature (`(req, res, next)`).
 - `[joiOpts]` - optional `object` containing joi [options](https://github.com/hapijs/joi/blob/master/API.md#anyvalidatevalue-options) that are passed directly into the `validate` function. Defaults to `{ warnings: true }`.
 - `[opts]` - an optional `object` with the following keys. Defaults to `{}`.
   - `reqContext` - `bool` value that instructs joi to use the incoming `req` object as the `context` value during joi validation. If set, this will trump the value of `joiOptions.context`. This is useful if you want to validate part of the request object against another part of the request object. See the tests for more details.
+  - `[mode]` - optional [`Modes`](#modes) for controlling the validation mode celebrate uses. Defaults to `partial`.
 
 ### `celebrator([opts], [joiOptions], schema)`
 
@@ -126,8 +127,9 @@ This is a curried version of [`celebrate`](#celebrateschema-joioptions-opts). It
 
 - `[opts]` - an optional `object` with the following keys. Defaults to `{}`.
   - `reqContext` - `bool` value that instructs joi to use the incoming `req` object as the `context` value during joi validation. If set, this will trump the value of `joiOptions.context`. This is useful if you want to validate part of the request object against another part of the request object. See the tests for more details.
-  - `[joiOpts]` - optional `object` containing joi [options](https://github.com/hapijs/joi/blob/master/API.md#anyvalidatevalue-options) that are passed directly into the `validate` function. Defaults to `{ warnings: true }`.
-  - `requestRules` - an `object` where `key` can be one of the values from [`Segments`](#segments) and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the keys specified will be validated against the incoming request object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one valid key. 
+  - `[mode]` - optional [`Modes`](#modes) for controlling the validation mode celebrate uses. Defaults to `partial`.
+- `[joiOpts]` - optional `object` containing joi [options](https://github.com/hapijs/joi/blob/master/API.md#anyvalidatevalue-options) that are passed directly into the `validate` function. Defaults to `{ warnings: true }`.
+- `requestRules` - an `object` where `key` can be one of the values from [`Segments`](#segments) and the `value` is a [joi](https://github.com/hapijs/joi/blob/master/API.md) validation schema. Only the keys specified will be validated against the incoming request object. If you omit a key, that part of the `req` object will not be validated. A schema must contain at least one valid key. 
 
 <details>
   <summary>Sample usage</summary>
@@ -208,22 +210,24 @@ An enum containing all the segments of `req` objects that celebrate *can* valiat
 }
 ```
 
+### `Modes`
+
+An enum containing all the available validation modes that celebrate can support.
+
+- `FULL` - ends validation on the first failure. Does *not* apply joi transformations if any part of the request is invalid.
+- `PARTIAL` - validates the entire request object and collects all the validation failures in the result. Does *not* apply joi transformations if any part of the request is invalid.
+
+
 ### `new CelebrateError([message], [opts])`
 
 Creates a new `CelebrateError` object.
 
 - `message` - optional `string` message. Defaults to `'celebrate request validation failed'`
 - `[opts]` - optional `object` with the following keys
-  - `celebrated` - `bool` that, when `true`, adds `Symbol('celebrated'): true` to the result object. This indicates this error as originating from `celebrate`. You'd likely want to set this to `true` if you want the celebrate error handler to handle errors originating from the `format` function that you call in user-land code. Defaults to `false`. 
+  - `celebrated` - `bool` that, when `true`, adds `Symbol('celebrated'): true` to the result object. This indicates this error as originating from `celebrate`. You'd likely want to set this to `true` if you want the celebrate error handler to handle errors originating from the `format` function that you call in user-land code. Defaults to `false`.
 
-`CelebrateError`s extend JavaScript build in `Error` objects. It does not have any additional public properties.
-
-#### `celebrateError.include(segment, joiError)
-
-Instance method that adds a joi error to the details of the current `CelebrateError` object.
-
-- `segment` - A [`Segment`](#segments) indicating the step where the validation failed.
-- `joiError` - a Joi validation error object
+`CelebrateError` has the following public properties:
+- `details` - a `Map` of all validation failures. The `key` is a [`Segments`](#segments) and the value is a joi validation error. Adding to `details` is done via `details.set`. The `value` must be a joi validation error or an exception will be thrown.
 
 
 <details>
@@ -232,7 +236,7 @@ Instance method that adds a joi error to the details of the current `CelebrateEr
   ```js
     const result = Joi.validate(req.params.id, Joi.string().valid('foo'), { abortEarly: false });
     const err = new CelebrateError(undefined, { celebrated: true });
-    err.add(Segments.PARAMS, result);
+    err.details.add(Segments.PARAMS, result.error);
   ```
 </details>
 
@@ -255,11 +259,9 @@ celebrate validates request values in the following order:
 5. `req.signedCookies` (_assuming `cookie-parser` is being used_)
 6. `req.body` (_assuming `body-parser` is being used_)
 
-If any of the configured validation rules fail, the entire request will be considered invalid and the rest of the validation will be short-circuited and the validation error will be passed into `next`. 
-
 ### Mutation Warning
 
-If you use any of joi's updating validation APIs (`default`, `rename`, etc.) `celebrate` will override the source value with the changes applied by joi. 
+If you use any of joi's updating validation APIs (`default`, `rename`, etc.) `celebrate` will override the source value with the changes applied by joi (assuming the request is valid).
 
 For example, if you validate `req.query` and have a `default` value in your joi schema, if the incoming `req.query` is missing a value for default, during validation `celebrate` will overrite the original `req.query` with the result of `joi.validate`. This is done so that once `req` has been validated, you can be sure all the inputs are valid and ready to consume in your handler functions and you don't need to re-write all your handlers to look for the query values in `res.locals.*`.
 

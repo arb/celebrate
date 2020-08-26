@@ -1,5 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`celebrate() validates the entire request (params, query, body) with full validatate mode 1`] = `
+Map {
+  "params" => [ValidationError: "id" must be a string],
+  "query" => [ValidationError: "end" is not allowed],
+  "body" => [ValidationError: "role" must be a number],
+}
+`;
+
 exports[`errors() honors the configuration options 1`] = `
 Object {
   "error": "Conflict",
