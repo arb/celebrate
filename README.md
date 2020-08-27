@@ -240,7 +240,7 @@ Creates a new `CelebrateError` object.
   ```
 </details>
 
-### `isCelebrate(err)`
+### `isCelebrateError(err)`
 
 Returns `true` if the provided `err` object originated from the `celebrate` middleware, and `false` otherwise. Useful if you want to write your own error handler for celebrate errors.
 

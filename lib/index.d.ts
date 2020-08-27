@@ -17,11 +17,6 @@ export declare enum Segments {
 }
 
 
-interface CelebrateInternalError {
-    joi: ValidationError;
-    meta: { source: Segments };
-}
-
 interface Celebrator1 {
   (joiOpts: ValidationOptions): Celebrator2;
   (joiOpts: ValidationOptions, requestRules: SchemaOptions): RequestHandler;
@@ -103,4 +98,7 @@ export declare function isCelebrate(err: object): boolean;
 /**
  * The standard error used by Celebrate
  */
-export declare function CelebrateError(error: ValidationError, segment: Segments, opts?: { celebrated?: boolean }): Error & CelebrateInternalError;
+export declare class CelebrateError extends Error {
+    details: Map<string, ValidationError>;
+    constructor(message?:string, opts?: { celebrated?: boolean }) {}
+}
