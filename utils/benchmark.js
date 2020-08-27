@@ -1,26 +1,45 @@
 const Benchmark = require('benchmark');
-const { celebrate, Joi } = require('../lib');
+const { celebrate, Joi, Modes } = require('../lib');
 
-const middleware = celebrate({
+const schema1 = {
   body: {
     name: Joi.string().allow('adam').required(),
   },
-});
+};
 
 const suite = new Benchmark.Suite();
-const noop = () => {};
+const noop = () => { };
 
 suite.add('valid', () => {
-  middleware({
+  celebrate(schema1)({
     body: {
       name: 'adam',
     },
     method: 'post',
   }, {}, noop);
-}).add('invalid', () => {
-  middleware({
+}).add('invalid partial', () => {
+  celebrate(schema1)({
     body: {},
     method: 'post',
+  }, {}, noop);
+}).add('invalid full', () => {
+  celebrate({
+    body: {
+      name: Joi.string().allow('adam').required(),
+    },
+    query: {
+      age: Joi.number().integer().required(),
+    },
+    params: {
+      page: Joi.number().required(),
+    },
+  }, undefined, {
+    mode: Modes.FULL,
+  })({
+    method: 'post',
+    body: {},
+    query: {},
+    params: {},
   }, {}, noop);
 });
 

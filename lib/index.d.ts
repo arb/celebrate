@@ -3,7 +3,6 @@ import {
     Root as joi,
     ValidationOptions,
     ValidationError,
-    ValidationResult,
 } from '@hapi/joi';
 
 
@@ -16,6 +15,10 @@ export declare enum Segments {
     BODY          = 'body',
 }
 
+export declare enum Modes {
+    FULL = 'full',
+    PARTIAL = 'partial',
+}
 
 interface Celebrator1 {
   (joiOpts: ValidationOptions): Celebrator2;
@@ -41,6 +44,10 @@ export interface CelebrateOptions {
      * When `true` uses the entire `req` object as the `context` value during validation.
      */
     reqContext?: boolean;
+    /**
+     * Which validation mode celebrate should use. Defaults to `PARTIAL`.
+     */
+    mode?: Modes;
 }
 
 export interface SchemaOptions {
