@@ -4,7 +4,7 @@ import {
     ValidationOptions,
     ValidationError,
     ValidationResult,
-} from '@hapi/joi';
+} from 'joi';
 
 
 export declare enum Segments {
