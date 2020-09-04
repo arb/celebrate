@@ -29,8 +29,7 @@
   },
   "homepage": "https://github.com/arb/celebrate#readme",
   "dependencies": {
-    "@hapi/joi": "17.x.x",
-    "@types/hapi__joi": "17.x.x",
+    "joi": "17.x.x",
     "escape-html": "1.0.3",
     "lodash": "4.17.x"
   },
