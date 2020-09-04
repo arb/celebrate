@@ -1,6 +1,6 @@
 {
   "name": "celebrate",
-  "version": "12.2.0",
+  "version": "13.0.0",
   "description": "A joi validation middleware for Express.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -29,8 +29,8 @@
   },
   "homepage": "https://github.com/arb/celebrate#readme",
   "dependencies": {
-    "joi": "17.x.x",
     "escape-html": "1.0.3",
+    "joi": "17.x.x",
     "lodash": "4.17.x"
   },
   "devDependencies": {
