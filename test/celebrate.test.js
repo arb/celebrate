@@ -7,7 +7,7 @@ const {
   celebrate,
   Joi,
   errors,
-  isCelebrate,
+  isCelebrateError,
   CelebrateError,
   Segments,
   celebrator,
@@ -45,20 +45,19 @@ describe('celebrate()', () => {
   ${celebrator(undefined, undefined)} | ${'celebrator'}
   `('', ({ fn, kind }) => {
   it(`validates ${segment} correctly with ${kind}`, () => {
-    expect.assertions(3);
+    expect.assertions(2);
     const middleware = fn(schema);
 
     return middleware(req, null, (err) => {
-      expect(isCelebrate(err)).toBe(true);
-      expect(err.joi.details[0].message).toBe(message);
-      expect(err.meta.source).toBe(segment);
+      expect(isCelebrateError(err)).toBe(true);
+      expect(err.details.get(segment).message).toBe(message);
     });
   });
 });
 });
 
-  it('errors on the first validation problem (params, query, body)', () => {
-    expect.assertions(3);
+  it('errors on the first validation problem (params, query, body) by default', () => {
+    expect.assertions(2);
     const middleware = celebrate({
       [Segments.PARAMS]: {
         id: Joi.string().required(),
@@ -85,13 +84,50 @@ describe('celebrate()', () => {
         last: name.lastName(),
       },
     }, null, (err) => {
-      expect(isCelebrate(err)).toBe(true);
-      expect(err.joi.details[0].message).toBe('"end" is not allowed');
-      expect(err.meta.source).toBe(Segments.QUERY);
+      expect(isCelebrateError(err)).toBe(true);
+      expect(err.details.get(Segments.QUERY).message).toBe('"end" is not allowed');
+    });
+  });
+
+  it('validates the entire request (params, query, body) with full validatate mode', () => {
+    expect.assertions(2);
+    const middleware = celebrate({
+      [Segments.PARAMS]: {
+        id: Joi.string().required(),
+      },
+      [Segments.QUERY]: Joi.object().keys({
+        start: Joi.date(),
+      }),
+      [Segments.BODY]: {
+        first: Joi.string().required(),
+        last: Joi.string(),
+        role: Joi.number().integer().required(),
+      },
+    }, undefined, {
+      mode: 'full',
+    });
+
+    return middleware({
+      [Segments.PARAMS]: {
+        id: random.number(),
+      },
+      [Segments.QUERY]: {
+        end: random.boolean(),
+      },
+      [Segments.BODY]: {
+        first: name.firstName(),
+        last: name.lastName(),
+        role: random.boolean(),
+      },
+      method: 'POST',
+    }, null, (err) => {
+      expect(isCelebrateError(err)).toBe(true);
+      expect(err.details).toMatchSnapshot();
     });
   });
 
   it('applys any joi transorms back to the object', () => {
+    expect.assertions(4);
     const first = name.firstName();
     const last = name.lastName();
     const role = name.jobTitle();
@@ -109,7 +145,7 @@ describe('celebrate()', () => {
       [Segments.BODY]: {
         first: Joi.string().required(),
         last: Joi.string(),
-        role: Joi.number().integer().default(role),
+        role: Joi.string().default(role),
       },
       [Segments.QUERY]: Joi.number(),
       [Segments.COOKIES]: Joi.object().keys({
@@ -129,6 +165,48 @@ describe('celebrate()', () => {
       expect(req.cookies).toEqual({
         browser,
         agent: 'NODE',
+      });
+    });
+  });
+
+  it('does not apply joi transform during a failed validation with full validatate mode', () => {
+    expect.assertions(3);
+    const first = name.firstName();
+    const last = name.lastName();
+    const role = name.jobTitle();
+    const browser = internet.domainWord();
+    const req = {
+      [Segments.BODY]: {
+        first,
+        last,
+      },
+      [Segments.COOKIES]: { browser: undefined },
+      method: 'POST',
+    };
+    const middleware = celebrate({
+      [Segments.BODY]: {
+        first: Joi.string().required(),
+        last: Joi.string().uppercase(),
+        role: Joi.string().default(role),
+      },
+      [Segments.COOKIES]: Joi.object().keys({
+        browser: Joi.string().default(browser),
+        agent: Joi.string().uppercase().required(),
+      }),
+    }, {
+      mode: 'full',
+    });
+
+    return middleware(req, null, (err) => {
+      expect(isCelebrateError(err)).toBe(true);
+      // missing role
+      expect(req.body).toEqual({
+        first,
+        last,
+      });
+      // browser is still default
+      expect(req.cookies).toEqual({
+        browser: undefined,
       });
     });
   });
@@ -184,8 +262,8 @@ describe('celebrate()', () => {
       },
       method: 'POST',
     }, null, (err) => {
-      expect(isCelebrate(err)).toBe(true);
-      expect(err.joi.details[0].message).toBe('"first" must equal "john"');
+      expect(isCelebrateError(err)).toBe(true);
+      expect(err.details.get(Segments.BODY).message).toBe('"first" must equal "john"');
     });
   });
 
@@ -223,8 +301,8 @@ describe('celebrate()', () => {
         accept: 'application/json',
       },
     }, null, (err) => {
-      expect(isCelebrate(err)).toBe(true);
-      expect(err.joi.details[0].message).toBe('"accept" with value "application/json" fails to match the required pattern: /xml/');
+      expect(isCelebrateError(err)).toBe(true);
+      expect(err.details.get(Segments.HEADERS).message).toBe('"accept" with value "application/json" fails to match the required pattern: /xml/');
     });
   });
 
@@ -246,8 +324,8 @@ describe('celebrate()', () => {
         id: random.number({ min: 1, max: 99 }),
       },
     }, null, (err) => {
-      expect(isCelebrate(err)).toBe(true);
-      expect(err.joi.details[0].message).toBe('"id" must be [ref:global:id]');
+      expect(isCelebrateError(err)).toBe(true);
+      expect(err.details.get(Segments.BODY).message).toBe('"id" must be [ref:global:id]');
     });
   });
 
@@ -273,8 +351,8 @@ describe('celebrate()', () => {
         id: random.number({ min: 1, max: 9 }),
       },
     }, null, (err) => {
-      expect(isCelebrate(err)).toBe(true);
-      expect(err.joi.details[0].message).toBe('"id" must be [ref:global:params.userId]');
+      expect(isCelebrateError(err)).toBe(true);
+      expect(err.details.get(Segments.BODY).message).toBe('"id" must be [ref:global:params.userId]');
     });
   });
 });
@@ -329,38 +407,6 @@ describe('errors()', () => {
 
     handler(error, undefined, res, (e) => {
       expect(e).toEqual(error);
-    });
-  });
-
-  it('only includes key values if joi returns details', () => {
-    expect.assertions(3);
-    const middleware = celebrate({
-      [Segments.BODY]: {
-        first: Joi.string().required(),
-      },
-    });
-    const handler = errors();
-    const next = jest.fn();
-    const res = {
-      status(statusCode) {
-        expect(statusCode).toBe(400);
-        return {
-          send(err) {
-            expect(err).toMatchSnapshot();
-            expect(next).not.toHaveBeenCalled();
-          },
-        };
-      },
-    };
-
-    return middleware({
-      [Segments.BODY]: {
-        role: random.word(),
-      },
-      method: 'POST',
-    }, null, (err) => {
-      err.joi.details = null; // eslint-disable-line no-param-reassign
-      handler(err, undefined, res, next);
     });
   });
 
@@ -437,7 +483,7 @@ describe('errors()', () => {
   });
 });
 
-describe('isCelebrate()', () => {
+describe('isCelebrateError()', () => {
   describe.each`
         value | expected
         ${Error()} | ${false}
@@ -446,10 +492,10 @@ describe('isCelebrate()', () => {
         ${[0, 1]} | ${false}
         ${null} | ${false}
         ${undefined} | ${false}
-      `('isCelebrate($value)', ({ value, expected }) => {
+      `('isCelebrateError($value)', ({ value, expected }) => {
   it(`returns ${expected}`, () => {
     expect.assertions(1);
-    expect(isCelebrate(value)).toBe(expected);
+    expect(isCelebrateError(value)).toBe(expected);
   });
 });
 
@@ -466,7 +512,7 @@ describe('isCelebrate()', () => {
         accept: random.number(),
       },
     }, null, (err) => {
-      expect(isCelebrate(err)).toBe(true);
+      expect(isCelebrateError(err)).toBe(true);
     });
   });
 });
@@ -475,56 +521,41 @@ describe('CelebrateError()', () => {
   const schema = Joi.string().valid('foo');
   // Need a real Joi error to use in a few places for these tests
   const result = schema.validate(null);
-  describe.each`
-    value
-    ${null}
-    ${undefined}
-    ${Error()}
-    ${{}}
-    `('CelebrateError($value)', ({ value }) => {
-  it('throws an error', () => {
-    expect.assertions(1);
-    expect(() => CelebrateError(value)).toThrow('"error" must be a Joi error');
-  });
-});
-  it('throws an error if the source is not a valid string', () => {
-    expect.assertions(1);
-    expect(() => CelebrateError(result.error, 'foo')).toThrow(Joi.ValidationError);
-  });
-  it('throws an error if the option arguments is incorrect', () => {
-    expect.assertions(1);
-    expect(() => CelebrateError(result.error, 'body', false)).toThrow(Joi.ValidationError);
-  });
   it('returns a formatted error object with options', () => {
-    expect.assertions(2);
-    const err = CelebrateError(result.error, 'body', { celebrated: true });
-    expect(err).toMatchObject({
-      joi: expect.any(Joi.ValidationError),
-      meta: { source: 'body' },
-      message: expect.any(String),
-    });
-    expect(isCelebrate(err)).toBe(true);
+    expect.assertions(3);
+    const err = new CelebrateError(undefined, { celebrated: true });
+    err.details.set(Segments.BODY, result.error);
+
+    expect(err).toHaveProperty('message', 'celebrate request validation failed');
+    expect(err.details.get(Segments.BODY)).toBe(result.error);
+    expect(isCelebrateError(err)).toBe(true);
   });
-  it('[sync] returns a CelebrateError object without options', () => {
-    expect.assertions(2);
-    const err = CelebrateError(result.error, 'body');
-    expect(err).toMatchObject({
-      joi: expect.any(Joi.ValidationError),
-      meta: { source: 'body' },
-      message: expect.any(String),
-    });
-    expect(isCelebrate(err)).toBe(false);
+  it('[sync] returns a CelebrateError object with custom message', () => {
+    expect.assertions(3);
+    const message = 'my custom error message';
+    const err = new CelebrateError(message);
+    err.details.set(Segments.BODY, result.error);
+
+    expect(err).toHaveProperty('message', message);
+    expect(err.details.get(Segments.BODY)).toBe(result.error);
+    expect(isCelebrateError(err)).toBe(false);
   });
   it('[async] returns a CelebrateError object without options', () => {
-    expect.assertions(2);
+    expect.assertions(3);
     return schema.validateAsync(null).catch((e) => {
-      const err = CelebrateError(e, 'body');
-      expect(err).toMatchObject({
-        joi: expect.any(Joi.ValidationError),
-        meta: { source: 'body' },
-        message: expect.any(String),
-      });
-      expect(isCelebrate(err)).toBe(false);
+      const err = new CelebrateError();
+      err.details.set(Segments.QUERY, e);
+
+      expect(err).toHaveProperty('message', 'celebrate request validation failed');
+      expect(err.details.get(Segments.QUERY)).toBe(e);
+      expect(isCelebrateError(err)).toBe(false);
     });
+  });
+  it('throws an error if you try to add a detail that is not a joi error', () => {
+    expect.assertions(1);
+    const err = new CelebrateError();
+    expect(() => {
+      err.details.set(Segments.BODY, new Error());
+    }).toThrow('value must be a joi validation error');
   });
 });
