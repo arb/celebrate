@@ -3,7 +3,7 @@ import {
     Root as joi,
     ValidationOptions,
     ValidationError,
-} from '@hapi/joi';
+} from 'joi';
 
 
 export declare enum Segments {
