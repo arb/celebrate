@@ -100,7 +100,7 @@ export declare const Joi: joi;
 /**
  * Examines an error object to determine if it originated from the celebrate middleware.
  */
-export declare function isCelebrate(err: object): boolean;
+export declare function isCelebrateError(err: object): boolean;
 
 /**
  * The standard error used by Celebrate
