@@ -107,5 +107,5 @@ export declare function isCelebrateError(err: object): boolean;
  */
 export declare class CelebrateError extends Error {
     details: Map<string, ValidationError>;
-    constructor(message?:string, opts?: { celebrated?: boolean }) {}
+    constructor(message?:string, opts?: { celebrated?: boolean });
 }
