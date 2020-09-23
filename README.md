@@ -215,8 +215,8 @@ An enum containing all the segments of `req` objects that celebrate *can* valiat
 
 An enum containing all the available validation modes that celebrate can support.
 
-- `FULL` - ends validation on the first failure. Does *not* apply joi transformations if any part of the request is invalid.
-- `PARTIAL` - validates the entire request object and collects all the validation failures in the result. Does *not* apply joi transformations if any part of the request is invalid.
+- `PARTIAL` - ends validation on the first failure. Does *not* apply joi transformations if any part of the request is invalid.
+- `FULL` - validates the entire request object and collects all the validation failures in the result. Does *not* apply joi transformations if any part of the request is invalid.
 
 
 ### `new CelebrateError([message], [opts])`
