@@ -1,4 +1,5 @@
 import { ErrorRequestHandler, RequestHandler } from 'express';
+import { ParamsDictionary, Query } from 'express-serve-static-core';
 import {
     Root as joi,
     ValidationOptions,
@@ -20,23 +21,23 @@ export declare enum Modes {
     PARTIAL = 'partial',
 }
 
-interface Celebrator1 {
+interface Celebrator1<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query> {
   (joiOpts: ValidationOptions): Celebrator2;
-  (joiOpts: ValidationOptions, requestRules: SchemaOptions): RequestHandler;
+  (joiOpts: ValidationOptions, requestRules: SchemaOptions): RequestHandler<P, ResBody, ReqBody, ReqQuery>;
 }
 
 interface Celebrator2 {
   (requestRules: SchemaOptions): RequestHandler;
 }
 
-interface Celebrator {
+interface Celebrator<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query> {
     (opts: CelebrateOptions): Celebrator1;
     (opts: CelebrateOptions, joiOpts: ValidationOptions): Celebrator2;
     (
         opts: CelebrateOptions,
         joiOpts: ValidationOptions,
         requestRules: SchemaOptions
-    ): RequestHandler;
+    ): RequestHandler<P, ResBody, ReqBody, ReqQuery>;
   }
 
 export interface CelebrateOptions {
@@ -80,7 +81,7 @@ export interface SchemaOptions {
 /**
 * Creates a celebrate middleware function.
 */
-export declare function celebrate(requestRules: SchemaOptions, joiOpts?: ValidationOptions, opts?: CelebrateOptions): RequestHandler;
+export declare function celebrate<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query>(requestRules: SchemaOptions, joiOpts?: ValidationOptions, opts?: CelebrateOptions): RequestHandler<P, ResBody, ReqBody, ReqQuery>;
 
 /**
  * Curried version of `celebrate`.
@@ -90,7 +91,7 @@ export declare const celebrator: Celebrator;
 /**
  * Creates a Celebrate error handler middleware function.
  */
-export declare function errors(opts?: { statusCode: number }): ErrorRequestHandler;
+export declare function errors<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query>(opts?: { statusCode: number }): ErrorRequestHandler<P, ResBody, ReqBody, ReqQuery>;
 
 /**
  * The Joi version Celebrate uses internally.
