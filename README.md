@@ -188,7 +188,7 @@ Returns a `function` with the error handler signature (`(err, req, res, next)`).
 - `[opts]` - an optional `object` with the following keys
   - `statusCode` - `number` that will be used for the response status code in the event of an error. Must be greater than 399 and less than 600. It must also be a number available to the node [HTTP module](https://nodejs.org/api/http.html#http_http_status_codes). Defaults to 400.
 
-If the error response format does not suite your needs, you are encouraged to write your own and check `isCelebrate(err)` to format celebrate errors to your liking. 
+If the error response format does not suite your needs, you are encouraged to write your own and check [`isCelebrateError(err)`](#iscelebrateerrorerr) to format celebrate errors to your liking. 
 
 Errors origintating from the `celebrate()` middleware are [`CelebrateError`](#celebrateerrorerror-segment-opts) objects.
 
