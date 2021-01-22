@@ -31,7 +31,8 @@
   "dependencies": {
     "escape-html": "1.0.3",
     "joi": "17.x.x",
-    "lodash": "4.17.x"
+    "lodash": "4.17.x",
+    "statuses": "^2.0.1"
   },
   "devDependencies": {
     "@hapi/teamwork": "3.3.x",
