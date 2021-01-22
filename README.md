@@ -237,7 +237,7 @@ Creates a new `CelebrateError` object.
   ```js
     const result = Joi.validate(req.params.id, Joi.string().valid('foo'), { abortEarly: false });
     const err = new CelebrateError(undefined, { celebrated: true });
-    err.details.add(Segments.PARAMS, result.error);
+    err.details.set(Segments.PARAMS, result.error);
   ```
 </details>
 
