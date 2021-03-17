@@ -11,6 +11,7 @@ const {
   CelebrateError,
   Segments,
   celebrator,
+  Modes,
 } = require('../lib');
 
 describe('celebrate()', () => {
@@ -557,5 +558,42 @@ describe('CelebrateError()', () => {
     expect(() => {
       err.details.set(Segments.BODY, new Error());
     }).toThrow('value must be a joi validation error');
+  });
+});
+
+describe('celebrator', () => {
+  let c;
+
+  const opts = { reqContext: true, mode: Modes.FULL };
+  const joiOpts = { convert: true };
+  const schema = {
+    [Segments.HEADERS]: Joi.object({
+      name: Joi.string().required(),
+    }),
+  };
+
+  it('can be invoked (opts)(joiOpts)(schema)', () => {
+    expect(() => {
+      c = celebrator(opts)(joiOpts)(schema);
+    }).not.toThrow();
+    expect(c._schema).toEqual(schema);
+  });
+  it('can be invoked (opts, joiOpts)(schema)', () => {
+    expect(() => {
+      c = celebrator(opts, joiOpts)(schema);
+    }).not.toThrow();
+    expect(c._schema).toEqual(schema);
+  });
+  it('can be invoked (opts)(joiOpts, schema)', () => {
+    expect(() => {
+      c = celebrator(opts)(joiOpts, schema);
+    }).not.toThrow();
+    expect(c._schema).toEqual(schema);
+  });
+  it('can be invoked (opts, joiOpts, schema);', () => {
+    expect(() => {
+      c = celebrator(opts, joiOpts, schema);
+    }).not.toThrow();
+    expect(c._schema).toEqual(schema);
   });
 });
