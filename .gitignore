@@ -20,3 +20,4 @@ complexity.md
 .eslintcache
 coverage/**
 **/package-lock.json
+.nova/**
