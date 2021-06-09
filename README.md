@@ -36,8 +36,6 @@ celebrate lists joi as a formal dependency. This means that celebrate will alway
 1. To ensure that celebrate can always use the latest version of joi as soon as it's published
 2. So that celebrate can export the version of joi it uses to the consumer to maximize compatibility
 
-Wondering why *another* joi middleware library for express? Full blog post [here](https://medium.com/@adambretz/time-to-celebrate-27ccfc656d7f).
-
 <!-- toc -->
 
 - [express Compatibility](#express-compatibility)
