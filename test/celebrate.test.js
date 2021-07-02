@@ -446,21 +446,23 @@ describe('errors()', () => {
   });
 
   it('honors the configuration options', () => {
-    expect.assertions(4);
+    expect.assertions(5);
     const middleware = celebrate({
       [Segments.QUERY]: {
         role: Joi.number().integer().min(4),
       },
     });
     const statusCode = 409;
-    const handler = errors({ statusCode });
+    const message = 'your request is bad and you should feel bad';
+    const handler = errors({ statusCode, message });
     const next = jest.fn();
     const res = {
       status(code) {
         expect(code).toBe(statusCode);
         return {
           send(err) {
-            expect(err).toHaveProperty('statusCode', 409);
+            expect(err).toHaveProperty('statusCode', statusCode);
+            expect(err).toHaveProperty('message', message);
             expect(err).toMatchSnapshot();
             expect(next).not.toHaveBeenCalled();
           },
@@ -527,7 +529,7 @@ describe('CelebrateError()', () => {
     const err = new CelebrateError(undefined, { celebrated: true });
     err.details.set(Segments.BODY, result.error);
 
-    expect(err).toHaveProperty('message', 'celebrate request validation failed');
+    expect(err).toHaveProperty('message', 'Validation failed');
     expect(err.details.get(Segments.BODY)).toBe(result.error);
     expect(isCelebrateError(err)).toBe(true);
   });
@@ -547,7 +549,7 @@ describe('CelebrateError()', () => {
       const err = new CelebrateError();
       err.details.set(Segments.QUERY, e);
 
-      expect(err).toHaveProperty('message', 'celebrate request validation failed');
+      expect(err).toHaveProperty('message', 'Validation failed');
       expect(err.details.get(Segments.QUERY)).toBe(e);
       expect(isCelebrateError(err)).toBe(false);
     });

@@ -11,7 +11,7 @@ Map {
 exports[`errors() honors the configuration options 1`] = `
 Object {
   "error": "Conflict",
-  "message": "celebrate request validation failed",
+  "message": "your request is bad and you should feel bad",
   "statusCode": 409,
   "validation": Object {
     "query": Object {
@@ -28,7 +28,7 @@ Object {
 exports[`errors() includes more information when abourtEarly is false 1`] = `
 Object {
   "error": "Bad Request",
-  "message": "celebrate request validation failed",
+  "message": "Validation failed",
   "statusCode": 400,
   "validation": Object {
     "query": Object {
@@ -46,7 +46,7 @@ Object {
 exports[`errors() responds with a joi error from celebrate middleware 1`] = `
 Object {
   "error": "Bad Request",
-  "message": "celebrate request validation failed",
+  "message": "Validation failed",
   "statusCode": 400,
   "validation": Object {
     "query": Object {

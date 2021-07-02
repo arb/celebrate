@@ -187,6 +187,7 @@ Returns a `function` with the error handler signature (`(err, req, res, next)`).
 
 - `[opts]` - an optional `object` with the following keys
   - `statusCode` - `number` that will be used for the response status code in the event of an error. Must be greater than 399 and less than 600. It must also be a number available to the node [HTTP module](https://nodejs.org/api/http.html#http_http_status_codes). Defaults to 400.
+  - `message` - `string` that will be used for the `message` value sent out by the error handler. Defaults to `'Validation failed'`
 
 If the error response format does not suite your needs, you are encouraged to write your own and check [`isCelebrateError(err)`](#iscelebrateerrorerr) to format celebrate errors to your liking. 
 
@@ -221,9 +222,9 @@ An enum containing all the available validation modes that celebrate can support
 
 ### `new CelebrateError([message], [opts])`
 
-Creates a new `CelebrateError` object.
+Creates a new `CelebrateError` object. Extends the built in `Error` object.
 
-- `message` - optional `string` message. Defaults to `'celebrate request validation failed'`
+- `message` - optional `string` message. Defaults to `'Validation failed'`.
 - `[opts]` - optional `object` with the following keys
   - `celebrated` - `bool` that, when `true`, adds `Symbol('celebrated'): true` to the result object. This indicates this error as originating from `celebrate`. You'd likely want to set this to `true` if you want the celebrate error handler to handle errors originating from the `format` function that you call in user-land code. Defaults to `false`.
 
