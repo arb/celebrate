@@ -1,7 +1,11 @@
 /* eslint-env jest */
 const expect = require('expect');
 const {
-  name, random, date, internet,
+  name,
+  random,
+  date,
+  internet,
+  datatype,
 } = require('faker');
 const {
   celebrate,
@@ -22,40 +26,40 @@ describe('celebrate()', () => {
     ${{}}
     ${{ [Segments.QUERY]: { name: Joi.string(), age: Joi.number() }, foo: Joi.string() }}
     `('celebrate($schema)', ({ schema }) => {
-  it('throws an error', () => {
-    expect(() => {
-      celebrate(schema);
-    }).toThrow(Joi.ValidationError);
+    it('throws an error', () => {
+      expect(() => {
+        celebrate(schema);
+      }).toThrow(Joi.ValidationError);
+    });
   });
-});
 
   describe.each`
     segment | schema | req | message
     ${Segments.HEADERS} | ${{ [Segments.HEADERS]: { accept: Joi.string().regex(/xml/) } }} | ${{ [Segments.HEADERS]: { accept: 'application/json' } }} | ${'"accept" with value "application/json" fails to match the required pattern: /xml/'}
     ${Segments.PARAMS} | ${{ [Segments.PARAMS]: { id: Joi.string().token() } }} | ${{ [Segments.PARAMS]: { id: '@@@' } }} | ${'"id" must only contain alpha-numeric and underscore characters'}
-    ${Segments.QUERY} | ${{ [Segments.QUERY]: Joi.object().keys({ start: Joi.date() }) }} | ${{ [Segments.QUERY]: { end: random.number() } }} | ${'"end" is not allowed'}
-    ${Segments.BODY} | ${{ [Segments.BODY]: { first: Joi.string().required(), last: Joi.string(), role: Joi.number().integer() } }} | ${{ [Segments.BODY]: { first: name.firstName(), last: random.number() }, method: 'POST' }} | ${'"last" must be a string'}
-    ${Segments.COOKIES} | ${{ [Segments.COOKIES]: { state: Joi.string().required() } }} | ${{ [Segments.COOKIES]: { state: random.number() } }} | ${'"state" must be a string'}
-    ${Segments.SIGNEDCOOKIES} | ${{ [Segments.SIGNEDCOOKIES]: { uid: Joi.string().required() } }} | ${{ [Segments.SIGNEDCOOKIES]: { uid: random.number() } }} | ${'"uid" must be a string'}
+    ${Segments.QUERY} | ${{ [Segments.QUERY]: Joi.object().keys({ start: Joi.date() }) }} | ${{ [Segments.QUERY]: { end: datatype.number() } }} | ${'"end" is not allowed'}
+    ${Segments.BODY} | ${{ [Segments.BODY]: { first: Joi.string().required(), last: Joi.string(), role: Joi.number().integer() } }} | ${{ [Segments.BODY]: { first: name.firstName(), last: datatype.number() }, method: 'POST' }} | ${'"last" must be a string'}
+    ${Segments.COOKIES} | ${{ [Segments.COOKIES]: { state: Joi.string().required() } }} | ${{ [Segments.COOKIES]: { state: datatype.number() } }} | ${'"state" must be a string'}
+    ${Segments.SIGNEDCOOKIES} | ${{ [Segments.SIGNEDCOOKIES]: { uid: Joi.string().required() } }} | ${{ [Segments.SIGNEDCOOKIES]: { uid: datatype.number() } }} | ${'"uid" must be a string'}
     `('celebate middleware', ({
-  schema, req, message, segment,
-}) => {
-  describe.each`
+    schema, req, message, segment,
+  }) => {
+    describe.each`
   fn | kind
   ${celebrate} | ${'celebrate'}
   ${celebrator(undefined, undefined)} | ${'celebrator'}
   `('', ({ fn, kind }) => {
-  it(`validates ${segment} correctly with ${kind}`, () => {
-    expect.assertions(2);
-    const middleware = fn(schema);
+      it(`validates ${segment} correctly with ${kind}`, () => {
+        expect.assertions(2);
+        const middleware = fn(schema);
 
-    return middleware(req, null, (err) => {
-      expect(isCelebrateError(err)).toBe(true);
-      expect(err.details.get(segment).message).toBe(message);
+        return middleware(req, null, (err) => {
+          expect(isCelebrateError(err)).toBe(true);
+          expect(err.details.get(segment).message).toBe(message);
+        });
+      });
     });
   });
-});
-});
 
   it('errors on the first validation problem (params, query, body) by default', () => {
     expect.assertions(2);
@@ -78,7 +82,7 @@ describe('celebrate()', () => {
         id: random.alphaNumeric(10),
       },
       [Segments.QUERY]: {
-        end: random.boolean(),
+        end: datatype.boolean(),
       },
       [Segments.BODY]: {
         first: name.firstName(),
@@ -110,15 +114,15 @@ describe('celebrate()', () => {
 
     return middleware({
       [Segments.PARAMS]: {
-        id: random.number(),
+        id: datatype.number(),
       },
       [Segments.QUERY]: {
-        end: random.boolean(),
+        end: datatype.boolean(),
       },
       [Segments.BODY]: {
         first: name.firstName(),
         last: name.lastName(),
-        role: random.boolean(),
+        role: datatype.boolean(),
       },
       method: 'POST',
     }, null, (err) => {
@@ -259,7 +263,7 @@ describe('celebrate()', () => {
     return middleware({
       [Segments.BODY]: {
         first: name.firstName(),
-        role: random.number(),
+        role: datatype.number(),
       },
       method: 'POST',
     }, null, (err) => {
@@ -322,7 +326,7 @@ describe('celebrate()', () => {
     return middleware({
       method: 'POST',
       [Segments.BODY]: {
-        id: random.number({ min: 1, max: 99 }),
+        id: datatype.number({ min: 1, max: 99 }),
       },
     }, null, (err) => {
       expect(isCelebrateError(err)).toBe(true);
@@ -349,7 +353,7 @@ describe('celebrate()', () => {
         userId: 10,
       },
       [Segments.BODY]: {
-        id: random.number({ min: 1, max: 9 }),
+        id: datatype.number({ min: 1, max: 9 }),
       },
     }, null, (err) => {
       expect(isCelebrateError(err)).toBe(true);
@@ -382,7 +386,7 @@ describe('errors()', () => {
 
     return middleware({
       [Segments.QUERY]: {
-        role: random.number({ min: 0, max: 3 }),
+        role: datatype.number({ min: 0, max: 3 }),
       },
       method: 'GET',
     }, null, (err) => {
@@ -437,7 +441,7 @@ describe('errors()', () => {
 
     return middleware({
       [Segments.QUERY]: {
-        role: random.number({ min: 0, max: 3 }),
+        role: datatype.number({ min: 0, max: 3 }),
       },
       method: 'GET',
     }, null, (err) => {
@@ -472,7 +476,7 @@ describe('errors()', () => {
 
     return middleware({
       [Segments.QUERY]: {
-        role: random.number({ min: 0, max: 3 }),
+        role: datatype.number({ min: 0, max: 3 }),
       },
       method: 'GET',
     }, null, (err) => {
@@ -496,11 +500,11 @@ describe('isCelebrateError()', () => {
         ${null} | ${false}
         ${undefined} | ${false}
       `('isCelebrateError($value)', ({ value, expected }) => {
-  it(`returns ${expected}`, () => {
-    expect.assertions(1);
-    expect(isCelebrateError(value)).toBe(expected);
+    it(`returns ${expected}`, () => {
+      expect.assertions(1);
+      expect(isCelebrateError(value)).toBe(expected);
+    });
   });
-});
 
   it('returns true if the error object came from celebrate', () => {
     expect.assertions(1);
@@ -512,7 +516,7 @@ describe('isCelebrateError()', () => {
 
     return middleware({
       [Segments.HEADERS]: {
-        accept: random.number(),
+        accept: datatype.number(),
       },
     }, null, (err) => {
       expect(isCelebrateError(err)).toBe(true);
