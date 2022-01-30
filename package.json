@@ -1,6 +1,6 @@
 {
   "name": "celebrate",
-  "version": "15.0.0",
+  "version": "15.0.1",
   "description": "A joi validation middleware for Express.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
