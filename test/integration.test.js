@@ -4,7 +4,7 @@ const Artificial = require('artificial');
 const BodyParser = require('body-parser');
 const CookieParser = require('cookie-parser');
 const signature = require('cookie-signature');
-const { random } = require('faker');
+const { datatype, random } = require('faker');
 const Teamwork = require('@hapi/teamwork');
 const {
   celebrate,
@@ -24,7 +24,7 @@ describe('validations', () => {
   test('req.headers', async () => {
     expect.assertions(2);
     const server = Server();
-    const team = new Teamwork();
+    const team = new Teamwork.Team();
     const next = jest.fn();
 
     server.get('/', celebrate({
@@ -52,7 +52,7 @@ describe('validations', () => {
   test('req.params', async () => {
     expect.assertions(2);
     const server = Server();
-    const team = new Teamwork();
+    const team = new Teamwork.Team();
     const next = jest.fn();
 
     server.get('/user/:id', celebrate({
@@ -75,7 +75,7 @@ describe('validations', () => {
   test('req.query', async () => {
     expect.assertions(2);
     const server = Server();
-    const team = new Teamwork();
+    const team = new Teamwork.Team();
     const next = jest.fn();
 
     server.get('/', celebrate({
@@ -97,7 +97,7 @@ describe('validations', () => {
   test('req.cookies', async () => {
     expect.assertions(2);
     const server = Server();
-    const team = new Teamwork();
+    const team = new Teamwork.Team();
     const next = jest.fn();
 
     server.post('/', celebrate({
@@ -123,7 +123,7 @@ describe('validations', () => {
   test('req.signedCookies', async () => {
     expect.assertions(2);
     const server = Server();
-    const team = new Teamwork();
+    const team = new Teamwork.Team();
     const next = jest.fn();
 
     server.get('/', celebrate({
@@ -151,7 +151,7 @@ describe('validations', () => {
   test('req.body', async () => {
     expect.assertions(2);
     const server = Server();
-    const team = new Teamwork();
+    const team = new Teamwork.Team();
     const next = jest.fn();
 
     server.post('/', celebrate({
@@ -182,7 +182,7 @@ describe('update req values', () => {
   test('req.headers', async () => {
     expect.assertions(1);
     const server = Server();
-    const team = new Teamwork();
+    const team = new Teamwork.Team();
 
     server.get('/', celebrate({
       [Segments.HEADERS]: {
@@ -216,7 +216,7 @@ describe('update req values', () => {
   test('req.params', async () => {
     expect.assertions(1);
     const server = Server();
-    const team = new Teamwork();
+    const team = new Teamwork.Team();
 
     server.get('/user/:id', celebrate({
       [Segments.PARAMS]: {
@@ -237,7 +237,7 @@ describe('update req values', () => {
   test('req.query', async () => {
     expect.assertions(1);
     const server = Server();
-    const team = new Teamwork();
+    const team = new Teamwork.Team();
 
     server.get('/', celebrate({
       [Segments.QUERY]: Joi.object().keys({
@@ -261,7 +261,7 @@ describe('update req values', () => {
   test('req.body', async () => {
     expect.assertions(1);
     const server = Server();
-    const team = new Teamwork();
+    const team = new Teamwork.Team();
 
     server.post('/', celebrate({
       [Segments.BODY]: {
@@ -293,7 +293,7 @@ describe('reqContext', () => {
   test('passes req as Joi context during validation', async () => {
     expect.assertions(2);
     const server = Server();
-    const team = new Teamwork({ meetings: 2 });
+    const team = new Teamwork.Team({ meetings: 2 });
 
     server.post('/:userId', celebrate({
       [Segments.BODY]: {
@@ -325,7 +325,7 @@ describe('reqContext', () => {
   test('fails validation based on req values', async () => {
     expect.assertions(2);
     const server = Server();
-    const team = new Teamwork();
+    const team = new Teamwork.Team();
     const next = jest.fn();
 
     server.post('/:userId', celebrate({
@@ -371,15 +371,17 @@ describe('multiple-runs', () => {
       res.send(req.headers);
     });
 
-    const attempts = Array.from({ length: 10 }, () => new Promise((resolve) => server.inject({
-      method: 'GET',
-      url: '/',
-      headers: {
-        accept: 'application/json',
-      },
-    }, (r) => {
-      resolve(JSON.parse(r.payload));
-    })));
+    const attempts = Array.from({ length: 10 }, () => new Promise((resolve) => {
+      server.inject({
+        method: 'GET',
+        url: '/',
+        headers: {
+          accept: 'application/json',
+        },
+      }, (r) => {
+        resolve(JSON.parse(r.payload));
+      });
+    }));
 
     return Promise.all(attempts).then((v) => {
       v.forEach((headers) => {
@@ -402,18 +404,20 @@ describe('multiple-runs', () => {
       },
     }));
 
-    const attempts = Array.from({ length: 10 }, () => new Promise((resolve) => server.inject({
-      method: 'POST',
-      url: '/',
-      payload: {
-        age: random.number(),
-      },
-      headers: {
-        accept: 'application/json',
-      },
-    }, (r) => {
-      resolve(r.statusCode);
-    })));
+    const attempts = Array.from({ length: 10 }, () => new Promise((resolve) => {
+      server.inject({
+        method: 'POST',
+        url: '/',
+        payload: {
+          age: datatype.number(),
+        },
+        headers: {
+          accept: 'application/json',
+        },
+      }, (r) => {
+        resolve(r.statusCode);
+      });
+    }));
 
     return Promise.all(attempts).then((v) => {
       v.forEach((statusCode) => {
