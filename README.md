@@ -6,22 +6,6 @@
 [![Code Coverage](https://flat.badgen.net/codecov/c/github/arb/celebrate?icon=codecov)](https://codecov.io/gh/arb/celebrate)
 [![Total Downloads](https://badgen.net/npm/dt/celebrate?&color=cyan)](https://www.npmjs.org/package/celebrate)
 
-<table>
-  <tbody>
-    <tr>
-      <td>Sponsored by</td>
-      <td>
-        <a href="https://github.com/webflow/">
-          <img 
-            height="100"
-            src="https://github.com/arb/celebrate/raw/master/images/webflow-logo-blue.svg?sanitize=1" 
-            alt="Webflow"
-          />
-        </a>
-      </td>
-    </tr>
-  </tbody>
-</table>
 
 celebrate is an express middleware function that wraps the [joi](https://github.com/hapijs/joi/tree/master) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, and `req.query`.
 
