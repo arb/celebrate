@@ -6,6 +6,8 @@ node_js:
 
 cache: npm
 
+dist: focal
+
 env:
     - EXPRESS_VERSION="latest"
     - EXPRESS_VERSION="next"
