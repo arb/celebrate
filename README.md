@@ -181,7 +181,7 @@ celebrate exports the version of joi it is using internally. For maximum compati
 
 ### `Segments`
 
-An enum containing all the segments of `req` objects that celebrate *can* valiate against.
+An enum containing all the segments of `req` objects that celebrate *can* validate against.
 
 ```js
 {
