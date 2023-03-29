@@ -4,6 +4,7 @@ import {
     Root as joi,
     ValidationOptions,
     ValidationError,
+    Schema
 } from 'joi';
 
 
@@ -51,11 +52,11 @@ export interface CelebrateOptions {
     mode?: Modes;
 }
 
-export interface SchemaOptions {
+export interface SchemaOptions<P=ParamsDictionary, ReqBody=any, ReqQuery=Query> {
     /**
      * When `params` is set, `joi` will validate `req.params` with the supplied schema.
      */
-    params?: object;
+    params?: Schema<P>;
     /**
      * When `headers` is set, `joi` will validate `req.headers` with the supplied schema.
      */
@@ -63,7 +64,7 @@ export interface SchemaOptions {
     /**
      * When `query` is set, `joi` will validate `req.query` with the supplied schema.
      */
-    query?: object;
+    query?: Schema<ReqQuery>;
     /**
      * When `cookies` is set, `joi` will validate `req.cookies` with the supplied schema.
      */
@@ -75,13 +76,13 @@ export interface SchemaOptions {
     /**
      * When `body` is set, `joi` will validate `req.body` with the supplied schema.
      */
-    body?: object;
+    body?: Schema<ReqBody>;
 }
 
 /**
 * Creates a celebrate middleware function.
 */
-export declare function celebrate<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query>(requestRules: SchemaOptions, joiOpts?: ValidationOptions, opts?: CelebrateOptions): RequestHandler<P, ResBody, ReqBody, ReqQuery>;
+export declare function celebrate<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query>(requestRules: SchemaOptions<P, ReqBody, ReqQuery>, joiOpts?: ValidationOptions, opts?: CelebrateOptions): RequestHandler<P, ResBody, ReqBody, ReqQuery>;
 
 /**
  * Curried version of `celebrate`.
@@ -110,3 +111,4 @@ export declare class CelebrateError extends Error {
     details: Map<string, ValidationError>;
     constructor(message?:string, opts?: { celebrated?: boolean });
 }
+
