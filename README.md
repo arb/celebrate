@@ -1,10 +1,10 @@
 [![celebrate](https://github.com/arb/celebrate/raw/master/images/logo.svg?sanitize=1)](https://www.npmjs.org/package/celebrate)
 
 [![Current Version](https://flat.badgen.net/npm/v/celebrate?icon=npm)](https://www.npmjs.org/package/celebrate)
-[![Build Status](https://flat.badgen.net/travis/arb/celebrate?icon=travis)](https://travis-ci.org/arb/celebrate)
+[![Build Status](https://flat.badgen.net/github/checks/arb/celebrate?label=build&icon=github)](https://www.google.com)
 [![airbnb-style](https://flat.badgen.net/badge/eslint/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
 [![Code Coverage](https://flat.badgen.net/codecov/c/github/arb/celebrate?icon=codecov)](https://codecov.io/gh/arb/celebrate)
-[![Total Downloads](https://badgen.net/npm/dt/celebrate?&color=cyan)](https://www.npmjs.org/package/celebrate)
+[![Total Downloads](https://flat.badgen.net/npm/dt/celebrate?&color=cyan)](https://www.npmjs.org/package/celebrate)
 
 
 celebrate is an express middleware function that wraps the [joi](https://github.com/hapijs/joi/tree/master) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, and `req.query`.
