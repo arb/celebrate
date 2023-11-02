@@ -1,10 +1,6 @@
 import { ErrorRequestHandler, RequestHandler } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
-import {
-    Root as joi,
-    ValidationOptions,
-    ValidationError,
-} from 'joi';
+import * as Joi from 'joi';
 
 
 export declare enum Segments {
@@ -22,8 +18,8 @@ export declare enum Modes {
 }
 
 interface Celebrator1<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query> {
-  (joiOpts: ValidationOptions): Celebrator2;
-  (joiOpts: ValidationOptions, requestRules: SchemaOptions): RequestHandler<P, ResBody, ReqBody, ReqQuery>;
+  (joiOpts: Joi.ValidationOptions): Celebrator2;
+  (joiOpts: Joi.ValidationOptions, requestRules: SchemaOptions): RequestHandler<P, ResBody, ReqBody, ReqQuery>;
 }
 
 interface Celebrator2 {
@@ -32,10 +28,10 @@ interface Celebrator2 {
 
 interface Celebrator<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query> {
     (opts: CelebrateOptions): Celebrator1;
-    (opts: CelebrateOptions, joiOpts: ValidationOptions): Celebrator2;
+    (opts: CelebrateOptions, joiOpts: Joi.ValidationOptions): Celebrator2;
     (
         opts: CelebrateOptions,
-        joiOpts: ValidationOptions,
+        joiOpts: Joi.ValidationOptions,
         requestRules: SchemaOptions
     ): RequestHandler<P, ResBody, ReqBody, ReqQuery>;
   }
@@ -81,7 +77,7 @@ export interface SchemaOptions {
 /**
 * Creates a celebrate middleware function.
 */
-export declare function celebrate<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query>(requestRules: SchemaOptions, joiOpts?: ValidationOptions, opts?: CelebrateOptions): RequestHandler<P, ResBody, ReqBody, ReqQuery>;
+export declare function celebrate<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query>(requestRules: SchemaOptions, joiOpts?: Joi.ValidationOptions, opts?: CelebrateOptions): RequestHandler<P, ResBody, ReqBody, ReqQuery>;
 
 /**
  * Curried version of `celebrate`.
@@ -96,7 +92,7 @@ export declare function errors<P=ParamsDictionary, ResBody=any, ReqBody=any, Req
 /**
  * The Joi version Celebrate uses internally.
  */
-export declare const Joi: joi;
+export { Joi };
 
 /**
  * Examines an error object to determine if it originated from the celebrate middleware.
@@ -107,6 +103,6 @@ export declare function isCelebrateError(err: any): err is CelebrateError;
  * The standard error used by Celebrate
  */
 export declare class CelebrateError extends Error {
-    details: Map<string, ValidationError>;
+    details: Map<string, Joi.ValidationError>;
     constructor(message?:string, opts?: { celebrated?: boolean });
 }
