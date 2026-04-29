@@ -17,8 +17,8 @@ jobs:
     strategy:
       matrix:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-        node-version: [12.x, 14.x, 16.x, 18.x, latest]
-        express-version: [latest, next]
+        node-version: [20.x, 22.x, 24.x, 25.x]
+        express-version: [latest-4, latest]
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
