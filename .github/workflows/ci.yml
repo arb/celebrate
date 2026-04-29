@@ -20,12 +20,11 @@ jobs:
         node-version: [20.x, 22.x, 24.x, 25.x]
         express-version: [latest-4, latest]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        express-version: ${{ matrix.express-version }}
     - run: npm install -g codecov
     - run: npm install -g json
     - run: json -I -f package.json -e "this.devDependencies.express=\"${{ matrix.express-version }}\"" 
