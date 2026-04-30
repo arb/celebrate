@@ -1,8 +1,8 @@
-const neostandard = require('neostandard');
-const globals = require('globals');
+import neostandard from 'neostandard';
+import globals from 'globals';
 
-module.exports = [
-  ...neostandard({ noJsx: true, node: true, commonjs: true, semi: true }),
+export default [
+  ...neostandard({ noJsx: true, node: true, semi: true }),
   {
     languageOptions: {
       globals: {

@@ -1,5 +1,5 @@
-const { Bench } = require('tinybench');
-const { celebrate, Joi, Modes } = require('../lib');
+import { Bench } from 'tinybench';
+import { celebrate, Joi, Modes } from '../lib/index.js';
 
 const noop = () => {};
 
@@ -41,10 +41,8 @@ bench
     params: {},
   }, {}, noop));
 
-(async () => {
-  await bench.run();
-  console.table(bench.table());
-})();
+await bench.run();
+console.table(bench.table());
 
 // first run
 // valid x 707,830 ops/sec ±7.21% (69 runs sampled)

@@ -1,15 +1,16 @@
-const Express = require('express');
-const Artificial = require('artificial');
-const signature = require('cookie-signature');
-const CookieParser = require('cookie-parser');
-const { faker } = require('@faker-js/faker');
-const Teamwork = require('@hapi/teamwork');
-const {
+import { jest } from '@jest/globals';
+import Express from 'express';
+import Artificial from 'artificial';
+import signature from 'cookie-signature';
+import CookieParser from 'cookie-parser';
+import { faker } from '@faker-js/faker';
+import Teamwork from '@hapi/teamwork';
+import {
   celebrate,
   Joi,
   Segments,
   isCelebrateError,
-} = require('../lib');
+} from '../lib/index.js';
 
 const cookieSecret = faker.string.alphanumeric();
 

@@ -4,14 +4,20 @@
   "description": "A joi validation middleware for Express.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "type": "commonjs",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    }
+  },
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "test": "is-ci 'test:ci' 'test:local'",
-    "test:local": "jest --watch --verbose",
-    "test:ci": "jest --ci",
+    "test:local": "node --experimental-vm-modules node_modules/.bin/jest --watch --verbose",
+    "test:ci": "node --experimental-vm-modules node_modules/.bin/jest --ci",
     "benchmark": "node utils/benchmark",
     "toc": "node utils/generate-toc",
     "version": "npm run toc && git add README.md"

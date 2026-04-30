@@ -1,5 +1,6 @@
-const { faker } = require('@faker-js/faker');
-const {
+import { jest } from '@jest/globals';
+import { faker } from '@faker-js/faker';
+import {
   celebrate,
   Joi,
   errors,
@@ -8,7 +9,7 @@ const {
   Segments,
   celebrator,
   Modes,
-} = require('../lib');
+} from '../lib/index.js';
 
 describe('celebrate()', () => {
   describe.each`
@@ -120,6 +121,53 @@ describe('celebrate()', () => {
     }, null, (err) => {
       expect(isCelebrateError(err)).toBe(true);
       expect(err.details).toMatchSnapshot();
+    });
+  });
+
+  it('applies joi transforms back to the request object in full validate mode', () => {
+    expect.assertions(3);
+    const first = faker.person.firstName();
+    const role = faker.person.jobTitle();
+    const req = {
+      [Segments.BODY]: { first },
+      [Segments.QUERY]: { id: '42' },
+      method: 'POST',
+    };
+    const middleware = celebrate({
+      [Segments.BODY]: {
+        first: Joi.string().required(),
+        role: Joi.string().default(role),
+      },
+      [Segments.QUERY]: Joi.object().keys({
+        id: Joi.number().integer(),
+      }),
+    }, { convert: true }, { mode: Modes.FULL });
+
+    return middleware(req, null, (err) => {
+      expect(err).toBe(null);
+      expect(req.body).toEqual({ first, role });
+      expect(req.query).toEqual({ id: 42 });
+    });
+  });
+
+  it('skips body validation in full validate mode for GET requests', () => {
+    expect.assertions(2);
+    const req = {
+      [Segments.QUERY]: { id: '7' },
+      method: 'GET',
+    };
+    const middleware = celebrate({
+      [Segments.BODY]: {
+        first: Joi.string().required(),
+      },
+      [Segments.QUERY]: Joi.object().keys({
+        id: Joi.number().integer(),
+      }),
+    }, { convert: true }, { mode: Modes.FULL });
+
+    return middleware(req, null, (err) => {
+      expect(err).toBe(null);
+      expect(req.query).toEqual({ id: 7 });
     });
   });
 
