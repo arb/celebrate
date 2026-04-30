@@ -10,19 +10,48 @@ const {
   celebrate,
   Joi,
   Segments,
+  isCelebrateError,
 } = require('../lib');
 
+const cookieSecret = random.alphaNumeric();
+
 const Server = () => {
-  const server = Express();
-  server.use(CookieParser(random.alphaNumeric()));
-  server.use(BodyParser.json());
-  Artificial(server);
-  return server;
+  // Standard Express app with the middleware the tests rely on.
+  // Artificial(app) attaches `.inject` so tests can drive requests synchronously.
+  const app = Express();
+  app.use(CookieParser(cookieSecret));
+  app.use(BodyParser.json());
+  Artificial(app);
+
+  // Tests register their routes on this child router. Mounting the error
+  // handler on the parent app right after the router means any CelebrateError
+  // that bubbles out of a celebrate middleware lands here, where the test can
+  // inspect it via `server.errors.error`.
+  const router = Express.Router();
+  const errors = { error: null };
+
+  app.use(router);
+  // eslint-disable-next-line no-unused-vars
+  app.use((err, req, res, next) => {
+    errors.error = err;
+    res.status(isCelebrateError(err) ? 400 : 500).end();
+  });
+
+  // Hand back an explicit test handle so tests have a single `server` object
+  // for route registration, request injection, and error inspection -- without
+  // mutating Express's router/app objects.
+  return {
+    get: router.get.bind(router),
+    post: router.post.bind(router),
+    use: router.use.bind(router),
+    inject: app.inject.bind(app),
+    errors,
+  };
 };
 
 describe('validations', () => {
   test('req.headers', async () => {
-    expect.assertions(2);
+    expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
     const next = jest.fn();
@@ -45,12 +74,14 @@ describe('validations', () => {
 
     const { statusCode } = await team.work;
 
-    expect(statusCode).toBe(500);
+    expect(statusCode).toBe(400);
+    expect(isCelebrateError(server.errors.error)).toBe(true);
+    expect(server.errors.error.details.has(Segments.HEADERS)).toBe(true);
     expect(next).not.toHaveBeenCalled();
   });
 
   test('req.params', async () => {
-    expect.assertions(2);
+    expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
     const next = jest.fn();
@@ -68,12 +99,14 @@ describe('validations', () => {
 
     const { statusCode } = await team.work;
 
-    expect(statusCode).toBe(500);
+    expect(statusCode).toBe(400);
+    expect(isCelebrateError(server.errors.error)).toBe(true);
+    expect(server.errors.error.details.has(Segments.PARAMS)).toBe(true);
     expect(next).not.toHaveBeenCalled();
   });
 
   test('req.query', async () => {
-    expect.assertions(2);
+    expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
     const next = jest.fn();
@@ -90,12 +123,14 @@ describe('validations', () => {
 
     const { statusCode } = await team.work;
 
-    expect(statusCode).toBe(500);
+    expect(statusCode).toBe(400);
+    expect(isCelebrateError(server.errors.error)).toBe(true);
+    expect(server.errors.error.details.has(Segments.QUERY)).toBe(true);
     expect(next).not.toHaveBeenCalled();
   });
 
   test('req.cookies', async () => {
-    expect.assertions(2);
+    expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
     const next = jest.fn();
@@ -116,23 +151,25 @@ describe('validations', () => {
 
     const { statusCode } = await team.work;
 
-    expect(statusCode).toBe(500);
+    expect(statusCode).toBe(400);
+    expect(isCelebrateError(server.errors.error)).toBe(true);
+    expect(server.errors.error.details.has(Segments.COOKIES)).toBe(true);
     expect(next).not.toHaveBeenCalled();
   });
 
   test('req.signedCookies', async () => {
-    expect.assertions(2);
+    expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
     const next = jest.fn();
 
     server.get('/', celebrate({
       [Segments.SIGNEDCOOKIES]: {
-        secureState: Joi.number().required(),
+        state: Joi.number().required(),
       },
     }), next);
 
-    const val = signature.sign('notanumber', 'secret');
+    const val = signature.sign('notanumber', cookieSecret);
 
     server.inject({
       url: '/',
@@ -144,12 +181,14 @@ describe('validations', () => {
 
     const { statusCode } = await team.work;
 
-    expect(statusCode).toBe(500);
+    expect(statusCode).toBe(400);
+    expect(isCelebrateError(server.errors.error)).toBe(true);
+    expect(server.errors.error.details.has(Segments.SIGNEDCOOKIES)).toBe(true);
     expect(next).not.toHaveBeenCalled();
   });
 
   test('req.body', async () => {
-    expect.assertions(2);
+    expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
     const next = jest.fn();
@@ -173,7 +212,9 @@ describe('validations', () => {
 
     const { statusCode } = await team.work;
 
-    expect(statusCode).toBe(500);
+    expect(statusCode).toBe(400);
+    expect(isCelebrateError(server.errors.error)).toBe(true);
+    expect(server.errors.error.details.has(Segments.BODY)).toBe(true);
     expect(next).not.toHaveBeenCalled();
   });
 });
@@ -323,7 +364,7 @@ describe('reqContext', () => {
   });
 
   test('fails validation based on req values', async () => {
-    expect.assertions(2);
+    expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
     const next = jest.fn();
@@ -349,7 +390,9 @@ describe('reqContext', () => {
 
     const res = await team.work;
 
-    expect(res.statusCode).toBe(500);
+    expect(res.statusCode).toBe(400);
+    expect(isCelebrateError(server.errors.error)).toBe(true);
+    expect(server.errors.error.details.has(Segments.BODY)).toBe(true);
     expect(next).not.toHaveBeenCalled();
   });
 });
@@ -421,7 +464,7 @@ describe('multiple-runs', () => {
 
     return Promise.all(attempts).then((v) => {
       v.forEach((statusCode) => {
-        expect(statusCode).toEqual(500);
+        expect(statusCode).toEqual(400);
       });
     });
   });
