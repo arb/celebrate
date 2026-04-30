@@ -1,12 +1,4 @@
-/* eslint-env jest */
-const expect = require('expect');
-const {
-  name,
-  random,
-  date,
-  internet,
-  datatype,
-} = require('faker');
+const { faker } = require('@faker-js/faker');
 const {
   celebrate,
   Joi,
@@ -37,10 +29,10 @@ describe('celebrate()', () => {
     segment | schema | req | message
     ${Segments.HEADERS} | ${{ [Segments.HEADERS]: { accept: Joi.string().regex(/xml/) } }} | ${{ [Segments.HEADERS]: { accept: 'application/json' } }} | ${'"accept" with value "application/json" fails to match the required pattern: /xml/'}
     ${Segments.PARAMS} | ${{ [Segments.PARAMS]: { id: Joi.string().token() } }} | ${{ [Segments.PARAMS]: { id: '@@@' } }} | ${'"id" must only contain alpha-numeric and underscore characters'}
-    ${Segments.QUERY} | ${{ [Segments.QUERY]: Joi.object().keys({ start: Joi.date() }) }} | ${{ [Segments.QUERY]: { end: datatype.number() } }} | ${'"end" is not allowed'}
-    ${Segments.BODY} | ${{ [Segments.BODY]: { first: Joi.string().required(), last: Joi.string(), role: Joi.number().integer() } }} | ${{ [Segments.BODY]: { first: name.firstName(), last: datatype.number() }, method: 'POST' }} | ${'"last" must be a string'}
-    ${Segments.COOKIES} | ${{ [Segments.COOKIES]: { state: Joi.string().required() } }} | ${{ [Segments.COOKIES]: { state: datatype.number() } }} | ${'"state" must be a string'}
-    ${Segments.SIGNEDCOOKIES} | ${{ [Segments.SIGNEDCOOKIES]: { uid: Joi.string().required() } }} | ${{ [Segments.SIGNEDCOOKIES]: { uid: datatype.number() } }} | ${'"uid" must be a string'}
+    ${Segments.QUERY} | ${{ [Segments.QUERY]: Joi.object().keys({ start: Joi.date() }) }} | ${{ [Segments.QUERY]: { end: faker.number.int() } }} | ${'"end" is not allowed'}
+    ${Segments.BODY} | ${{ [Segments.BODY]: { first: Joi.string().required(), last: Joi.string(), role: Joi.number().integer() } }} | ${{ [Segments.BODY]: { first: faker.person.firstName(), last: faker.number.int() }, method: 'POST' }} | ${'"last" must be a string'}
+    ${Segments.COOKIES} | ${{ [Segments.COOKIES]: { state: Joi.string().required() } }} | ${{ [Segments.COOKIES]: { state: faker.number.int() } }} | ${'"state" must be a string'}
+    ${Segments.SIGNEDCOOKIES} | ${{ [Segments.SIGNEDCOOKIES]: { uid: Joi.string().required() } }} | ${{ [Segments.SIGNEDCOOKIES]: { uid: faker.number.int() } }} | ${'"uid" must be a string'}
     `('celebate middleware', ({
     schema, req, message, segment,
   }) => {
@@ -79,14 +71,14 @@ describe('celebrate()', () => {
 
     return middleware({
       [Segments.PARAMS]: {
-        id: random.alphaNumeric(10),
+        id: faker.string.alphanumeric(10),
       },
       [Segments.QUERY]: {
-        end: datatype.boolean(),
+        end: faker.datatype.boolean(),
       },
       [Segments.BODY]: {
-        first: name.firstName(),
-        last: name.lastName(),
+        first: faker.person.firstName(),
+        last: faker.person.lastName(),
       },
     }, null, (err) => {
       expect(isCelebrateError(err)).toBe(true);
@@ -114,15 +106,15 @@ describe('celebrate()', () => {
 
     return middleware({
       [Segments.PARAMS]: {
-        id: datatype.number(),
+        id: faker.number.int(),
       },
       [Segments.QUERY]: {
-        end: datatype.boolean(),
+        end: faker.datatype.boolean(),
       },
       [Segments.BODY]: {
-        first: name.firstName(),
-        last: name.lastName(),
-        role: datatype.boolean(),
+        first: faker.person.firstName(),
+        last: faker.person.lastName(),
+        role: faker.datatype.boolean(),
       },
       method: 'POST',
     }, null, (err) => {
@@ -133,10 +125,10 @@ describe('celebrate()', () => {
 
   it('applys any joi transorms back to the object', () => {
     expect.assertions(4);
-    const first = name.firstName();
-    const last = name.lastName();
-    const role = name.jobTitle();
-    const browser = internet.domainWord();
+    const first = faker.person.firstName();
+    const last = faker.person.lastName();
+    const role = faker.person.jobTitle();
+    const browser = faker.internet.domainWord();
     const req = {
       [Segments.BODY]: {
         first,
@@ -176,10 +168,10 @@ describe('celebrate()', () => {
 
   it('does not apply joi transform during a failed validation with full validatate mode', () => {
     expect.assertions(3);
-    const first = name.firstName();
-    const last = name.lastName();
-    const role = name.jobTitle();
-    const browser = internet.domainWord();
+    const first = faker.person.firstName();
+    const last = faker.person.lastName();
+    const role = faker.person.jobTitle();
+    const browser = faker.internet.domainWord();
     const req = {
       [Segments.BODY]: {
         first,
@@ -204,12 +196,10 @@ describe('celebrate()', () => {
 
     return middleware(req, null, (err) => {
       expect(isCelebrateError(err)).toBe(true);
-      // missing role
       expect(req.body).toEqual({
         first,
         last,
       });
-      // browser is still default
       expect(req.cookies).toEqual({
         browser: undefined,
       });
@@ -228,8 +218,8 @@ describe('celebrate()', () => {
 
     return middleware({
       [Segments.BODY]: {
-        first: name.firstName(),
-        last: name.lastName(),
+        first: faker.person.firstName(),
+        last: faker.person.lastName(),
       },
       method: 'GET',
     }, null, (err) => {
@@ -245,7 +235,7 @@ describe('celebrate()', () => {
       messages: {
         'john.base': '{#label} must equal "john"',
       },
-      validate(value, helpers) {
+      validate (value, helpers) {
         if (value !== 'john') {
           return { value, errors: helpers.error('john.base') };
         }
@@ -262,8 +252,8 @@ describe('celebrate()', () => {
 
     return middleware({
       [Segments.BODY]: {
-        first: name.firstName(),
-        role: datatype.number(),
+        first: faker.person.firstName(),
+        role: faker.number.int(),
       },
       method: 'POST',
     }, null, (err) => {
@@ -281,7 +271,7 @@ describe('celebrate()', () => {
     }, { stripUnknown: true });
     const req = {
       [Segments.QUERY]: {
-        start: date.recent(),
+        start: faker.date.recent(),
         page: 1,
       },
       method: 'GET',
@@ -326,7 +316,7 @@ describe('celebrate()', () => {
     return middleware({
       method: 'POST',
       [Segments.BODY]: {
-        id: datatype.number({ min: 1, max: 99 }),
+        id: faker.number.int({ min: 1, max: 99 }),
       },
     }, null, (err) => {
       expect(isCelebrateError(err)).toBe(true);
@@ -353,7 +343,7 @@ describe('celebrate()', () => {
         userId: 10,
       },
       [Segments.BODY]: {
-        id: datatype.number({ min: 1, max: 9 }),
+        id: faker.number.int({ min: 1, max: 9 }),
       },
     }, null, (err) => {
       expect(isCelebrateError(err)).toBe(true);
@@ -373,10 +363,10 @@ describe('errors()', () => {
     const handler = errors();
     const next = jest.fn();
     const res = {
-      status(statusCode) {
+      status (statusCode) {
         expect(statusCode).toBe(400);
         return {
-          send(err) {
+          send (err) {
             expect(err).toMatchSnapshot();
             expect(next).not.toHaveBeenCalled();
           },
@@ -386,7 +376,7 @@ describe('errors()', () => {
 
     return middleware({
       [Segments.QUERY]: {
-        role: datatype.number({ min: 0, max: 3 }),
+        role: faker.number.int({ min: 0, max: 3 }),
       },
       method: 'GET',
     }, null, (err) => {
@@ -397,7 +387,7 @@ describe('errors()', () => {
   it('passes the error through next if not a joi error from celebrate middleware', () => {
     const handler = errors();
     const res = {
-      status() {
+      status () {
         throw Error('status called');
       },
     };
@@ -407,7 +397,7 @@ describe('errors()', () => {
     });
 
     const { error } = schema.validate({
-      role: random.word(),
+      role: faker.lorem.word(),
     });
 
     handler(error, undefined, res, (e) => {
@@ -428,10 +418,10 @@ describe('errors()', () => {
     const handler = errors();
     const next = jest.fn();
     const res = {
-      status(statusCode) {
+      status (statusCode) {
         expect(statusCode).toBe(400);
         return {
-          send(err) {
+          send (err) {
             expect(err).toMatchSnapshot();
             expect(next).not.toHaveBeenCalled();
           },
@@ -441,7 +431,7 @@ describe('errors()', () => {
 
     return middleware({
       [Segments.QUERY]: {
-        role: datatype.number({ min: 0, max: 3 }),
+        role: faker.number.int({ min: 0, max: 3 }),
       },
       method: 'GET',
     }, null, (err) => {
@@ -461,10 +451,10 @@ describe('errors()', () => {
     const handler = errors({ statusCode, message });
     const next = jest.fn();
     const res = {
-      status(code) {
+      status (code) {
         expect(code).toBe(statusCode);
         return {
-          send(err) {
+          send (err) {
             expect(err).toHaveProperty('statusCode', statusCode);
             expect(err).toHaveProperty('message', message);
             expect(err).toMatchSnapshot();
@@ -476,7 +466,7 @@ describe('errors()', () => {
 
     return middleware({
       [Segments.QUERY]: {
-        role: datatype.number({ min: 0, max: 3 }),
+        role: faker.number.int({ min: 0, max: 3 }),
       },
       method: 'GET',
     }, null, (err) => {
@@ -516,7 +506,7 @@ describe('isCelebrateError()', () => {
 
     return middleware({
       [Segments.HEADERS]: {
-        accept: datatype.number(),
+        accept: faker.number.int(),
       },
     }, null, (err) => {
       expect(isCelebrateError(err)).toBe(true);
@@ -526,7 +516,6 @@ describe('isCelebrateError()', () => {
 
 describe('CelebrateError()', () => {
   const schema = Joi.string().valid('foo');
-  // Need a real Joi error to use in a few places for these tests
   const result = schema.validate(null);
   it('returns a formatted error object with options', () => {
     expect.assertions(3);

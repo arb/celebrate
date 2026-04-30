@@ -1,13 +1,13 @@
+const Fs = require('node:fs/promises');
 const Toc = require('markdown-toc');
-const Fs = require('fs');
 
 const filename = './README.md';
 
-const generate = () => {
-  const api = Fs.readFileSync(filename, 'utf8');
+const generate = async () => {
+  const api = await Fs.readFile(filename, 'utf8');
   const tocOptions = {
     bullets: '-',
-    slugify(text) {
+    slugify (text) {
       return text.toLowerCase()
         .replace(/\s/g, '-')
         .replace(/[^\w-]/g, '');
@@ -15,7 +15,7 @@ const generate = () => {
   };
 
   const output = Toc.insert(api, tocOptions);
-  Fs.writeFileSync(filename, output);
+  await Fs.writeFile(filename, output);
 };
 
 generate();
