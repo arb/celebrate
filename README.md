@@ -45,13 +45,17 @@ celebrate lists joi as a formal dependency. This means that celebrate will alway
 
 celebrate is tested and has full compatibility with express 4 and 5. It likely works correctly with express 3, but including it in the test matrix was more trouble than it's worth. This is primarily because express 3 exposes route parameters as an array rather than an object.
 
+## 16.x breaking changes
+
+celebrate 16 ships as a native ES module. `require('celebrate')` is no longer supported — use `import` syntax instead. The minimum supported Node version is unchanged at 20+.
+
 ## Example Usage
 
 Example of using celebrate on a single POST route to validate `req.body`.
 ```js
-const express = require('express');
-const BodyParser = require('body-parser');
-const { celebrate, Joi, errors, Segments } = require('celebrate');
+import express from 'express';
+import BodyParser from 'body-parser';
+import { celebrate, Joi, errors, Segments } from 'celebrate';
 
 const app = express();
 app.use(BodyParser.json());
@@ -74,8 +78,8 @@ app.use(errors());
 
 Example of using celebrate to validate all incoming requests to ensure the `token` header is present and matches the supplied regular expression.
 ```js
-const express = require('express');
-const { celebrate, Joi, errors, Segments } = require('celebrate');
+import express from 'express';
+import { celebrate, Joi, errors, Segments } from 'celebrate';
 const app = express();
 
 // validate all incoming request headers for the token header
@@ -120,8 +124,8 @@ This is a curried version of [`celebrate`](#celebrateschema-joioptions-opts). It
   This is an example use of curried celebrate in a real server.
 
   ```js
-    const express = require('express');
-    const { celebrator, Joi, errors, Segments } = require('celebrate');
+    import express from 'express';
+    import { celebrator, Joi, errors, Segments } from 'celebrate';
     const app = express();
 
     // now every instance of `celebrate` will use these same options so you only

@@ -1,5 +1,5 @@
-const Fs = require('node:fs/promises');
-const Toc = require('markdown-toc');
+import Fs from 'node:fs/promises';
+import Toc from 'markdown-toc';
 
 const filename = './README.md';
 
@@ -18,4 +18,4 @@ const generate = async () => {
   await Fs.writeFile(filename, output);
 };
 
-generate();
+await generate();

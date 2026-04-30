@@ -1,7 +1,10 @@
-module.exports = {
+export default {
   testEnvironment: 'node',
   collectCoverage: true,
-  collectCoverageFrom: ['<rootDir>/lib/index.js'],
+  collectCoverageFrom: [
+    '<rootDir>/lib/**/*.js',
+    '!<rootDir>/lib/index.js',
+  ],
   coverageDirectory: '<rootDir>/coverage',
   coverageThreshold: {
     global: {
