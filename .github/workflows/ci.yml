@@ -26,7 +26,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install -g codecov
-    - run: npm install -g json
-    - run: json -I -f package.json -e "this.devDependencies.express=\"${{ matrix.express-version }}\"" 
+    - run: npm pkg set "devDependencies.express=${{ matrix.express-version }}"
     - run: npm install
+    - run: npx eslint .
     - run: npm test

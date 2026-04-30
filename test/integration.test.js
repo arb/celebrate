@@ -1,10 +1,8 @@
-/* eslint-env jest */
 const Express = require('express');
 const Artificial = require('artificial');
-const BodyParser = require('body-parser');
-const CookieParser = require('cookie-parser');
 const signature = require('cookie-signature');
-const { datatype, random } = require('faker');
+const CookieParser = require('cookie-parser');
+const { faker } = require('@faker-js/faker');
 const Teamwork = require('@hapi/teamwork');
 const {
   celebrate,
@@ -13,14 +11,14 @@ const {
   isCelebrateError,
 } = require('../lib');
 
-const cookieSecret = random.alphaNumeric();
+const cookieSecret = faker.string.alphanumeric();
 
 const Server = () => {
   // Standard Express app with the middleware the tests rely on.
   // Artificial(app) attaches `.inject` so tests can drive requests synchronously.
   const app = Express();
   app.use(CookieParser(cookieSecret));
-  app.use(BodyParser.json());
+  app.use(Express.json());
   Artificial(app);
 
   // Tests register their routes on this child router. Mounting the error
@@ -31,8 +29,7 @@ const Server = () => {
   const errors = { error: null };
 
   app.use(router);
-  // eslint-disable-next-line no-unused-vars
-  app.use((err, req, res, next) => {
+  app.use((err, req, res, _next) => {
     errors.error = err;
     res.status(isCelebrateError(err) ? 400 : 500).end();
   });
@@ -233,7 +230,7 @@ describe('update req values', () => {
     }, {
       allowUnknown: true,
     }), (req) => {
-      delete req.headers.host; // this can change computer to computer, so just remove it
+      delete req.headers.host; // varies between machines
       team.attend(req);
     });
 
@@ -410,7 +407,7 @@ describe('multiple-runs', () => {
     }, {
       allowUnknown: true,
     }), (req, res) => {
-      delete req.headers.host; // this can change computer to computer, so just remove it
+      delete req.headers.host; // varies between machines
       res.send(req.headers);
     });
 
@@ -452,7 +449,7 @@ describe('multiple-runs', () => {
         method: 'POST',
         url: '/',
         payload: {
-          age: datatype.number(),
+          age: faker.number.int(),
         },
         headers: {
           accept: 'application/json',

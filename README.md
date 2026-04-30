@@ -1,8 +1,8 @@
 [![celebrate](https://github.com/arb/celebrate/raw/master/images/logo.svg?sanitize=1)](https://www.npmjs.org/package/celebrate)
 
-[![Current Version](https://flat.badgen.net/npm/v/celebrate?icon=npm)](https://www.npmjs.org/package/celebrate)
+[![Current Version](https://flat.badgen.net/npm/v/celebrate)](https://www.npmjs.org/package/celebrate)
 [![Build Status](https://flat.badgen.net/github/checks/arb/celebrate?label=build&icon=github)](https://github.com/arb/celebrate)
-[![airbnb-style](https://flat.badgen.net/badge/eslint/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
+[![Neo Standard](https://badgen.net/badge/style/neostandard?color=ff80ff)](https://github.com/neostandard/neostandard#readme-badges)
 [![Code Coverage](https://flat.badgen.net/codecov/c/github/arb/celebrate?icon=codecov)](https://codecov.io/gh/arb/celebrate)
 [![Total Downloads](https://flat.badgen.net/npm/dt/celebrate?&color=cyan)](https://www.npmjs.org/package/celebrate)
 

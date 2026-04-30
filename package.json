@@ -4,6 +4,10 @@
   "description": "A joi validation middleware for Express.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "test": "is-ci 'test:ci' 'test:local'",
     "test:local": "jest --watch --verbose",
@@ -30,26 +34,24 @@
   "homepage": "https://github.com/arb/celebrate#readme",
   "dependencies": {
     "escape-html": "1.0.3",
-    "joi": "17.x.x",
-    "lodash": "4.17.x"
+    "joi": "18.1.x",
+    "lodash.curry": "4.1.x",
+    "lodash.flip": "4.2.x"
   },
   "devDependencies": {
-    "@hapi/teamwork": "5.1.0",
-    "@types/express": "4.x.x",
+    "@faker-js/faker": "9.x.x",
+    "@hapi/teamwork": "5.x.x",
+    "@types/express": "5.x.x",
     "artificial": "1.x.x",
-    "benchmark": "2.1.x",
-    "body-parser": "1.20.x",
-    "cookie-parser": "1.4.x",
-    "cookie-signature": "1.1.x",
-    "eslint": "8.x.x",
-    "eslint-config-airbnb-base": "15.x.x",
-    "eslint-plugin-import": "2.x.x",
-    "expect": "27.x.x",
-    "express": "next",
-    "faker": "5.5.x",
+    "cookie-parser": "1.x.x",
+    "cookie-signature": "1.x.x",
+    "eslint": "9.x.x",
+    "express": "5.x.x",
+    "globals": "16.x.x",
     "is-ci-cli": "2.x.x",
-    "jest": "27.x.x",
-    "jest-runner-eslint": "1.x.x",
-    "markdown-toc": "1.2.x"
+    "jest": "30.x.x",
+    "markdown-toc": "1.x.x",
+    "neostandard": "0.x.x",
+    "tinybench": "5.x.x"
   }
 }

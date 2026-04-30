@@ -1,7 +1,5 @@
-const watchPathIgnorePatterns = ['<rootDir>/node_modules/'];
-const testEnvironment = 'node';
-
 module.exports = {
+  testEnvironment: 'node',
   collectCoverage: true,
   collectCoverageFrom: ['<rootDir>/lib/index.js'],
   coverageDirectory: '<rootDir>/coverage',
@@ -13,18 +11,7 @@ module.exports = {
       statements: 100,
     },
   },
-  projects: [{
-    displayName: 'test',
-    testEnvironment,
-    // Hack because of broken jest https://github.com/facebook/jest/issues/8088
-    watchPathIgnorePatterns,
-  }, {
-    displayName: 'linter',
-    runner: 'jest-runner-eslint',
-    testEnvironment,
-    testMatch: ['<rootDir>/lib/**/*.js', '<rootDir>/test/**/*.js', '<rootDir>/jest.config.js'],
-    // Hack because of broken jest https://github.com/facebook/jest/issues/8088
-    watchPathIgnorePatterns,
-  }],
-  watchPlugins: ['jest-runner-eslint/watch-fix'],
+  // Workaround for jest --watch EMFILE on macOS without watchman.
+  // See https://github.com/jestjs/jest/issues/8088
+  watchPathIgnorePatterns: ['<rootDir>/node_modules/'],
 };

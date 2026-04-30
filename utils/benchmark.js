@@ -1,14 +1,14 @@
-const Benchmark = require('benchmark');
+const { Bench } = require('tinybench');
 const { celebrate, Joi, Modes } = require('../lib');
 
-const suite = new Benchmark.Suite();
-const noop = () => { };
+const noop = () => {};
 
 const f = celebrate({
   body: {
     name: Joi.string().allow('adam').required(),
   },
 });
+
 const g = celebrate({
   body: {
     name: Joi.string().allow('adam').required(),
@@ -23,11 +23,11 @@ const g = celebrate({
   mode: Modes.FULL,
 });
 
-suite
+const bench = new Bench({ time: 1000 });
+
+bench
   .add('valid', () => f({
-    body: {
-      name: 'adam',
-    },
+    body: { name: 'adam' },
     method: 'post',
   }, {}, noop))
   .add('invalid partial', () => f({
@@ -41,16 +41,12 @@ suite
     params: {},
   }, {}, noop));
 
-suite.on('complete', function suiteComplete() {
-  for (let i = 0; i < this.length; i += 1) {
-    console.log(this[i].toString());
-  }
-});
-
-suite.run({ async: true });
+(async () => {
+  await bench.run();
+  console.table(bench.table());
+})();
 
 // first run
 // valid x 707,830 ops/sec ±7.21% (69 runs sampled)
 // invalid partial x 581,854 ops/sec ±8.39% (36 runs sampled)
 // invalid full x 15,922 ops/sec ±8.31% (67 runs sampled)
-// --------
