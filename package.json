@@ -15,7 +15,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "is-ci 'test:ci' 'test:local'",
+    "test": "is-ci-cli test:ci test:local",
     "test:local": "node --experimental-vm-modules node_modules/.bin/jest --watch --verbose",
     "test:ci": "node --experimental-vm-modules node_modules/.bin/jest --ci",
     "benchmark": "node utils/benchmark",
