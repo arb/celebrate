@@ -1,10 +1,10 @@
 [![celebrate](https://github.com/arb/celebrate/raw/master/images/logo.svg?sanitize=1)](https://www.npmjs.org/package/celebrate)
 
-[![Current Version](https://img.shields.io/npm/v/celebrate?style=flat)](https://www.npmjs.org/package/celebrate)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/arb/celebrate/ci.yml?branch=master&style=flat&label=build&logo=github)](https://github.com/arb/celebrate/actions/workflows/ci.yml)
-[![Neo Standard](https://img.shields.io/badge/style-neostandard-ff80ff?style=flat)](https://github.com/neostandard/neostandard#readme-badges)
-[![Code Coverage](https://img.shields.io/codecov/c/github/arb/celebrate?style=flat&logo=codecov)](https://codecov.io/gh/arb/celebrate)
-[![Total Downloads](https://img.shields.io/npm/dt/celebrate?style=flat&color=cyan)](https://www.npmjs.org/package/celebrate)
+[![Current Version](https://img.shields.io/npm/v/celebrate?style=for-the-badge)](https://www.npmjs.org/package/celebrate)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/arb/celebrate/ci.yml?branch=master&style=for-the-badge&label=build&logo=github)](https://github.com/arb/celebrate/actions/workflows/ci.yml)
+[![Neo Standard](https://img.shields.io/badge/style-neostandard-ff80ff?style=for-the-badge)](https://github.com/neostandard/neostandard#readme-badges)
+[![Code Coverage](https://img.shields.io/codecov/c/github/arb/celebrate?style=for-the-badge&logo=codecov)](https://codecov.io/gh/arb/celebrate)
+[![18mo Downloads](https://img.shields.io/npm/d18m/celebrate?style=for-the-badge&color=cyan)](https://www.npmjs.org/package/celebrate)
 
 
 celebrate is an express middleware function that wraps the [joi](https://github.com/hapijs/joi/tree/master) validation library. This allows you to use this middleware in any single route, or globally, and ensure that all of your inputs are correct before any handler function. The middleware allows you to validate `req.params`, `req.headers`, and `req.query`.
