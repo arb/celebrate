@@ -21,3 +21,4 @@ complexity.md
 coverage/**
 **/package-lock.json
 .nova/**
+.cursor/**
