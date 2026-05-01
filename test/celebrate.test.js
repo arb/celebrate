@@ -1,4 +1,5 @@
-import { jest } from '@jest/globals';
+import { describe, it, mock } from 'node:test';
+import { expect } from 'expect';
 import { faker } from '@faker-js/faker';
 import {
   celebrate,
@@ -12,46 +13,48 @@ import {
 } from '../lib/index.js';
 
 describe('celebrate()', () => {
-  describe.each`
-    schema
-    ${false}
-    ${undefined}
-    ${{}}
-    ${{ [Segments.QUERY]: { name: Joi.string(), age: Joi.number() }, foo: Joi.string() }}
-    `('celebrate($schema)', ({ schema }) => {
-    it('throws an error', () => {
-      expect(() => {
-        celebrate(schema);
-      }).toThrow(Joi.ValidationError);
-    });
-  });
-
-  describe.each`
-    segment | schema | req | message
-    ${Segments.HEADERS} | ${{ [Segments.HEADERS]: { accept: Joi.string().regex(/xml/) } }} | ${{ [Segments.HEADERS]: { accept: 'application/json' } }} | ${'"accept" with value "application/json" fails to match the required pattern: /xml/'}
-    ${Segments.PARAMS} | ${{ [Segments.PARAMS]: { id: Joi.string().token() } }} | ${{ [Segments.PARAMS]: { id: '@@@' } }} | ${'"id" must only contain alpha-numeric and underscore characters'}
-    ${Segments.QUERY} | ${{ [Segments.QUERY]: Joi.object().keys({ start: Joi.date() }) }} | ${{ [Segments.QUERY]: { end: faker.number.int() } }} | ${'"end" is not allowed'}
-    ${Segments.BODY} | ${{ [Segments.BODY]: { first: Joi.string().required(), last: Joi.string(), role: Joi.number().integer() } }} | ${{ [Segments.BODY]: { first: faker.person.firstName(), last: faker.number.int() }, method: 'POST' }} | ${'"last" must be a string'}
-    ${Segments.COOKIES} | ${{ [Segments.COOKIES]: { state: Joi.string().required() } }} | ${{ [Segments.COOKIES]: { state: faker.number.int() } }} | ${'"state" must be a string'}
-    ${Segments.SIGNEDCOOKIES} | ${{ [Segments.SIGNEDCOOKIES]: { uid: Joi.string().required() } }} | ${{ [Segments.SIGNEDCOOKIES]: { uid: faker.number.int() } }} | ${'"uid" must be a string'}
-    `('celebate middleware', ({
-    schema, req, message, segment,
-  }) => {
-    describe.each`
-  fn | kind
-  ${celebrate} | ${'celebrate'}
-  ${celebrator(undefined, undefined)} | ${'celebrator'}
-  `('', ({ fn, kind }) => {
-      it(`validates ${segment} correctly with ${kind}`, () => {
-        expect.assertions(2);
-        const middleware = fn(schema);
-
-        return middleware(req, null, (err) => {
-          expect(isCelebrateError(err)).toBe(true);
-          expect(err.details.get(segment).message).toBe(message);
-        });
+  const invalidSchemaCases = [
+    { schema: false },
+    { schema: undefined },
+    { schema: {} },
+    { schema: { [Segments.QUERY]: { name: Joi.string(), age: Joi.number() }, foo: Joi.string() } },
+  ];
+  for (const { schema } of invalidSchemaCases) {
+    describe(`celebrate(${String(schema)})`, () => {
+      it('throws an error', () => {
+        expect(() => {
+          celebrate(schema);
+        }).toThrow(Joi.ValidationError);
       });
     });
+  }
+
+  const segmentCases = [
+    { segment: Segments.HEADERS, schema: { [Segments.HEADERS]: { accept: Joi.string().regex(/xml/) } }, req: { [Segments.HEADERS]: { accept: 'application/json' } }, message: '"accept" with value "application/json" fails to match the required pattern: /xml/' },
+    { segment: Segments.PARAMS, schema: { [Segments.PARAMS]: { id: Joi.string().token() } }, req: { [Segments.PARAMS]: { id: '@@@' } }, message: '"id" must only contain alpha-numeric and underscore characters' },
+    { segment: Segments.QUERY, schema: { [Segments.QUERY]: Joi.object().keys({ start: Joi.date() }) }, req: { [Segments.QUERY]: { end: faker.number.int() } }, message: '"end" is not allowed' },
+    { segment: Segments.BODY, schema: { [Segments.BODY]: { first: Joi.string().required(), last: Joi.string(), role: Joi.number().integer() } }, req: { [Segments.BODY]: { first: faker.person.firstName(), last: faker.number.int() }, method: 'POST' }, message: '"last" must be a string' },
+    { segment: Segments.COOKIES, schema: { [Segments.COOKIES]: { state: Joi.string().required() } }, req: { [Segments.COOKIES]: { state: faker.number.int() } }, message: '"state" must be a string' },
+    { segment: Segments.SIGNEDCOOKIES, schema: { [Segments.SIGNEDCOOKIES]: { uid: Joi.string().required() } }, req: { [Segments.SIGNEDCOOKIES]: { uid: faker.number.int() } }, message: '"uid" must be a string' },
+  ];
+  const fnCases = [
+    { fn: celebrate, kind: 'celebrate' },
+    { fn: celebrator(undefined, undefined), kind: 'celebrator' },
+  ];
+  describe('celebate middleware', () => {
+    for (const { schema, req, message, segment } of segmentCases) {
+      for (const { fn, kind } of fnCases) {
+        it(`validates ${segment} correctly with ${kind}`, () => {
+          expect.assertions(2);
+          const middleware = fn(schema);
+
+          return middleware(req, null, (err) => {
+            expect(isCelebrateError(err)).toBe(true);
+            expect(err.details.get(segment).message).toBe(message);
+          });
+        });
+      }
+    }
   });
 
   it('errors on the first validation problem (params, query, body) by default', () => {
@@ -88,7 +91,7 @@ describe('celebrate()', () => {
   });
 
   it('validates the entire request (params, query, body) with full validatate mode', () => {
-    expect.assertions(2);
+    expect.assertions(5);
     const middleware = celebrate({
       [Segments.PARAMS]: {
         id: Joi.string().required(),
@@ -120,7 +123,10 @@ describe('celebrate()', () => {
       method: 'POST',
     }, null, (err) => {
       expect(isCelebrateError(err)).toBe(true);
-      expect(err.details).toMatchSnapshot();
+      expect([...err.details.keys()]).toEqual([Segments.PARAMS, Segments.QUERY, Segments.BODY]);
+      expect(err.details.get(Segments.PARAMS).message).toBe('"id" must be a string');
+      expect(err.details.get(Segments.QUERY).message).toBe('"end" is not allowed');
+      expect(err.details.get(Segments.BODY).message).toBe('"role" must be a number');
     });
   });
 
@@ -409,14 +415,25 @@ describe('errors()', () => {
       },
     });
     const handler = errors();
-    const next = jest.fn();
+    const next = mock.fn();
     const res = {
       status (statusCode) {
         expect(statusCode).toBe(400);
         return {
           send (err) {
-            expect(err).toMatchSnapshot();
-            expect(next).not.toHaveBeenCalled();
+            expect(err).toEqual({
+              error: 'Bad Request',
+              message: 'Validation failed',
+              statusCode: 400,
+              validation: {
+                query: {
+                  keys: ['role'],
+                  message: '"role" must be greater than or equal to 4',
+                  source: 'query',
+                },
+              },
+            });
+            expect(next.mock.callCount()).toBe(0);
           },
         };
       },
@@ -464,14 +481,25 @@ describe('errors()', () => {
       abortEarly: false,
     });
     const handler = errors();
-    const next = jest.fn();
+    const next = mock.fn();
     const res = {
       status (statusCode) {
         expect(statusCode).toBe(400);
         return {
           send (err) {
-            expect(err).toMatchSnapshot();
-            expect(next).not.toHaveBeenCalled();
+            expect(err).toEqual({
+              error: 'Bad Request',
+              message: 'Validation failed',
+              statusCode: 400,
+              validation: {
+                query: {
+                  keys: ['role', 'name'],
+                  message: '"role" must be greater than or equal to 4. "name" is required',
+                  source: 'query',
+                },
+              },
+            });
+            expect(next.mock.callCount()).toBe(0);
           },
         };
       },
@@ -497,7 +525,7 @@ describe('errors()', () => {
     const statusCode = 409;
     const message = 'your request is bad and you should feel bad';
     const handler = errors({ statusCode, message });
-    const next = jest.fn();
+    const next = mock.fn();
     const res = {
       status (code) {
         expect(code).toBe(statusCode);
@@ -505,8 +533,19 @@ describe('errors()', () => {
           send (err) {
             expect(err).toHaveProperty('statusCode', statusCode);
             expect(err).toHaveProperty('message', message);
-            expect(err).toMatchSnapshot();
-            expect(next).not.toHaveBeenCalled();
+            expect(err).toEqual({
+              error: 'Conflict',
+              message,
+              statusCode,
+              validation: {
+                query: {
+                  keys: ['role'],
+                  message: '"role" must be greater than or equal to 4',
+                  source: 'query',
+                },
+              },
+            });
+            expect(next.mock.callCount()).toBe(0);
           },
         };
       },
@@ -529,20 +568,22 @@ describe('errors()', () => {
 });
 
 describe('isCelebrateError()', () => {
-  describe.each`
-        value | expected
-        ${Error()} | ${false}
-        ${'errr'} | ${false}
-        ${0} | ${false}
-        ${[0, 1]} | ${false}
-        ${null} | ${false}
-        ${undefined} | ${false}
-      `('isCelebrateError($value)', ({ value, expected }) => {
-    it(`returns ${expected}`, () => {
-      expect.assertions(1);
-      expect(isCelebrateError(value)).toBe(expected);
+  const isCelebrateErrorCases = [
+    { value: Error(), expected: false },
+    { value: 'errr', expected: false },
+    { value: 0, expected: false },
+    { value: [0, 1], expected: false },
+    { value: null, expected: false },
+    { value: undefined, expected: false },
+  ];
+  for (const { value, expected } of isCelebrateErrorCases) {
+    describe(`isCelebrateError(${String(value)})`, () => {
+      it(`returns ${expected}`, () => {
+        expect.assertions(1);
+        expect(isCelebrateError(value)).toBe(expected);
+      });
     });
-  });
+  }
 
   it('returns true if the error object came from celebrate', () => {
     expect.assertions(1);

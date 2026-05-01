@@ -16,8 +16,8 @@
   },
   "scripts": {
     "test": "is-ci-cli test:ci test:local",
-    "test:local": "node --experimental-vm-modules node_modules/.bin/jest --watch --verbose",
-    "test:ci": "node --experimental-vm-modules node_modules/.bin/jest --ci",
+    "test:local": "node --test --watch test/*.test.js",
+    "test:ci": "c8 --reporter=lcov --reporter=text --100 node --test test/*.test.js",
     "benchmark": "node utils/benchmark",
     "toc": "node utils/generate-toc",
     "version": "npm run toc && git add README.md"
@@ -49,13 +49,14 @@
     "@hapi/teamwork": "5.x.x",
     "@types/express": "5.x.x",
     "artificial": "1.x.x",
+    "c8": "10.x.x",
     "cookie-parser": "1.x.x",
     "cookie-signature": "1.x.x",
     "eslint": "9.x.x",
+    "expect": "30.x.x",
     "express": "5.x.x",
     "globals": "16.x.x",
     "is-ci-cli": "2.x.x",
-    "jest": "30.x.x",
     "markdown-toc": "1.x.x",
     "neostandard": "0.x.x",
     "tinybench": "5.x.x"

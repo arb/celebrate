@@ -1,4 +1,5 @@
-import { jest } from '@jest/globals';
+import { describe, test, mock } from 'node:test';
+import { expect } from 'expect';
 import Express from 'express';
 import Artificial from 'artificial';
 import signature from 'cookie-signature';
@@ -52,7 +53,7 @@ describe('validations', () => {
     expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
-    const next = jest.fn();
+    const next = mock.fn();
 
     server.get('/', celebrate({
       [Segments.HEADERS]: {
@@ -75,14 +76,14 @@ describe('validations', () => {
     expect(statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
     expect(server.errors.error.details.has(Segments.HEADERS)).toBe(true);
-    expect(next).not.toHaveBeenCalled();
+    expect(next.mock.callCount()).toBe(0);
   });
 
   test('req.params', async () => {
     expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
-    const next = jest.fn();
+    const next = mock.fn();
 
     server.get('/user/:id', celebrate({
       [Segments.PARAMS]: {
@@ -100,14 +101,14 @@ describe('validations', () => {
     expect(statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
     expect(server.errors.error.details.has(Segments.PARAMS)).toBe(true);
-    expect(next).not.toHaveBeenCalled();
+    expect(next.mock.callCount()).toBe(0);
   });
 
   test('req.query', async () => {
     expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
-    const next = jest.fn();
+    const next = mock.fn();
 
     server.get('/', celebrate({
       [Segments.QUERY]: Joi.object().keys({
@@ -124,14 +125,14 @@ describe('validations', () => {
     expect(statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
     expect(server.errors.error.details.has(Segments.QUERY)).toBe(true);
-    expect(next).not.toHaveBeenCalled();
+    expect(next.mock.callCount()).toBe(0);
   });
 
   test('req.cookies', async () => {
     expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
-    const next = jest.fn();
+    const next = mock.fn();
 
     server.post('/', celebrate({
       cookies: {
@@ -152,14 +153,14 @@ describe('validations', () => {
     expect(statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
     expect(server.errors.error.details.has(Segments.COOKIES)).toBe(true);
-    expect(next).not.toHaveBeenCalled();
+    expect(next.mock.callCount()).toBe(0);
   });
 
   test('req.signedCookies', async () => {
     expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
-    const next = jest.fn();
+    const next = mock.fn();
 
     server.get('/', celebrate({
       [Segments.SIGNEDCOOKIES]: {
@@ -182,14 +183,14 @@ describe('validations', () => {
     expect(statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
     expect(server.errors.error.details.has(Segments.SIGNEDCOOKIES)).toBe(true);
-    expect(next).not.toHaveBeenCalled();
+    expect(next.mock.callCount()).toBe(0);
   });
 
   test('req.body', async () => {
     expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
-    const next = jest.fn();
+    const next = mock.fn();
 
     server.post('/', celebrate({
       [Segments.BODY]: {
@@ -213,7 +214,7 @@ describe('validations', () => {
     expect(statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
     expect(server.errors.error.details.has(Segments.BODY)).toBe(true);
-    expect(next).not.toHaveBeenCalled();
+    expect(next.mock.callCount()).toBe(0);
   });
 });
 
@@ -365,7 +366,7 @@ describe('reqContext', () => {
     expect.assertions(4);
     const server = Server();
     const team = new Teamwork.Team();
-    const next = jest.fn();
+    const next = mock.fn();
 
     server.post('/:userId', celebrate({
       [Segments.BODY]: {
@@ -391,7 +392,7 @@ describe('reqContext', () => {
     expect(res.statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
     expect(server.errors.error.details.has(Segments.BODY)).toBe(true);
-    expect(next).not.toHaveBeenCalled();
+    expect(next.mock.callCount()).toBe(0);
   });
 });
 
