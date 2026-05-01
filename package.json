@@ -16,8 +16,8 @@
   },
   "scripts": {
     "test": "is-ci-cli test:ci test:local",
-    "test:local": "node --test --watch test/",
-    "test:ci": "c8 --reporter=lcov --reporter=text --100 node --test test/",
+    "test:local": "node --test --watch test/*.test.js",
+    "test:ci": "c8 --reporter=lcov --reporter=text --100 node --test test/*.test.js",
     "benchmark": "node utils/benchmark",
     "toc": "node utils/generate-toc",
     "version": "npm run toc && git add README.md"
