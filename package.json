@@ -48,7 +48,6 @@
     "@faker-js/faker": "9.x.x",
     "@hapi/teamwork": "5.x.x",
     "@types/express": "5.x.x",
-    "artificial": "1.x.x",
     "c8": "10.x.x",
     "cookie-parser": "1.x.x",
     "cookie-signature": "1.x.x",
