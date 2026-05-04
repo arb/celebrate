@@ -19,7 +19,7 @@
     "test:local": "node --test --watch test/*.test.js",
     "test:ci": "c8 --reporter=lcov --reporter=text --100 node --test test/*.test.js",
     "benchmark": "node utils/benchmark",
-    "toc": "node utils/generate-toc",
+    "toc": "markdown-toc-gen insert README.md",
     "version": "npm run toc && git add README.md"
   },
   "repository": {
@@ -40,7 +40,7 @@
   "homepage": "https://github.com/arb/celebrate#readme",
   "dependencies": {
     "escape-html": "1.0.3",
-    "joi": "18.1.x",
+    "joi": "18.x.x",
     "lodash.curry": "4.1.x",
     "lodash.flip": "4.2.x"
   },
@@ -56,7 +56,7 @@
     "express": "5.x.x",
     "globals": "16.x.x",
     "is-ci-cli": "2.x.x",
-    "markdown-toc": "1.x.x",
+    "markdown-toc-gen": "1.x.x",
     "neostandard": "0.x.x",
     "tinybench": "5.x.x"
   }
