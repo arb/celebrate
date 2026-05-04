@@ -4,7 +4,6 @@ import Express from 'express';
 import signature from 'cookie-signature';
 import CookieParser from 'cookie-parser';
 import { faker } from '@faker-js/faker';
-import Teamwork from '@hapi/teamwork';
 import {
   celebrate,
   Joi,
@@ -34,8 +33,8 @@ const Server = () => {
 
   // Drives the app over real HTTP on a per-call ephemeral port. The whole
   // chain is awaited so node:test sees a complete unit of work: listen,
-  // fetch, optional callback, then full server close before resolving.
-  const inject = async (options, callback) => {
+  // fetch, then full server close before resolving with the response.
+  const inject = async (options) => {
     const httpServer = app.listen(0, '127.0.0.1');
     await new Promise((resolve) => httpServer.once('listening', resolve));
     try {
@@ -50,10 +49,10 @@ const Server = () => {
         },
         body: options.payload && JSON.stringify(options.payload),
       });
-      callback?.({
+      return {
         statusCode: response.status,
         payload: await response.text(),
-      });
+      };
     } finally {
       await new Promise((resolve) => httpServer.close(resolve));
     }
@@ -75,7 +74,6 @@ describe('validations', () => {
   test('req.headers', async () => {
     expect.assertions(4);
     const server = Server();
-    const team = new Teamwork.Team();
     const next = mock.fn();
 
     server.get('/', celebrate({
@@ -86,15 +84,13 @@ describe('validations', () => {
       allowUnknown: true,
     }), next);
 
-    await server.inject({
+    const { statusCode } = await server.inject({
       method: 'GET',
       url: '/',
       [Segments.HEADERS]: {
         accept: 'application/json',
       },
-    }, team.attend.bind(team));
-
-    const { statusCode } = await team.work;
+    });
 
     expect(statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
@@ -105,7 +101,6 @@ describe('validations', () => {
   test('req.params', async () => {
     expect.assertions(4);
     const server = Server();
-    const team = new Teamwork.Team();
     const next = mock.fn();
 
     server.get('/user/:id', celebrate({
@@ -114,12 +109,10 @@ describe('validations', () => {
       },
     }), next);
 
-    await server.inject({
+    const { statusCode } = await server.inject({
       method: 'get',
       url: '/user/@@',
-    }, team.attend.bind(team));
-
-    const { statusCode } = await team.work;
+    });
 
     expect(statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
@@ -130,7 +123,6 @@ describe('validations', () => {
   test('req.query', async () => {
     expect.assertions(4);
     const server = Server();
-    const team = new Teamwork.Team();
     const next = mock.fn();
 
     server.get('/', celebrate({
@@ -139,11 +131,9 @@ describe('validations', () => {
       }),
     }), next);
 
-    await server.inject({
+    const { statusCode } = await server.inject({
       url: '/?end=celebrate',
-    }, team.attend.bind(team));
-
-    const { statusCode } = await team.work;
+    });
 
     expect(statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
@@ -154,7 +144,6 @@ describe('validations', () => {
   test('req.cookies', async () => {
     expect.assertions(4);
     const server = Server();
-    const team = new Teamwork.Team();
     const next = mock.fn();
 
     server.post('/', celebrate({
@@ -163,15 +152,13 @@ describe('validations', () => {
       },
     }), next);
 
-    await server.inject({
+    const { statusCode } = await server.inject({
       url: '/',
       method: 'post',
       [Segments.HEADERS]: {
         Cookie: 'state=notanumber',
       },
-    }, team.attend.bind(team));
-
-    const { statusCode } = await team.work;
+    });
 
     expect(statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
@@ -182,7 +169,6 @@ describe('validations', () => {
   test('req.signedCookies', async () => {
     expect.assertions(4);
     const server = Server();
-    const team = new Teamwork.Team();
     const next = mock.fn();
 
     server.get('/', celebrate({
@@ -193,15 +179,13 @@ describe('validations', () => {
 
     const val = signature.sign('notanumber', cookieSecret);
 
-    await server.inject({
+    const { statusCode } = await server.inject({
       url: '/',
       method: 'get',
       [Segments.HEADERS]: {
         Cookie: `state=s:${val}`,
       },
-    }, team.attend.bind(team));
-
-    const { statusCode } = await team.work;
+    });
 
     expect(statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
@@ -212,7 +196,6 @@ describe('validations', () => {
   test('req.body', async () => {
     expect.assertions(4);
     const server = Server();
-    const team = new Teamwork.Team();
     const next = mock.fn();
 
     server.post('/', celebrate({
@@ -223,16 +206,14 @@ describe('validations', () => {
       },
     }), next);
 
-    await server.inject({
+    const { statusCode } = await server.inject({
       url: '/',
       method: 'post',
       payload: {
         first: 'john',
         last: 123,
       },
-    }, team.attend.bind(team));
-
-    const { statusCode } = await team.work;
+    });
 
     expect(statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
@@ -241,11 +222,17 @@ describe('validations', () => {
   });
 });
 
+// These tests assert on the post-celebrate `req` (defaults applied, values
+// coerced) which only exists inside the route handler's closure. A simple
+// `let captured` smuggles that req out to the assertion scope -- no deferred
+// or queue is needed because `inject()` awaits the full request lifecycle
+// (listen, fetch, handler, close) before resolving, so by the time the
+// `await` returns the closure has already run.
 describe('update req values', () => {
   test('req.headers', async () => {
     expect.assertions(1);
     const server = Server();
-    const team = new Teamwork.Team();
+    let captured;
 
     server.get('/', celebrate({
       [Segments.HEADERS]: {
@@ -255,7 +242,7 @@ describe('update req values', () => {
     }, {
       allowUnknown: true,
     }), (req, res) => {
-      team.attend(req);
+      captured = req;
       res.send();
     });
 
@@ -267,22 +254,20 @@ describe('update req values', () => {
       },
     });
 
-    const { headers } = await team.work;
-
-    expect(headers['secret-header']).toBe('@@@@@@');
+    expect(captured.headers['secret-header']).toBe('@@@@@@');
   });
 
   test('req.params', async () => {
     expect.assertions(1);
     const server = Server();
-    const team = new Teamwork.Team();
+    let captured;
 
     server.get('/user/:id', celebrate({
       [Segments.PARAMS]: {
         id: Joi.string().uppercase(),
       },
     }), (req, res) => {
-      team.attend(req);
+      captured = req;
       res.send();
     });
 
@@ -291,15 +276,13 @@ describe('update req values', () => {
       url: '/user/adam',
     });
 
-    const { params } = await team.work;
-
-    expect(params.id).toBe('ADAM');
+    expect(captured.params.id).toBe('ADAM');
   });
 
   test('req.query', async () => {
     expect.assertions(1);
     const server = Server();
-    const team = new Teamwork.Team();
+    let captured;
 
     server.get('/', celebrate({
       [Segments.QUERY]: Joi.object().keys({
@@ -307,7 +290,7 @@ describe('update req values', () => {
         page: Joi.number().default(1),
       }),
     }), (req, res) => {
-      team.attend(req);
+      captured = req;
       res.send();
     });
 
@@ -315,9 +298,7 @@ describe('update req values', () => {
       url: '/?name=john',
     });
 
-    const { query } = await team.work;
-
-    expect(query).toEqual({
+    expect(captured.query).toEqual({
       name: 'JOHN',
       page: 1,
     });
@@ -326,7 +307,7 @@ describe('update req values', () => {
   test('req.body', async () => {
     expect.assertions(1);
     const server = Server();
-    const team = new Teamwork.Team();
+    let captured;
 
     server.post('/', celebrate({
       [Segments.BODY]: {
@@ -335,7 +316,7 @@ describe('update req values', () => {
         role: Joi.string().uppercase(),
       },
     }), (req, res) => {
-      team.attend(req);
+      captured = req;
       res.send();
     });
 
@@ -348,8 +329,7 @@ describe('update req values', () => {
       },
     });
 
-    const { body } = await team.work;
-    expect(body).toEqual({
+    expect(captured.body).toEqual({
       first: 'john',
       role: 'ADMIN',
       last: 'Smith',
@@ -361,7 +341,9 @@ describe('reqContext', () => {
   test('passes req as Joi context during validation', async () => {
     expect.assertions(2);
     const server = Server();
-    const team = new Teamwork.Team({ meetings: 2 });
+    // Same closure-capture trick as the `update req values` block above, plus
+    // the response status from the inject() return value.
+    let captured;
 
     server.post('/:userId', celebrate({
       [Segments.BODY]: {
@@ -373,27 +355,25 @@ describe('reqContext', () => {
     }, null, {
       reqContext: true,
     }), (req, res) => {
-      team.attend(req);
+      captured = req;
       res.send();
     });
 
-    await server.inject({
+    const { statusCode } = await server.inject({
       method: 'POST',
       url: '/12345',
       payload: {
         id: 12345,
       },
-    }, team.attend.bind(team));
+    });
 
-    const [req, res] = await team.work;
-    expect(req.body.id).toEqual(req.params.userId);
-    expect(res.statusCode).toBe(200);
+    expect(captured.body.id).toEqual(captured.params.userId);
+    expect(statusCode).toBe(200);
   });
 
   test('fails validation based on req values', async () => {
     expect.assertions(4);
     const server = Server();
-    const team = new Teamwork.Team();
     const next = mock.fn();
 
     server.post('/:userId', celebrate({
@@ -407,17 +387,15 @@ describe('reqContext', () => {
       reqContext: true,
     }), next);
 
-    await server.inject({
+    const { statusCode } = await server.inject({
       method: 'POST',
       url: '/123',
       payload: {
         id: 12345,
       },
-    }, team.attend.bind(team));
+    });
 
-    const res = await team.work;
-
-    expect(res.statusCode).toBe(400);
+    expect(statusCode).toBe(400);
     expect(isCelebrateError(server.errors.error)).toBe(true);
     expect(server.errors.error.details.has(Segments.BODY)).toBe(true);
     expect(next.mock.callCount()).toBe(0);
@@ -441,17 +419,14 @@ describe('multiple-runs', () => {
     });
 
     const attempts = Array.from({ length: 10 }, async () => {
-      let payload;
-      await server.inject({
+      const { payload } = await server.inject({
         method: 'GET',
         url: '/',
         headers: {
           accept: 'application/json',
         },
-      }, (r) => {
-        payload = JSON.parse(r.payload);
       });
-      return payload;
+      return JSON.parse(payload);
     });
 
     return Promise.all(attempts).then((v) => {
@@ -472,8 +447,7 @@ describe('multiple-runs', () => {
     }));
 
     const attempts = Array.from({ length: 10 }, async () => {
-      let statusCode;
-      await server.inject({
+      const { statusCode } = await server.inject({
         method: 'POST',
         url: '/',
         payload: {
@@ -482,8 +456,6 @@ describe('multiple-runs', () => {
         headers: {
           accept: 'application/json',
         },
-      }, (r) => {
-        statusCode = r.statusCode;
       });
       return statusCode;
     });
