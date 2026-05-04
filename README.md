@@ -45,10 +45,6 @@ celebrate lists joi as a formal dependency. This means that celebrate will alway
 
 celebrate is tested and has full compatibility with express 4 and 5. It likely works correctly with express 3, but including it in the test matrix was more trouble than it's worth. This is primarily because express 3 exposes route parameters as an array rather than an object.
 
-## 16.x breaking changes
-
-celebrate 16 ships as a native ES module. `require('celebrate')` is no longer supported — use `import` syntax instead. The minimum supported Node version is unchanged at 20+.
-
 ## Example Usage
 
 Example of using celebrate on a single POST route to validate `req.body`.
