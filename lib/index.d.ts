@@ -3,32 +3,34 @@ import { ParamsDictionary, Query } from 'express-serve-static-core';
 import * as Joi from 'joi';
 
 
-export declare enum Segments {
-    PARAMS        = 'params',
-    HEADERS       = 'headers',
-    QUERY         = 'query',
-    COOKIES       = 'cookies',
-    SIGNEDCOOKIES = 'signedCookies',
-    BODY          = 'body',
-}
+export declare const Segments: {
+    readonly PARAMS: 'params';
+    readonly HEADERS: 'headers';
+    readonly QUERY: 'query';
+    readonly COOKIES: 'cookies';
+    readonly SIGNEDCOOKIES: 'signedCookies';
+    readonly BODY: 'body';
+};
+export type Segments = typeof Segments[keyof typeof Segments];
 
-export declare enum Modes {
-    FULL = 'full',
-    PARTIAL = 'partial',
+export declare const Modes: {
+    readonly FULL: 'full';
+    readonly PARTIAL: 'partial';
+};
+export type Modes = typeof Modes[keyof typeof Modes];
+
+interface Celebrator2<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query> {
+  (requestRules: SchemaOptions): RequestHandler<P, ResBody, ReqBody, ReqQuery>;
 }
 
 interface Celebrator1<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query> {
-  (joiOpts: Joi.ValidationOptions): Celebrator2;
+  (joiOpts: Joi.ValidationOptions): Celebrator2<P, ResBody, ReqBody, ReqQuery>;
   (joiOpts: Joi.ValidationOptions, requestRules: SchemaOptions): RequestHandler<P, ResBody, ReqBody, ReqQuery>;
 }
 
-interface Celebrator2 {
-  (requestRules: SchemaOptions): RequestHandler;
-}
-
 interface Celebrator<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query> {
-    (opts: CelebrateOptions): Celebrator1;
-    (opts: CelebrateOptions, joiOpts: Joi.ValidationOptions): Celebrator2;
+    (opts: CelebrateOptions): Celebrator1<P, ResBody, ReqBody, ReqQuery>;
+    (opts: CelebrateOptions, joiOpts: Joi.ValidationOptions): Celebrator2<P, ResBody, ReqBody, ReqQuery>;
     (
         opts: CelebrateOptions,
         joiOpts: Joi.ValidationOptions,
@@ -51,27 +53,27 @@ export interface SchemaOptions {
     /**
      * When `params` is set, `joi` will validate `req.params` with the supplied schema.
      */
-    params?: object;
+    params?: Joi.SchemaLike;
     /**
      * When `headers` is set, `joi` will validate `req.headers` with the supplied schema.
      */
-    headers?: object;
+    headers?: Joi.SchemaLike;
     /**
      * When `query` is set, `joi` will validate `req.query` with the supplied schema.
      */
-    query?: object;
+    query?: Joi.SchemaLike;
     /**
      * When `cookies` is set, `joi` will validate `req.cookies` with the supplied schema.
      */
-    cookies?: object;
+    cookies?: Joi.SchemaLike;
     /**
      * When `signedCookies` is set, `joi` will validate `req.signedCookies` with the supplied schema.
      */
-    signedCookies?: object;
+    signedCookies?: Joi.SchemaLike;
     /**
      * When `body` is set, `joi` will validate `req.body` with the supplied schema.
      */
-    body?: object;
+    body?: Joi.SchemaLike;
 }
 
 /**
@@ -87,7 +89,7 @@ export declare const celebrator: Celebrator;
 /**
  * Creates a Celebrate error handler middleware function.
  */
-export declare function errors<P=ParamsDictionary, ResBody=any, ReqBody=any, ReqQuery=Query>(opts?: { statusCode: number }): ErrorRequestHandler<P, ResBody, ReqBody, ReqQuery>;
+export declare function errors(opts?: { statusCode?: number; message?: string }): ErrorRequestHandler;
 
 /**
  * The Joi version Celebrate uses internally.
